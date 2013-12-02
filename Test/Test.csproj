@@ -57,22 +57,22 @@
     <None Include="TestFiles\NoHeaders.psv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\Headers.psv">
+    <None Include="TestFiles\Headers\Headers.psv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\NoHeaders.tsv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\Headers.tsv">
+    <None Include="TestFiles\Headers\Headers.tsv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\NoHeaders.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\Headers.csv">
+    <None Include="TestFiles\Headers\Headers.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\Headers.xlsx">
+    <None Include="TestFiles\Headers\Headers.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\NoHeaders.xlsx">

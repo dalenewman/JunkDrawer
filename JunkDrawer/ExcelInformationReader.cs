@@ -3,16 +3,18 @@ using System.IO;
 using System.Linq;
 using Transformalize.Libs.ExcelDataReader;
 
-namespace JunkDrawer
-{
-    public class ExcelInformationAppender {
+namespace JunkDrawer {
 
-        public FileInformation Append(FileInformation fileInformation) {
+    public class ExcelInformationReader {
+
+        public FileInformation Read(string fileName) {
+
+            var fileInformation = new FileInformation(fileName, FileType.Excel, 0);
 
             var columnNames = new List<string>();
 
-            var stream = File.Open(fileInformation.FileName, FileMode.Open, FileAccess.Read);
-            var isXml = fileInformation.FileExtenstion.Equals(".xlsx");
+            var stream = File.Open(fileInformation.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var isXml = fileInformation.FileExtension.Equals(".xlsx");
 
             var excelReader = isXml ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
             excelReader.Read();
@@ -22,7 +24,7 @@ namespace JunkDrawer
             }
 
             excelReader.Close();
-            fileInformation.ColumnNames = columnNames.Select(s=>s.Replace(" ",string.Empty).Trim(' ')).ToArray();
+            fileInformation.ColumnNames.AddRange(columnNames.Select(s => s.Replace(" ", string.Empty).Trim(' ')).ToArray());
             return fileInformation;
         }
     }

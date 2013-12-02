@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", "{A3B89755-972F-44D4-A372-7F162C7053EF}"
 	ProjectSection(SolutionItems) = preProject
-		assemblies\Transformalize.dll = assemblies\Transformalize.dll
+		..\Transformalize\Transformalize\bin\x64\Release\Transformalize.dll = ..\Transformalize\Transformalize\bin\x64\Release\Transformalize.dll
 	EndProjectSection
 EndProject
 Global

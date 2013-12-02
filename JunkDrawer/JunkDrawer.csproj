@@ -40,23 +40,27 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize">
+    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\assemblies\Transformalize.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExcelInformationAppender.cs" />
+    <Compile Include="ExcelInformationReader.cs" />
     <Compile Include="FileInformation.cs" />
+    <Compile Include="FileInformationFactory.cs" />
     <Compile Include="FileType.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FileInformationReader.cs" />
     <Compile Include="LineStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Request.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

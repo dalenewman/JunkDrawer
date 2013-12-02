@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace JunkDrawer {
     public class FileInformationReader {
+
         private readonly int _sampleSize;
 
         public FileInformationReader(int sampleSize) {
@@ -11,17 +12,6 @@ namespace JunkDrawer {
         }
 
         public FileInformation Read(string fileName) {
-
-            var ext = (Path.GetExtension(fileName) ?? string.Empty).ToLower();
-
-            if (ext.StartsWith(".xls")) {
-                return new ExcelInformationAppender().Append(new FileInformation(fileName, FileType.Excel, 0));
-            }
-
-            return DefaultReader(fileName);
-        }
-
-        private FileInformation DefaultReader(string fileName) {
             var lines = new List<LineStats>();
 
             using (var reader = new StreamReader(fileName)) {
@@ -37,7 +27,7 @@ namespace JunkDrawer {
                     return new FileInformation(fileName) {
                         ColumnCount = first.Item1 + 1,
                         FileType = pair.Value,
-                        ColumnNames = first.Item2.Split(pair.Key).Select(s=>s.Replace(" ", string.Empty).Trim(' ')).ToArray()
+                        ColumnNames = new List<string>(first.Item2.Split(pair.Key).Select(s => s.Replace(" ", string.Empty).Trim(' ')).ToArray())
                     };
                 }
             }
