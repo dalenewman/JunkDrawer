@@ -1,10 +1,14 @@
 ﻿using System;
 using System.IO;
 using Transformalize.Configuration.Builders;
+using Transformalize.Libs.NLog;
 using Transformalize.Main;
 
 namespace JunkDrawer {
-    class Program {
+    class Program
+    {
+
+        public static Logger Log = LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args) {
 
@@ -27,16 +31,13 @@ namespace JunkDrawer {
             }
             builder.CalculatedField("TflHashCode").Type("System.Int32").PrimaryKey().Transform("concat").AllParameters().Transform("gethashcode");
             
-            if (!Directory.Exists(request.ConfigurationDirectory)) {
-                Directory.CreateDirectory(request.ConfigurationDirectory);
-            }
-            File.WriteAllText(request.ConfigurationFile, builder.Process().Serialize());
+            Log.Info("Process Configuration...", Environment.NewLine);
+            Log.Info(Environment.NewLine + builder.Process().Serialize());
 
             ProcessFactory.Create(builder.Process(), new Options() { Mode = "init" }).Run();
             ProcessFactory.Create(builder.Process(), new Options() { Mode = "default" }).Run();
 
-            //File.Delete(request.FileInfo.FullName);
-
+            File.Move(request.FileInfo.FullName, request.FileInfo.FullName + ".bak");
         }
     }
 }
