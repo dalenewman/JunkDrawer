@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Transformalize.Libs.ExcelDataReader;
 
 namespace JunkDrawer {
@@ -24,7 +25,7 @@ namespace JunkDrawer {
             }
 
             excelReader.Close();
-            fileInformation.ColumnNames.AddRange(columnNames.Select(s => s.Replace(" ", string.Empty).Trim(' ')).ToArray());
+            fileInformation.ColumnNames.AddRange(columnNames.Select(s => Regex.Replace(s, @"[\s\-]|^[\d]", string.Empty).Trim(' ')).ToArray());
             return fileInformation;
         }
     }

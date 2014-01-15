@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace JunkDrawer {
     public class FileInformationReader {
@@ -27,7 +28,7 @@ namespace JunkDrawer {
                     return new FileInformation(fileName) {
                         ColumnCount = first.Item1 + 1,
                         FileType = pair.Value,
-                        ColumnNames = new List<string>(first.Item2.Split(pair.Key).Select(s => s.Replace(" ", string.Empty).Trim(' ')).ToArray())
+                        ColumnNames = new List<string>(first.Item2.Split(pair.Key).Select(s => Regex.Replace(s, @"[\s\-]|^[\d]", string.Empty).Trim(' ')).ToArray())
                     };
                 }
             }

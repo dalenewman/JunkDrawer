@@ -22,14 +22,14 @@ namespace JunkDrawer {
             var p = ProcessFactory.Create("Default");
             var builder = new ProcessBuilder(fi.ProcessName)
                 .Star(fi.ProcessName.Replace('-', '_'))
-                .Connection("input").Provider("File").File(request.FileInfo.FullName).Delimiter(fi.Delimiter).Start(request.FirstRowIsHeader ? 1 : 0)
+                .Connection("input").Provider("File").File(request.FileInfo.FullName).Delimiter(fi.Delimiter).Start(1)
                 .Connection("output").Server(p.OutputConnection.Server).Database(p.OutputConnection.Database)
-                .Entity("Data").Version("TflHashCode").IndexOptimizations(false);
+                .Entity("Data").Version("TflHashCode");
 
             for (var i = 0; i < fi.ColumnCount; i++) {
                 builder.Field(fi.ColumnNames[i]).Length(512);
             }
-            builder.CalculatedField("TflHashCode").Type("System.Int32").PrimaryKey().Transform("concat").AllParameters().Transform("gethashcode");
+            builder.CalculatedField("TflHashCode").Type("System.Int32").PrimaryKey().Transform("concat").Parameter("*").Transform("gethashcode");
             
             Log.Info("Process Configuration...", Environment.NewLine);
             Log.Info(Environment.NewLine + builder.Process().Serialize());
