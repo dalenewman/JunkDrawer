@@ -22,7 +22,7 @@ namespace JunkDrawer {
             var p = ProcessFactory.Create("Default");
             var builder = new ProcessBuilder(fi.ProcessName)
                 .Star(fi.ProcessName.Replace('-', '_'))
-                .Connection("input").Provider("File").File(request.FileInfo.FullName).Delimiter(fi.Delimiter).Start(1)
+                .Connection("input").Provider("File").File(request.FileInfo.FullName).Delimiter(fi.Delimiter).Start(fi.FirstRowIsHeader ? 2 : 1)
                 .Connection("output").Server(p.OutputConnection.Server).Database(p.OutputConnection.Database)
                 .Entity("Data").Version("TflHashCode");
 

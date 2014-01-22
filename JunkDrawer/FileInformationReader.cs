@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace JunkDrawer {
     public class FileInformationReader {
@@ -25,11 +24,12 @@ namespace JunkDrawer {
                 var counts = lines.Select(line => line[pair.Key]).ToList();
                 var first = counts.First();
                 if (first.Item1 > 0 && counts.All(i => i.Item1.Equals(first.Item1))) {
-                    return new FileInformation(fileName) {
+                    var fi = new FileInformation(fileName) {
                         ColumnCount = first.Item1 + 1,
-                        FileType = pair.Value,
-                        ColumnNames = new List<string>(first.Item2.Split(pair.Key).Select(s => Regex.Replace(s, @"[\s\-]|^[\d]", string.Empty).Trim(' ')).ToArray())
+                        FileType = pair.Value
                     };
+                    fi.ColumnNames = new List<string>(first.Item2.Split(pair.Key).Select(fi.CleanIdentifier).ToArray());
+                    return fi;
                 }
             }
 

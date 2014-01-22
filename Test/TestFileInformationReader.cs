@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using JunkDrawer;
+﻿using JunkDrawer;
 using NUnit.Framework;
 
 namespace Test {
@@ -50,29 +48,6 @@ namespace Test {
             Assert.AreEqual(expected.FileType, actual.FileType);
             Assert.AreEqual(expected.ColumnCount, actual.ColumnCount);
             Assert.AreEqual(expected.ColumnNames, actual.ColumnNames);
-        }
-
-        [Test]
-        public void TestRealWorldSpreadsheet1() {
-
-            var request = new Request(new[] { @"C:\Temp\NVE\RenoProductionDeployment.xlsx" });
-            var expected = new FileInformation(request.FileInfo.FullName, FileType.Excel, 20);
-            var actual = FileInformationFactory.Create(request);
-
-            Assert.AreEqual(expected.FileType, actual.FileType);
-            Assert.AreEqual(expected.ColumnCount, actual.ColumnCount);
-        }
-
-        [Test]
-        public void TestRealWorldSpreadsheet2()
-        {
-
-            var request = new Request(new[] {@"C:\Temp\NVE\Headers\RenoProductionDeployment.xlsx"});
-            var expected = new FileInformation(request.FileInfo.FullName, FileType.Excel, 20);
-            var actual = FileInformationFactory.Create(request);
-
-            Assert.AreEqual(expected.FileType, actual.FileType);
-            Assert.AreEqual(expected.ColumnCount, actual.ColumnCount);
         }
 
 

@@ -25,7 +25,7 @@ namespace JunkDrawer {
             }
 
             excelReader.Close();
-            fileInformation.ColumnNames.AddRange(columnNames.Select(s => Regex.Replace(s, @"[\s\-]|^[\d]", string.Empty).Trim(' ')).ToArray());
+            fileInformation.ColumnNames.AddRange(columnNames.Select(fileInformation.CleanIdentifier).ToArray());
             return fileInformation;
         }
     }
