@@ -1,20 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace JunkDrawer {
-
     public class FileInformation {
-
-        public const string CleanPattern = @"[\s\-]|^[\d]";
-        private List<string> _columnNames = new List<string>();
         private bool _firstRowIsHeader = true;
+        private List<string> _columnNames = new List<string>();
 
         public string FileName { get; set; }
         public FileType FileType { get; set; }
         public int ColumnCount { get; set; }
 
-        public List<string> ColumnNames {
+        public List<string> ColumnNames
+        {
             get { return _columnNames; }
             set { _columnNames = value; }
         }
@@ -25,7 +23,7 @@ namespace JunkDrawer {
         }
 
         public string FileExtension { get { return Path.GetExtension(FileName ?? string.Empty).ToLower(); } }
-        public string ProcessName { get { return CleanIdentifier(Path.GetFileNameWithoutExtension(FileName)); } }
+        public string ProcessName { get { return Utility.CleanIdentifier(Path.GetFileNameWithoutExtension(FileName)); } }
         public string Delimiter { get { return FileTypes.FileTypeMap[FileType]; } }
 
         public FileInformation(string fileName) {
@@ -34,18 +32,14 @@ namespace JunkDrawer {
         }
 
         public FileInformation(string fileName, FileType fileType, int columnCount)
-            : this(fileName, fileType, columnCount, new List<string>()) {
+            : this(fileName, fileType, columnCount, new string[0]) {
         }
 
         public FileInformation(string fileName, FileType fileType, int columnCount, IEnumerable<string> columnNames) {
             FileName = fileName;
             FileType = fileType;
             ColumnCount = columnCount;
-            ColumnNames.AddRange(columnNames);
-        }
-
-        public string CleanIdentifier(string input) {
-            return Regex.Replace(input, CleanPattern, string.Empty).Trim(' ');
+            ColumnNames = columnNames.ToList();
         }
 
     }
