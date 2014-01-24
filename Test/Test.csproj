@@ -43,16 +43,16 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize">
-      <HintPath>..\assemblies\Transformalize.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestProgram.cs" />
     <Compile Include="TestFileInformationReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="TestFiles\NoHeaders.psv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace JunkDrawer {
     public class FileInformation {
+
         private bool _firstRowIsHeader = true;
         private List<string> _columnNames = new List<string>();
 
@@ -40,6 +41,11 @@ namespace JunkDrawer {
             FileType = fileType;
             ColumnCount = columnCount;
             ColumnNames = columnNames.ToList();
+        }
+
+        public FieldType[] FieldTypes()
+        {
+            return new FieldInspector().Inspect(this);
         }
 
     }

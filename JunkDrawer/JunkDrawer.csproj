@@ -48,9 +48,12 @@
   <ItemGroup>
     <Compile Include="Delimiter.cs" />
     <Compile Include="ExcelInformationReader.cs" />
+    <Compile Include="FieldType.cs" />
     <Compile Include="FileInformation.cs" />
     <Compile Include="FileInformationFactory.cs" />
+    <Compile Include="FieldInspector.cs" />
     <Compile Include="FileLineLoader.cs" />
+    <Compile Include="FileProcessor.cs" />
     <Compile Include="FileType.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FileInformationReader.cs" />
@@ -63,7 +66,9 @@
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

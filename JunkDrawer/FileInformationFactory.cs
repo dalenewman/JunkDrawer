@@ -5,23 +5,24 @@ using System.Linq;
 namespace JunkDrawer {
     public static class FileInformationFactory {
 
-        public static FileInformation Create(Request request, int sampleSize = 5) {
-            var fileName = request.FileInfo.FullName;
+        public static FileInformation Create(string fileName, int sampleSize = 5) {
+
             var ext = (Path.GetExtension(fileName) ?? string.Empty).ToLower();
 
-            var fi = ext.StartsWith(".xls") ?
+            var fileInformation = ext.StartsWith(".xls") ?
                 new ExcelInformationReader().Read(fileName) :
                 new FileInformationReader(sampleSize).Read(fileName);
 
-            if (fi.ColumnCount == fi.ColumnNames.Distinct().Count()) return fi;
-
-            fi.FirstRowIsHeader = false;
-            fi.ColumnNames.Clear();
-            for (var i = 0; i < fi.ColumnCount; i++) {
-                fi.ColumnNames.Add(GetColumnNameFromIndex(i));
+            if (fileInformation.ColumnCount != fileInformation.ColumnNames.Distinct().Count())
+            {
+                fileInformation.FirstRowIsHeader = false;
+                fileInformation.ColumnNames.Clear();
+                for (var i = 0; i < fileInformation.ColumnCount; i++) {
+                    fileInformation.ColumnNames.Add(GetColumnNameFromIndex(i));
+                }                
             }
 
-            return fi;
+            return fileInformation;
         }
 
         public static string GetColumnNameFromIndex(int column) {
