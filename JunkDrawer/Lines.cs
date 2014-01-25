@@ -11,7 +11,7 @@ namespace JunkDrawer {
             _storage.AddRange(new LineLoader(new FileLineLoader(fileName, sampleSize)).Load());
         }
 
-        public Delimiter BestDelimiter() {
+        public Delimiter FindDelimiter() {
             if (_bestDelimiter != null)
                 return _bestDelimiter;
 
@@ -34,14 +34,8 @@ namespace JunkDrawer {
             return _bestDelimiter;
         }
 
-        public IEnumerable<string> Row(int index) {
-            if (index > _storage.Count)
-                index = _storage.Count;
-
-            if (index < 0)
-                index = 0;
-
-            return _storage[index].Content.Split(BestDelimiter().Character).Select(Utility.CleanIdentifier);
+        public IEnumerable<string> PossibleHeaders() {
+            return _storage[0].Content.Split(FindDelimiter().Character).Select(Utility.CleanIdentifier);
         }
 
     }

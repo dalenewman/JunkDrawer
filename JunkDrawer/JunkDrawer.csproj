@@ -46,6 +46,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColumnNameGenerator.cs" />
+    <Compile Include="ColumnNameValidator.cs" />
     <Compile Include="Delimiter.cs" />
     <Compile Include="ExcelInformationReader.cs" />
     <Compile Include="FieldType.cs" />

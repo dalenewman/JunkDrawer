@@ -45,10 +45,10 @@ namespace JunkDrawer {
                     .Parameter(name);
             }
 
-            _log.Info("Process Configuration...", Environment.NewLine);
-            _log.Info(Environment.NewLine + builder.Process().Serialize());
+            _log.Debug("Process Configuration...", Environment.NewLine);
+            _log.Debug(Environment.NewLine + builder.Process().Serialize());
 
-            var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = sampleSize, LogLevel = LogLevel.Debug });
+            var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = sampleSize });
             var results = runner.Run().First().ToList();
 
             var fieldTypes = new List<FieldType>();

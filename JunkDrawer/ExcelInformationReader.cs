@@ -9,7 +9,7 @@ namespace JunkDrawer {
 
         public FileInformation Read(string fileName) {
 
-            var fileInformation = new FileInformation(fileName, FileType.Excel, 0);
+            var fileInformation = new FileInformation(fileName, FileType.Excel);
 
             var columnNames = new List<string>();
 
@@ -18,13 +18,12 @@ namespace JunkDrawer {
 
             var excelReader = isXml ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
             excelReader.Read();
-            fileInformation.ColumnCount = excelReader.FieldCount;
-            for (var i = 0; i < fileInformation.ColumnCount; i++) {
+            for (var i = 0; i < excelReader.FieldCount; i++) {
                 columnNames.Add(excelReader.GetString(i));
             }
 
             excelReader.Close();
-            fileInformation.ColumnNames.AddRange(columnNames.Select(Utility.CleanIdentifier).ToArray());
+            fileInformation.ColumnNames = columnNames.Select(Utility.CleanIdentifier);
             return fileInformation;
         }
     }

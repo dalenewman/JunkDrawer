@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 
 namespace JunkDrawer {
     public static class FileInformationFactory {
@@ -13,25 +11,13 @@ namespace JunkDrawer {
                 new ExcelInformationReader().Read(fileName) :
                 new FileInformationReader(sampleSize).Read(fileName);
 
-            if (fileInformation.ColumnCount != fileInformation.ColumnNames.Distinct().Count())
-            {
-                fileInformation.FirstRowIsHeader = false;
-                fileInformation.ColumnNames.Clear();
-                for (var i = 0; i < fileInformation.ColumnCount; i++) {
-                    fileInformation.ColumnNames.Add(GetColumnNameFromIndex(i));
-                }                
-            }
+            var validator = new ColumnNameValidator(fileInformation.ColumnNames);
+            if (validator.Valid())
+                return fileInformation;
 
+            fileInformation.FirstRowIsHeader = false;
+            fileInformation.ColumnNames = new ColumnNameGenerator().Generate(fileInformation.ColumnCount());
             return fileInformation;
-        }
-
-        public static string GetColumnNameFromIndex(int column) {
-            var col = Convert.ToString((char)('A' + (column % 26)));
-            while (column >= 26) {
-                column = (column / 26) - 1;
-                col = Convert.ToString((char)('A' + (column % 26))) + col;
-            }
-            return col;
         }
 
     }

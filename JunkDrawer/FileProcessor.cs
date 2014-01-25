@@ -31,13 +31,13 @@ namespace JunkDrawer
                 }
             }
 
-            _log.Info("Process Configuration...", Environment.NewLine);
-            _log.Info(Environment.NewLine + builder.Process().Serialize());
+            _log.Debug("Process Configuration...", Environment.NewLine);
+            _log.Debug(Environment.NewLine + builder.Process().Serialize());
 
             ProcessFactory.Create(builder.Process(), new Options() { Mode = "init" }).Run();
             ProcessFactory.Create(builder.Process(), new Options() { Mode = "default" }).Run();
 
-            File.Move(fileInformation.FileName, fileInformation.FileName + ".bak");
+            //File.Move(fileInformation.FileName, fileInformation.FileName + ".bak");
         }
         
     }
