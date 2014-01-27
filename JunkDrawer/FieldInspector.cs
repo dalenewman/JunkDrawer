@@ -13,21 +13,26 @@ namespace JunkDrawer {
             return InspectFile(fileInformation, sampleSize).ToArray();
         }
 
-        private IEnumerable<FieldType> InspectFile(FileInformation fi, int sampleSize) {
+        private IEnumerable<FieldType> InspectFile(FileInformation fileInformation, int sampleSize) {
 
-            var builder = new ProcessBuilder("PreProcess")
-                .Connection("input").Provider("file").File(fi.FileName).Delimiter(fi.Delimiter).Start(fi.FirstRowIsHeader ? 2 : 1)
-                .Connection("output").Provider("internal")
+            var builder = new ProcessBuilder("DataTypeCheck")
+                .Connection("input")
+                    .Provider("file")
+                    .File(fileInformation.FileName)
+                    .Delimiter(fileInformation.Delimiter)
+                    .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
+                .Connection("output")
+                    .Provider("internal")
                 .Entity("Data");
 
-            foreach (var name in fi.ColumnNames) {
+            foreach (var name in fileInformation.ColumnNames) {
                 builder.Field(name).Length(512);
             }
 
             var dataTypes = new[] { "Boolean", "Int32", "DateTime" };
 
             foreach (var dataType in dataTypes) {
-                foreach (var name in fi.ColumnNames) {
+                foreach (var name in fileInformation.ColumnNames) {
                     var result = IsDataTypeField(name, dataType);
                     builder.CalculatedField(result).Bool()
                         .Transform("typeconversion")
@@ -38,7 +43,7 @@ namespace JunkDrawer {
                 }
             }
 
-            foreach (var name in fi.ColumnNames) {
+            foreach (var name in fileInformation.ColumnNames) {
                 var result = name + "Length";
                 builder.CalculatedField(result).Int32()
                     .Transform("length")
@@ -52,7 +57,7 @@ namespace JunkDrawer {
             var results = runner.Run().First().ToList();
 
             var fieldTypes = new List<FieldType>();
-            foreach (var name in fi.ColumnNames) {
+            foreach (var name in fileInformation.ColumnNames) {
                 var foundMatch = false;
                 foreach (var dataType in dataTypes) {
                     var result = IsDataTypeField(name, dataType);
