@@ -19,6 +19,5 @@ namespace JunkDrawer {
             fileInformation.ColumnNames = new ColumnNameGenerator().Generate(fileInformation.ColumnCount());
             return fileInformation;
         }
-
     }
 }
