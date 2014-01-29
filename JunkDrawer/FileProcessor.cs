@@ -19,7 +19,8 @@ namespace JunkDrawer
             var builder = new ProcessBuilder(fileInformation.ProcessName)
                 .Star(star)
                 .Connection("input").Provider("file").File(fileInformation.FileName).Delimiter(fileInformation.Delimiter).Start(fileInformation.FirstRowIsHeader ? 2 : 1)
-                .Connection("output").Server(p.OutputConnection.Server).Database(p.OutputConnection.Database)
+                .Connection("output")
+                    .ConnectionString(p.OutputConnection.GetConnectionString())
                 .Entity(table).PrependProcessNameToOutputName(false);
 
             foreach (var fieldType in fileInformation.FieldTypes()) {
