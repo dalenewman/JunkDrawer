@@ -1,18 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
 namespace JunkDrawer {
+
     public class FileInformation {
 
         private bool _firstRowIsHeader = true;
+        private FileInfo _fileInfo;
+        private FileType _fileType = FileType.Unknown;
+        private List<Field> _fields = new List<Field>();
 
         //properties
-        public string FileName { get; set; }
-        public FileType FileType { get; set; }
-        public IEnumerable<string> ColumnNames { get; set; }
-        public string FileExtension { get { return Path.GetExtension(FileName ?? string.Empty).ToLower(); } }
-        public string ProcessName { get { return Utility.CleanIdentifier(Path.GetFileNameWithoutExtension(FileName)); } }
+        public FileInfo FileInfo {
+            get { return _fileInfo; }
+            set { _fileInfo = value; }
+        }
+
+        public FileType FileType {
+            get { return _fileType; }
+            set { _fileType = value; }
+        }
+
+        public List<Field> Fields {
+            get { return _fields; }
+            set { _fields = value; }
+        }
+
+        public string ProcessName { get { return Utility.CleanIdentifier(Path.GetFileNameWithoutExtension(_fileInfo.Name)); } }
         public string Delimiter { get { return FileTypes.FileTypeMap[FileType]; } }
         public bool FirstRowIsHeader {
             get { return _firstRowIsHeader; }
@@ -20,30 +36,32 @@ namespace JunkDrawer {
         }
 
         //constructors
-        public FileInformation(string fileName) {
-            ColumnNames = new List<string>();
-            FileName = fileName;
-            FileType = FileType.Unknown;
+        public FileInformation(FileInfo fileInfo) {
+            _fileInfo = fileInfo;
         }
 
-        public FileInformation(string fileName, FileType fileType)
-            : this(fileName, fileType, new string[0]) {
+        public FileInformation(FileInfo fileInfo, FileType fileType) {
+            _fileInfo = fileInfo;
+            _fileType = fileType;
         }
 
-        public FileInformation(string fileName, FileType fileType, IEnumerable<string> columnNames) {
-            FileName = fileName;
+        public FileInformation(FileInfo fileInfo, FileType fileType, List<Field> fieldTypes) {
+            FileInfo = fileInfo;
             FileType = fileType;
-            ColumnNames = columnNames;
+            Fields = fieldTypes;
         }
 
         //methods
-
         public int ColumnCount() {
-            return ColumnNames.Count();
+            return Fields.Count();
         }
 
-        public FieldType[] FieldTypes() {
+        public List<Field> InspectedFieldTypes() {
             return new FieldInspector().Inspect(this);
+        }
+
+        public string Identifier() {
+            return "JDI" + ProcessName.GetHashCode().ToString(CultureInfo.InvariantCulture).Replace("-", "0").PadRight(13, '0');
         }
 
     }

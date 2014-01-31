@@ -1,14 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using Transformalize.Libs.NLog;
 
 namespace JunkDrawer {
 
     public class Lines {
+
+        private readonly FileSystemInfo _fileInfo;
         private readonly List<Line> _storage = new List<Line>();
         private Delimiter _bestDelimiter;
+        private readonly Logger _log = LogManager.GetCurrentClassLogger();
 
-        public Lines(string fileName, int sampleSize) {
-            _storage.AddRange(new LineLoader(new FileLineLoader(fileName, sampleSize)).Load());
+        public Lines(FileSystemInfo fileInfo, int sampleSize) {
+            _fileInfo = fileInfo;
+            _storage.AddRange(new LineLoader(fileInfo, sampleSize).Load());
         }
 
         public Delimiter FindDelimiter() {
@@ -20,8 +28,8 @@ namespace JunkDrawer {
 
             foreach (var delimiter in FileTypes.Delimiters) {
                 foreach (var line in _storage) {
-                    var count = line.DelimiterCounts[delimiter];
-                    if (count > 0 && _storage.All(l => l.DelimiterCounts[delimiter].Equals(count))) {
+                    var count = line.DelimiterCounts[delimiter].Delimiter.Count;
+                    if (count > 0 && _storage.All(l => l.DelimiterCounts[delimiter].Delimiter.Count.Equals(count))) {
                         candidates.Add(new Delimiter(delimiter, count));
                         if (count > max) {
                             max = count;
@@ -30,12 +38,32 @@ namespace JunkDrawer {
                 }
             }
 
+            if (!candidates.Any()) {
+                _log.Error("I have failed you.  I can not find the delimiter in this {0} :-(", _fileInfo.Name);
+                Environment.Exit(1);
+            }
+
             _bestDelimiter = candidates.First(d => d.Count.Equals(max));
+            _log.Info("Best Delimiter Found is {0}.", _bestDelimiter.Character);
             return _bestDelimiter;
         }
 
-        public IEnumerable<string> PossibleHeaders() {
-            return _storage[0].Content.Split(FindDelimiter().Character).Select(Utility.CleanIdentifier);
+        public List<Field> InitialFieldTypes() {
+            var fieldTypes = new List<Field>();
+            var delimiter = FindDelimiter();
+            var line = _storage[0];
+            var lineInfo = line.DelimiterCounts[delimiter.Character];
+
+            for (var i = 0; i < lineInfo.Values.Count; i++) {
+                var name = lineInfo.Values[i];
+                if (_storage.Any(l => l.DelimiterCounts[delimiter.Character].Values[i].Contains(delimiter.ToString()))) {
+                    fieldTypes.Add(new Field(name, line.Quote));
+                } else {
+                    fieldTypes.Add(new Field(name));
+                }
+            }
+
+            return fieldTypes;
         }
 
     }

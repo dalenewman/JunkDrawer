@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.IO;
 
 namespace JunkDrawer {
 
@@ -10,14 +10,14 @@ namespace JunkDrawer {
             _sampleSize = sampleSize;
         }
 
-        public FileInformation Read(string fileName) {
+        public FileInformation Read(FileInfo fileInfo) {
 
-            var lines = new Lines(fileName, _sampleSize);
+            var lines = new Lines(fileInfo, _sampleSize);
             var bestDelimiter = lines.FindDelimiter();
 
-            return new FileInformation(fileName) {
+            return new FileInformation(fileInfo) {
                 FileType = bestDelimiter.FileType,
-                ColumnNames = lines.PossibleHeaders().ToList()
+                Fields = lines.InitialFieldTypes()
             };
         }
     }

@@ -8,72 +8,78 @@ using Transformalize.Main;
 
 namespace JunkDrawer {
     public class FieldInspector {
-        private readonly Logger _log = LogManager.GetCurrentClassLogger();
-        public FieldType[] Inspect(FileInformation fileInformation, int sampleSize = 0) {
-            return InspectFile(fileInformation, sampleSize).ToArray();
+
+        private readonly Logger _log = LogManager.GetLogger(string.Empty);
+        public List<Field> Inspect(FileInformation fileInformation, int sampleSize = 0) {
+            return InspectFile(fileInformation, sampleSize);
         }
 
-        private IEnumerable<FieldType> InspectFile(FileInformation fileInformation, int sampleSize) {
+        private List<Field> InspectFile(FileInformation fileInformation, int sampleSize) {
 
-            var builder = new ProcessBuilder("DataTypeCheck")
+            var builder = new ProcessBuilder("JDT" + fileInformation.Identifier().TrimStart("JDI".ToCharArray()))
                 .Connection("input")
                     .Provider("file")
-                    .File(fileInformation.FileName)
+                    .File(fileInformation.FileInfo.FullName)
                     .Delimiter(fileInformation.Delimiter)
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .Provider("internal")
                 .Entity("Data");
 
-            foreach (var name in fileInformation.ColumnNames) {
-                builder.Field(name).Length(512);
+            foreach (var field in fileInformation.Fields) {
+                builder
+                    .Field(field.Name)
+                        .Length(512)
+                        .Type(field.Type)
+                        .QuotedWith(field.QuoteString());
             }
 
-            var dataTypes = new[] { "Boolean", "Int32", "DateTime" };
+            var dataTypes = new[] { "boolean", "byte", "int16", "int32", "int64", "single", "double", "decimal", "datetime" };
 
             foreach (var dataType in dataTypes) {
-                foreach (var name in fileInformation.ColumnNames) {
-                    var result = IsDataTypeField(name, dataType);
+                foreach (var field in fileInformation.Fields) {
+                    var result = IsDataTypeField(field.Name, dataType);
                     builder.CalculatedField(result).Bool()
                         .Transform("typeconversion")
-                        .Type(dataType)
-                        .ResultField(result)
-                        .MessageField(string.Empty)
-                        .Parameter(name);
+                            .Type(dataType)
+                            .ResultField(result)
+                            .MessageField(string.Empty)
+                            .Parameter(field.Name);
                 }
             }
 
-            foreach (var name in fileInformation.ColumnNames) {
-                var result = name + "Length";
+            foreach (var field in fileInformation.Fields) {
+                var result = field.Name + "Length";
                 builder.CalculatedField(result).Int32()
                     .Transform("length")
-                    .Parameter(name);
+                    .Parameter(field.Name);
             }
 
-            _log.Debug("Process Configuration...", Environment.NewLine);
-            _log.Debug(Environment.NewLine + builder.Process().Serialize());
+            _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine,string.Empty));
 
             var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = sampleSize });
             var results = runner.Run().First().ToList();
 
-            var fieldTypes = new List<FieldType>();
-            foreach (var name in fileInformation.ColumnNames) {
+            foreach (var field in fileInformation.Fields) {
                 var foundMatch = false;
                 foreach (var dataType in dataTypes) {
-                    var result = IsDataTypeField(name, dataType);
-                    if (!foundMatch && results.All(r => r[result].Equals(true))) {
-                        fieldTypes.Add(new FieldType(name, dataType) { Length = string.Empty });
+                    var result = IsDataTypeField(field.Name, dataType);
+                    if (!foundMatch && results.All(row => row[result].Equals(true))) {
+                        field.Type = dataType;
+                        field.Length = string.Empty;
                         foundMatch = true;
                     }
                 }
                 if (!foundMatch) {
-                    var length = results.Max(r => (int)r[name + "Length"]);
+                    var length = results.Max(row => (int)row[field.Name + "Length"]);
                     if (length == 0)
                         length = 1;
-                    fieldTypes.Add(new FieldType(name, "string") { Length = length.ToString(CultureInfo.InvariantCulture) });
+
+                    field.Length = length.ToString(CultureInfo.InvariantCulture);
                 }
             }
-            return fieldTypes;
+
+            return fileInformation.Fields;
         }
 
         private static string IsDataTypeField(string name, string dataType) {

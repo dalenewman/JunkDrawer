@@ -17,27 +17,32 @@ namespace JunkDrawer {
         public string Message { get { return _message; } }
 
         public Request(IList<string> args, int retries = 5) {
+
             var fileName = args.Count > 0 ? args[0] : null;
 
             if (string.IsNullOrEmpty(fileName)) {
                 const string message = @"Please provide a file name (i.e. jd c:\junk\header\temp.txt).";
-                _log.Error(message);
                 _message = message;
                 _isValid = false;
             } else {
                 _fileInfo = new FileInfo(fileName);
                 if (!_fileInfo.Exists) {
-                    var message = string.Format("File '{0}' does not exist!", _fileInfo.FullName);
-                    _log.Error(message);
+                    _message = string.Format("File '{0}' does not exist!", _fileInfo.FullName);
                 } else {
                     var tries = 0;
-                    while (tries < retries && FileInUse(_fileInfo)) {
+                    while (tries < retries - 1 && FileInUse(_fileInfo)) {
                         Console.Beep();
-                        _log.Info("Wait a second...");
-                        Thread.Sleep(1000);
                         tries++;
+                        _log.Info("File is in use. Waiting {0}...", tries);
+                        Thread.Sleep(1000);
                     }
-                    _isValid = true;
+                    if (FileInUse(_fileInfo)) {
+                        _message = string.Format("Another process is using {0}.", _fileInfo.Name);
+                        _isValid = false;
+                    } else {
+                        _isValid = true;
+                    }
+
                 }
             }
         }
@@ -48,7 +53,7 @@ namespace JunkDrawer {
                     return false;
                 }
             } catch (IOException exception) {
-                _log.Warn(exception.Message);
+                _log.Debug(exception.Message);
                 return true;
             }
         }

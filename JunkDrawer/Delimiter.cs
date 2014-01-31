@@ -1,4 +1,6 @@
-﻿namespace JunkDrawer {
+﻿using System.Globalization;
+
+namespace JunkDrawer {
 
     public class Delimiter {
         public char Character { get; private set; }
@@ -10,5 +12,9 @@
         }
 
         public FileType FileType { get { return FileTypes.DelimiterMap[Character]; } }
+
+        public override string ToString() {
+            return Character.ToString(CultureInfo.InvariantCulture);
+        }
     }
 }

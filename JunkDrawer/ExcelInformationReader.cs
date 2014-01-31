@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,14 +8,14 @@ namespace JunkDrawer {
 
     public class ExcelInformationReader {
 
-        public FileInformation Read(string fileName) {
+        public FileInformation Read(FileInfo fileInfo) {
 
-            var fileInformation = new FileInformation(fileName, FileType.Excel);
+            var fileInformation = new FileInformation(fileInfo, FileType.Excel);
 
             var columnNames = new List<string>();
 
-            var stream = File.Open(fileInformation.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var isXml = fileInformation.FileExtension.Equals(".xlsx");
+            var stream = File.Open(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var isXml = fileInfo.Extension.Equals(".xlsx", StringComparison.OrdinalIgnoreCase);
 
             var excelReader = isXml ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
             excelReader.Read();
@@ -23,7 +24,10 @@ namespace JunkDrawer {
             }
 
             excelReader.Close();
-            fileInformation.ColumnNames = columnNames.Select(Utility.CleanIdentifier);
+            foreach (var value in columnNames) {
+                fileInformation.Fields.Add(new Field(value));
+            }
+
             return fileInformation;
         }
     }
