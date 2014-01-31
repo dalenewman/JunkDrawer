@@ -20,7 +20,9 @@ namespace JunkDrawer {
             var excelReader = isXml ? ExcelReaderFactory.CreateOpenXmlReader(stream) : ExcelReaderFactory.CreateBinaryReader(stream);
             excelReader.Read();
             for (var i = 0; i < excelReader.FieldCount; i++) {
-                columnNames.Add(excelReader.GetString(i));
+                var name = excelReader.GetString(i);
+                if (name != null)
+                    columnNames.Add(name);
             }
 
             excelReader.Close();
