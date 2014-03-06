@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Configuration;
+using System.Linq;
+using Microsoft.SqlServer.Server;
 using Transformalize.Libs.NLog;
 using Transformalize.Main;
 
@@ -13,12 +16,22 @@ namespace JunkDrawer {
 
             var request = new Request(args);
 
+            var logger = LogManager.GetLogger(string.Empty);
             if (!request.IsValid) {
-                LogManager.GetLogger(string.Empty).Error(request.Message);
+                logger.Error(request.Message);
                 Environment.Exit(1);
             }
 
-            new FileImporter().Import(request.FileInfo);
+            var inpection = ((Configuration)ConfigurationManager.GetSection("junkdrawer")).GetInspectionRequest();
+
+            logger.Info("Default data type is {0}.", inpection.DefaultType);
+            logger.Info("Default string data type length is {0}.", inpection.DefaultLength);
+            logger.Info("Inspecting for {0} data types in the top {1} records.", inpection.DataTypes.Length, inpection.Top);
+            foreach (var type in inpection.DataTypes) {
+                logger.Info("Inspecting for data type: {0}.", type);
+            }
+
+            new FileImporter().Import(request.FileInfo, inpection);
         }
 
     }

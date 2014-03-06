@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Transformalize.Libs.NLog;
@@ -20,6 +18,7 @@ namespace JunkDrawer {
         }
 
         public Delimiter FindDelimiter() {
+
             if (_bestDelimiter != null)
                 return _bestDelimiter;
 
@@ -39,8 +38,8 @@ namespace JunkDrawer {
             }
 
             if (!candidates.Any()) {
-                _log.Error("I have failed you.  I can not find the delimiter in this {0} :-(", _fileInfo.Name);
-                Environment.Exit(1);
+                _log.Warn("Can't find the delimiter for {0}.  Defaulting to single column.", _fileInfo.Name);
+                return new Delimiter(default(char), 0);
             }
 
             _bestDelimiter = candidates.First(d => d.Count.Equals(max));
@@ -52,6 +51,12 @@ namespace JunkDrawer {
             var fieldTypes = new List<Field>();
             var delimiter = FindDelimiter();
             var line = _storage[0];
+
+            if (delimiter.FileType == FileType.Unknown) {
+                fieldTypes.Add(new Field(line.Content) { Length = "4000"});
+                return fieldTypes;
+            }
+
             var lineInfo = line.DelimiterCounts[delimiter.Character];
 
             for (var i = 0; i < lineInfo.Values.Count; i++) {

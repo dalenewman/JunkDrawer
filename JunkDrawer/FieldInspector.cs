@@ -10,11 +10,8 @@ namespace JunkDrawer {
     public class FieldInspector {
 
         private readonly Logger _log = LogManager.GetLogger(string.Empty);
-        public List<Field> Inspect(FileInformation fileInformation, int sampleSize = 0) {
-            return InspectFile(fileInformation, sampleSize);
-        }
 
-        private List<Field> InspectFile(FileInformation fileInformation, int sampleSize) {
+        public List<Field> Inspect(FileInformation fileInformation, InspectionRequest request) {
 
             var builder = new ProcessBuilder("JDT" + fileInformation.Identifier().TrimStart("JDI".ToCharArray()))
                 .Connection("input")
@@ -24,7 +21,8 @@ namespace JunkDrawer {
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .Provider("internal")
-                .Entity("Data");
+                .Entity("Data")
+                    .Sample(request.Sample);
 
             foreach (var field in fileInformation.Fields) {
                 builder
@@ -34,9 +32,7 @@ namespace JunkDrawer {
                         .QuotedWith(field.QuoteString());
             }
 
-            var dataTypes = new[] { "boolean", "byte", "int16", "int32", "int64", "single", "double", "decimal", "datetime" };
-
-            foreach (var dataType in dataTypes) {
+            foreach (var dataType in request.DataTypes) {
                 foreach (var field in fileInformation.Fields) {
                     var result = IsDataTypeField(field.Name, dataType);
                     builder.CalculatedField(result).Bool()
@@ -55,14 +51,14 @@ namespace JunkDrawer {
                     .Parameter(field.Name);
             }
 
-            _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine,string.Empty));
+            _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
-            var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = sampleSize });
+            var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = request.Top });
             var results = runner.Run().First().ToList();
 
             foreach (var field in fileInformation.Fields) {
                 var foundMatch = false;
-                foreach (var dataType in dataTypes) {
+                foreach (var dataType in request.DataTypes) {
                     var result = IsDataTypeField(field.Name, dataType);
                     if (!foundMatch && results.All(row => row[result].Equals(true))) {
                         field.Type = dataType;
@@ -71,10 +67,7 @@ namespace JunkDrawer {
                     }
                 }
                 if (!foundMatch) {
-                    var length = results.Max(row => (int)row[field.Name + "Length"]);
-                    if (length == 0)
-                        length = 1;
-
+                    var length = results.Max(row => (int)row[field.Name + "Length"]) + 1;
                     field.Length = length.ToString(CultureInfo.InvariantCulture);
                 }
             }

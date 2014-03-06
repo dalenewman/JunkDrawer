@@ -56,10 +56,6 @@ namespace JunkDrawer {
             return Fields.Count();
         }
 
-        public List<Field> InspectedFieldTypes() {
-            return new FieldInspector().Inspect(this);
-        }
-
         public string Identifier() {
             return "JDI" + ProcessName.GetHashCode().ToString(CultureInfo.InvariantCulture).Replace("-", "0").PadRight(13, '0');
         }

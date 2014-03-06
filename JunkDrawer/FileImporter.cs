@@ -8,10 +8,10 @@ namespace JunkDrawer {
     public class FileImporter {
         private readonly Logger _log = LogManager.GetCurrentClassLogger();
 
-        public void Import(FileInfo fileInfo) {
+        public void Import(FileInfo fileInfo, InspectionRequest request) {
 
             var fileInformation = FileInformationFactory.Create(fileInfo);
-            var defaultProcess = ProcessFactory.Create("Default");
+            var defaultProcess = ProcessFactory.Create("JunkDrawer");
 
             var entityName = fileInformation.Identifier();
 
@@ -24,22 +24,23 @@ namespace JunkDrawer {
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .ConnectionString(defaultProcess.OutputConnection.GetConnectionString())
+                    .Provider(defaultProcess.OutputConnection.Provider.Type.ToString().ToLower())
                 .Entity(entityName).PrependProcessNameToOutputName(false);
 
-            foreach (var fieldType in fileInformation.InspectedFieldTypes()) {
+            var fieldTypes = new FieldInspector().Inspect(fileInformation, request);
+
+            foreach (var fieldType in fieldTypes) {
                 if (fieldType.Type.Equals("string")) {
-                    builder
-                        .Field(fieldType.Name)
-                            .Length(fieldType.Length)
-                            .QuotedWith(fieldType.QuoteString());
+                    _log.Info("Using {0} character string for {1}.", fieldType.Length, fieldType.Name);
                 } else {
-                    builder
-                        .Field(fieldType.Name)
-                        .Type(fieldType.Type)
-                        .QuotedWith(fieldType.QuoteString())
-                        .Transform("convert")
-                            .To(fieldType.Type);
+                    _log.Info("Using {0} for {1}.", fieldType.Type, fieldType.Name);
                 }
+
+                builder
+                    .Field(fieldType.Name)
+                    .Length(fieldType.Length)
+                    .Type(fieldType.Type)
+                    .QuotedWith(fieldType.QuoteString());
             }
 
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));

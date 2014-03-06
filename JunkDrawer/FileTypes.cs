@@ -8,7 +8,8 @@ namespace JunkDrawer {
             {'|', FileType.PipeDelimited },
             {'\t', FileType.TabDelimited},
             {',', FileType.CommaDelimited},
-            {';', FileType.SemicolonDelimited}
+            {';', FileType.SemicolonDelimited},
+            {default(char), FileType.Unknown}
         };
 
         public static readonly Dictionary<FileType, string> FileTypeMap = new Dictionary<FileType, string> {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
-using System.Security.AccessControl;
+using System.IO;
 using JunkDrawer;
 using NUnit.Framework;
 
@@ -15,9 +14,24 @@ namespace Test {
             new Field("Header3")
         };
 
+
+        [Test]
+        public void TestFileImporter() {
+
+            var importer = new FileImporter();
+            var info = new FileInfo(@"TestFiles\Headers\Headers.xlsx");
+            var request = new InspectionRequest() {
+                DataTypes = new[] { "boolean", "int", "datetime" },
+                DefaultType = "string",
+                DefaultLength = "100",
+                Top = 0
+            };
+            importer.Import(info, request);
+        }
+
         [Test]
         public void TestExcel() {
-            var fileInfo = new System.IO.FileInfo(@"TestFiles\Headers\Headers.xlsx");
+            var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.xlsx");
             var expected = new FileInformation(fileInfo, FileType.Excel, _defaultFields);
             var actual = FileInformationFactory.Create(fileInfo);
 
@@ -28,7 +42,7 @@ namespace Test {
 
         [Test]
         public void TestCommas() {
-            var fileInfo = new System.IO.FileInfo(@"TestFiles\Headers\Headers.csv");
+            var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.csv");
             var expected = new FileInformation(fileInfo, FileType.CommaDelimited, _defaultFields);
             var actual = FileInformationFactory.Create(fileInfo);
 
@@ -39,7 +53,7 @@ namespace Test {
 
         [Test]
         public void TestPipes() {
-            var fileInfo = new System.IO.FileInfo(@"TestFiles\Headers\Headers.psv");
+            var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.psv");
             var expected = new FileInformation(fileInfo, FileType.PipeDelimited, _defaultFields);
             var actual = FileInformationFactory.Create(fileInfo);
 
@@ -50,7 +64,7 @@ namespace Test {
 
         [Test]
         public void TestTabs() {
-            var fileInfo = new System.IO.FileInfo(@"TestFiles\Headers\Headers.tsv");
+            var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.tsv");
             var expected = new FileInformation(fileInfo, FileType.TabDelimited, _defaultFields);
             var actual = FileInformationFactory.Create(fileInfo);
 
@@ -60,8 +74,21 @@ namespace Test {
         }
 
         [Test]
+        public void TestSingleColumn() {
+
+            var fileInfo = new FileInfo(@"TestFiles\Headers\Single.txt");
+            var expected = new FileInformation(fileInfo, FileType.Unknown, new List<Field> { new Field("Header1") });
+            var actual = FileInformationFactory.Create(fileInfo);
+
+            Assert.AreEqual(expected.FileType, actual.FileType);
+            Assert.AreEqual(expected.ColumnCount(), actual.ColumnCount());
+            Assert.AreEqual("Header1", actual.Fields[0].Name);
+            Assert.AreEqual("4000", actual.Fields[0].Length);
+        }
+
+        [Test]
         public void TestFieldQuotedCsvStep1() {
-            var fileInfo = new System.IO.FileInfo(@"TestFiles\Headers\FieldQuoted.csv");
+            var fileInfo = new FileInfo(@"TestFiles\Headers\FieldQuoted.csv");
             var actual = FileInformationFactory.Create(fileInfo);
 
             Assert.AreEqual(3, actual.Fields.Count);
@@ -86,9 +113,12 @@ namespace Test {
         [Test]
         public void TestFieldQuotedCsvStep2() {
 
-            var fileInfo = new System.IO.FileInfo(@"TestFiles\Headers\FieldQuoted.csv");
+            var fileInfo = new FileInfo(@"TestFiles\Headers\FieldQuoted.csv");
             var fileInformation = FileInformationFactory.Create(fileInfo);
-            var actual = new FieldInspector().Inspect(fileInformation, 5);
+            var inspection = new InspectionRequest() {
+                DataTypes = new[] { "decimal" }
+            };
+            var actual = new FieldInspector().Inspect(fileInformation, inspection);
 
             Assert.AreEqual(3, actual.Count);
 
@@ -104,9 +134,9 @@ namespace Test {
             Assert.AreEqual('\"', actual[1].Quote);
             Assert.AreEqual(default(char), actual[2].Quote);
 
-            Assert.AreEqual("2", actual[0].Length);
+            Assert.AreEqual("3", actual[0].Length);
             Assert.AreEqual(string.Empty, actual[1].Length);
-            Assert.AreEqual("9", actual[2].Length);
+            Assert.AreEqual("10", actual[2].Length);
         }
 
     }
