@@ -1,12 +1,34 @@
+using System.Collections.Generic;
+
 namespace JunkDrawer {
 
     public class InspectionRequest {
-        private string[] _dataTypes = { "byte", "int16", "int32", "int64", "single", "double", "datetime" };
+
         private string _defaultType = "string";
-        private string _defaultLength = "512";
+        private string _defaultLength = "1024";
         private decimal _sample = 100m;
+        private string[] _dataTypes = {
+            "byte", 
+            "int16", 
+            "int32", 
+            "int64", 
+            "single", 
+            "double", 
+            "datetime"
+        };
+        private Dictionary<char, string> _delimiters = new Dictionary<char, string> {
+            { '\t', "tab" },
+            { ',', "comma" },
+            { '|', "pipe" },
+            { ';', "semicolon" }
+        };
 
         public int Top { get; set; }
+
+        public Dictionary<char, string> Delimiters {
+            get { return _delimiters; }
+            set { _delimiters = value; }
+        }
 
         public decimal Sample {
             get { return _sample; }

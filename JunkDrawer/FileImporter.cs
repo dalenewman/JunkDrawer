@@ -6,7 +6,7 @@ using Transformalize.Main;
 
 namespace JunkDrawer {
     public class FileImporter {
-        private readonly Logger _log = LogManager.GetCurrentClassLogger();
+        private readonly Logger _log = LogManager.GetLogger("JunkDrawer.FileImporter");
 
         public void Import(FileInfo fileInfo, InspectionRequest request) {
 
@@ -45,10 +45,8 @@ namespace JunkDrawer {
 
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
-            ProcessFactory.Create(builder.Process(), new Options() { Mode = "init" }).Run();
-            ProcessFactory.Create(builder.Process(), new Options() { Mode = "default" }).Run();
-
-            //File.Move(fileInformation.FileName, fileInformation.FileName + ".bak");
+            ProcessFactory.Create(builder.Process(), new Options { Mode = "init" }).Run();
+            ProcessFactory.Create(builder.Process(), new Options { Mode = "default" }).Run();
         }
 
     }

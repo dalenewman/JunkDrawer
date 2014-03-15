@@ -16,9 +16,10 @@ namespace JunkDrawer {
 
         public bool Valid() {
             return AreDistinct() &&
-                    !ContainEmptyOrWhiteSpace() &&
-                    !ContainNumber() &&
-                    !ContainDatetime();
+                !ContainEmptyOrWhiteSpace() &&
+                !ContainNumber() &&
+                !ContainDatetime() &&
+                !ContainGuid();
         }
 
         private bool AreDistinct() {
@@ -38,5 +39,11 @@ namespace JunkDrawer {
             DateTime date;
             return _names.Any(n => DateTime.TryParse(n, out date));
         }
+
+        private bool ContainGuid() {
+            Guid guid;
+            return _names.Any(n => Guid.TryParse(n, out guid));
+        }
+
     }
 }

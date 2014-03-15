@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Linq;
-using Microsoft.SqlServer.Server;
 using Transformalize.Libs.NLog;
 using Transformalize.Main;
 
@@ -19,6 +17,7 @@ namespace JunkDrawer {
             var logger = LogManager.GetLogger(string.Empty);
             if (!request.IsValid) {
                 logger.Error(request.Message);
+                LogManager.Flush();
                 Environment.Exit(1);
             }
 
@@ -32,6 +31,7 @@ namespace JunkDrawer {
             }
 
             new FileImporter().Import(request.FileInfo, inpection);
+            new JunkReporter().Report();
         }
 
     }

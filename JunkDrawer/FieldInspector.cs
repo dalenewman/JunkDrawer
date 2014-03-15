@@ -27,7 +27,7 @@ namespace JunkDrawer {
             foreach (var field in fileInformation.Fields) {
                 builder
                     .Field(field.Name)
-                        .Length(512)
+                        .Length(field.Length)
                         .Type(field.Type)
                         .QuotedWith(field.QuoteString());
             }
@@ -54,7 +54,7 @@ namespace JunkDrawer {
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
             var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = request.Top });
-            var results = runner.Run().First().ToList();
+            var results = runner.Run()["Data"].ToList();
 
             foreach (var field in fileInformation.Fields) {
                 var foundMatch = false;
