@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JunkDrawer</RootNamespace>
     <AssemblyName>jd</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -67,11 +67,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86" Condition="'$(Platform)'=='x86'">
-      <HintPath>..\Assemblies\x86\Transformalize.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=amd64" Condition="'$(Platform)'=='x64'">
-      <HintPath>..\Assemblies\x64\Transformalize.dll</HintPath>
+    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Assemblies\Transformalize.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -24,7 +24,7 @@ namespace JunkDrawer {
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .ConnectionString(defaultProcess.OutputConnection.GetConnectionString())
-                    .Provider(defaultProcess.OutputConnection.Provider.Type.ToString().ToLower())
+                    .Provider(defaultProcess.OutputConnection.Type.ToString().ToLower())
                 .Entity(entityName).PrependProcessNameToOutputName(false);
 
             var fieldTypes = new FieldInspector().Inspect(fileInformation, request);
