@@ -17,10 +17,10 @@ namespace JunkDrawer {
             if (matches.Length <= 0) return;
 
             try {
-                ProcessFactory.Create(JUNK_SUMMARY, new Options() { Mode = "init" }).Run();
-                ProcessFactory.Create(JUNK_SUMMARY).Run();
+                ProcessFactory.Create(JUNK_SUMMARY, new Options() { Mode = "init" })[0].Run();
+                ProcessFactory.Create(JUNK_SUMMARY)[0].Run();
             } catch (Exception e) {
-                _log.Warn("Sorry. I couldn't produce the junk summary {0}. {0}.", matches[0].Connections["output"].File, e.Message);
+                _log.Warn("Sorry. I couldn't produce the junk summary {0}. {1}.", matches[0].Connections["output"].File, e.Message);
             }
         }
     }

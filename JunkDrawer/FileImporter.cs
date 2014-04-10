@@ -11,7 +11,7 @@ namespace JunkDrawer {
         public void Import(FileInfo fileInfo, InspectionRequest request) {
 
             var fileInformation = FileInformationFactory.Create(fileInfo);
-            var defaultProcess = ProcessFactory.Create("JunkDrawer");
+            var defaultProcess = ProcessFactory.Create("JunkDrawer")[0];
 
             var entityName = fileInformation.Identifier();
 
@@ -25,7 +25,9 @@ namespace JunkDrawer {
                 .Connection("output")
                     .ConnectionString(defaultProcess.OutputConnection.GetConnectionString())
                     .Provider(defaultProcess.OutputConnection.Type.ToString().ToLower())
-                .Entity(entityName).PrependProcessNameToOutputName(false);
+                .Entity(entityName)
+                    .PrependProcessNameToOutputName(false)
+                    .DetectChanges(false);
 
             var fieldTypes = new FieldInspector().Inspect(fileInformation, request);
 
@@ -45,8 +47,8 @@ namespace JunkDrawer {
 
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
-            ProcessFactory.Create(builder.Process(), new Options { Mode = "init" }).Run();
-            ProcessFactory.Create(builder.Process(), new Options { Mode = "default" }).Run();
+            ProcessFactory.Create(builder.Process(), new Options { Mode = "init" })[0].Run();
+            ProcessFactory.Create(builder.Process())[0].Run();
         }
 
     }

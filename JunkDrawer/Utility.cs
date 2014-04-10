@@ -4,6 +4,8 @@ using Transformalize.Extensions;
 
 namespace JunkDrawer {
     public static class Utility {
+        public const string TypeCheckPrefix = "JDT";
+        public const string ImportPrefix = "JDI";
         public const string CleanPattern = @"[\s\-]|^[\d]";
 
         public static string CleanIdentifier(string input) {

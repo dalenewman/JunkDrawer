@@ -67,7 +67,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Assemblies\Transformalize.dll</HintPath>
     </Reference>

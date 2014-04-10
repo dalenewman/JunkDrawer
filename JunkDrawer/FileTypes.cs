@@ -17,7 +17,8 @@ namespace JunkDrawer {
             {FileType.TabDelimited, "\t"},
             {FileType.CommaDelimited, ","},
             {FileType.SemicolonDelimited, ";" },
-            {FileType.Excel, string.Empty}
+            {FileType.Excel, string.Empty},
+            {FileType.Unknown, string.Empty}
         };
 
         public static readonly char[] Delimiters = DelimiterMap.Select(p => p.Key).ToArray();

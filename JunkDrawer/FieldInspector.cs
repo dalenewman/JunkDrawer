@@ -7,13 +7,14 @@ using Transformalize.Libs.NLog;
 using Transformalize.Main;
 
 namespace JunkDrawer {
+
     public class FieldInspector {
 
         private readonly Logger _log = LogManager.GetLogger(string.Empty);
 
         public List<Field> Inspect(FileInformation fileInformation, InspectionRequest request) {
 
-            var builder = new ProcessBuilder("JDT" + fileInformation.Identifier().TrimStart("JDI".ToCharArray()))
+            var builder = new ProcessBuilder(Utility.TypeCheckPrefix + fileInformation.Identifier().TrimStart(Utility.ImportPrefix.ToCharArray()))
                 .Connection("input")
                     .Provider("file")
                     .File(fileInformation.FileInfo.FullName)
@@ -21,7 +22,7 @@ namespace JunkDrawer {
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .Provider("internal")
-                .Entity("Data")
+                .Entity("Data").DetectChanges(false)
                     .Sample(request.Sample);
 
             foreach (var field in fileInformation.Fields) {
@@ -53,7 +54,7 @@ namespace JunkDrawer {
 
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
-            var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = request.Top });
+            var runner = ProcessFactory.Create(builder.Process(), new Options() { Top = request.Top })[0];
             var results = runner.Run()["Data"].ToList();
 
             foreach (var field in fileInformation.Fields) {

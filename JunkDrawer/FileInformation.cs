@@ -57,7 +57,7 @@ namespace JunkDrawer {
         }
 
         public string Identifier() {
-            return "JDI" + ProcessName.GetHashCode().ToString(CultureInfo.InvariantCulture).Replace("-", "0").PadRight(13, '0');
+            return Utility.ImportPrefix + ProcessName.GetHashCode().ToString(CultureInfo.InvariantCulture).Replace("-", "0").PadRight(13, '0');
         }
 
     }
