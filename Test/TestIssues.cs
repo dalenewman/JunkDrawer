@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using JunkDrawer;
 using NUnit.Framework;
-using Transformalize.Libs.EnterpriseLibrary.Validation.Validators;
 
 namespace Test {
 
@@ -21,9 +20,10 @@ Thursday,13,4.4,4/1/2014
 Friday,14,5.5,5/1/2014
 Saturday,15,6.6,6/1/2014");
 
-            var dataTypes = new List<string> { "int32", "double", "datetime" };
-            var request = new InspectionRequest() { DataTypes = dataTypes };
-            var information = FileInformationFactory.Create(new FileInfo(file));
+
+            var request = ConfigurationFactory.Create();
+            request.DataTypes = new List<string> { "int32", "double", "datetime" };
+            var information = FileInformationFactory.Create(new FileInfo(file), request);
             var fields = new FieldInspector().Inspect(information, request).ToArray();
 
             Assert.AreEqual("string", fields[0].Type);
@@ -37,29 +37,13 @@ Saturday,15,6.6,6/1/2014");
         }
 
         [Test]
-        public void TestIssue002A() {
-            var validator = new TypeConversionValidator(typeof(DateTime));
-            var results = validator.Validate("1.1");
-            Assert.IsTrue(results.IsValid);
-
-            validator = new TypeConversionValidator(typeof(DateTime));
-            results = validator.Validate(1.1);
-            Assert.IsFalse(results.IsValid);
-
-            validator = new TypeConversionValidator(typeof(DateTime));
-            results = validator.Validate("1.1000000000001");
-            Assert.IsFalse(results.IsValid);
-
-        }
-
-        [Test]
         public void TestIssue002B() {
 
             const string file = @"TestFiles\Headers\Issue002.xlsx";
 
-            var dataTypes = new List<string> { "int32", "datetime" };
-            var request = new InspectionRequest() { DataTypes = dataTypes };
-            var information = FileInformationFactory.Create(new FileInfo(file));
+            var request = ConfigurationFactory.Create();
+            request.DataTypes = new List<string> { "int32", "datetime" };
+            var information = FileInformationFactory.Create(new FileInfo(file), request);
             var fields = new FieldInspector().Inspect(information, request).ToArray();
 
             Assert.AreEqual("string", fields[0].Type);

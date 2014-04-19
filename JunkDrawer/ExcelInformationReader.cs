@@ -7,11 +7,15 @@ using Transformalize.Libs.ExcelDataReader;
 namespace JunkDrawer {
 
     public class ExcelInformationReader {
+        private readonly InspectionRequest _request;
+
+        public ExcelInformationReader(InspectionRequest request) {
+            _request = request;
+        }
 
         public FileInformation Read(FileInfo fileInfo) {
 
-            var fileInformation = new FileInformation(fileInfo, FileType.Excel);
-
+            var fileInformation = new FileInformation(fileInfo);
             var columnNames = new List<string>();
 
             var stream = File.Open(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -27,7 +31,7 @@ namespace JunkDrawer {
 
             excelReader.Close();
             foreach (var value in columnNames) {
-                fileInformation.Fields.Add(new Field(value));
+                fileInformation.Fields.Add(new Field(value, _request.DefaultType, _request.DefaultLength));
             }
 
             return fileInformation;

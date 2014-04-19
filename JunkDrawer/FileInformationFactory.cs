@@ -5,12 +5,12 @@ using System.Linq;
 namespace JunkDrawer {
     public static class FileInformationFactory {
 
-        public static FileInformation Create(FileInfo fileInfo, int sampleSize = 100) {
+        public static FileInformation Create(FileInfo fileInfo, InspectionRequest request) {
             var ext = fileInfo.Extension.ToLower();
 
             var fileInformation = ext.StartsWith(".xls", StringComparison.OrdinalIgnoreCase) ?
-                new ExcelInformationReader().Read(fileInfo) :
-                new FileInformationReader(sampleSize).Read(fileInfo);
+                new ExcelInformationReader(request).Read(fileInfo) :
+                new FileInformationReader(request).Read(fileInfo);
 
             var validator = new ColumnNameValidator(fileInformation.Fields.Select(f => f.Name));
             if (validator.Valid())

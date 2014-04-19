@@ -18,7 +18,7 @@ namespace JunkDrawer {
                 .Connection("input")
                     .Provider("file")
                     .File(fileInformation.FileInfo.FullName)
-                    .Delimiter(fileInformation.Delimiter)
+                    .Delimiter(fileInformation.Delimiter == default(char) ? string.Empty : fileInformation.Delimiter.ToString(CultureInfo.InvariantCulture))
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .Provider("internal")

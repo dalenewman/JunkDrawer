@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using Transformalize.Configuration.Builders;
 using Transformalize.Libs.NLog;
@@ -10,7 +11,7 @@ namespace JunkDrawer {
 
         public void Import(FileInfo fileInfo, InspectionRequest request) {
 
-            var fileInformation = FileInformationFactory.Create(fileInfo);
+            var fileInformation = FileInformationFactory.Create(fileInfo, request);
             var defaultProcess = ProcessFactory.Create("JunkDrawer")[0];
 
             var entityName = fileInformation.Identifier();
@@ -20,7 +21,7 @@ namespace JunkDrawer {
                 .Connection("input")
                     .Provider("file")
                     .File(fileInformation.FileInfo.FullName)
-                    .Delimiter(fileInformation.Delimiter)
+                    .Delimiter(fileInformation.Delimiter.ToString(CultureInfo.InvariantCulture))
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
                     .ConnectionString(defaultProcess.OutputConnection.GetConnectionString())

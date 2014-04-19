@@ -13,10 +13,11 @@ namespace JunkDrawer {
         public string Type { get; set; }
         public string Length { get; set; }
 
-        public Field(string name)
-        {
+        public Field(string name, string type, string length) {
             Quote = default(char);
             Name = name;
+            Type = type;
+            Length = length;
         }
 
         public bool IsQuoted() {

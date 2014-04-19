@@ -29,7 +29,7 @@ namespace JunkDrawer {
         }
 
         public string ProcessName { get { return Utility.CleanIdentifier(Path.GetFileNameWithoutExtension(_fileInfo.Name)); } }
-        public string Delimiter { get; set;}
+        public char Delimiter { get; set;}
         public bool FirstRowIsHeader {
             get { return _firstRowIsHeader; }
             set { _firstRowIsHeader = value; }
@@ -38,11 +38,6 @@ namespace JunkDrawer {
         //constructors
         public FileInformation(FileInfo fileInfo) {
             _fileInfo = fileInfo;
-        }
-
-        public FileInformation(FileInfo fileInfo, FileType fileType) {
-            _fileInfo = fileInfo;
-            //_fileType = fileType;
         }
 
         //methods

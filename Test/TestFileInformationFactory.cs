@@ -8,52 +8,56 @@ namespace Test {
     public class TestFileInformationFactory {
 
         [Test]
-        public void TestExcel() {
+        public void TestExcel()
+        {
+            var request = ConfigurationFactory.Create();
             var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.xlsx");
-            var actual = FileInformationFactory.Create(fileInfo);
+            var actual = FileInformationFactory.Create(fileInfo, request);
 
-            Assert.AreEqual(FileType.Excel, actual.FileType);
             Assert.AreEqual(3, actual.ColumnCount());
             Assert.AreEqual("Header2", actual.Fields[1].Name);
         }
 
         [Test]
         public void TestCommas() {
+            var request = ConfigurationFactory.Create();
             var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.csv");
-            var actual = FileInformationFactory.Create(fileInfo);
+            var actual = FileInformationFactory.Create(fileInfo, request);
 
-            Assert.AreEqual(FileType.CommaDelimited, actual.FileType);
+            Assert.AreEqual(',', actual.Delimiter);
             Assert.AreEqual(3, actual.ColumnCount());
             Assert.AreEqual("Header2", actual.Fields[1].Name);
         }
 
         [Test]
         public void TestPipes() {
+            var request = ConfigurationFactory.Create();
             var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.psv");
-            var actual = FileInformationFactory.Create(fileInfo);
+            var actual = FileInformationFactory.Create(fileInfo, request);
 
-            Assert.AreEqual(FileType.PipeDelimited, actual.FileType);
+            Assert.AreEqual('|', actual.Delimiter);
             Assert.AreEqual(3, actual.ColumnCount());
             Assert.AreEqual("Header2", actual.Fields[1].Name);
         }
 
         [Test]
         public void TestTabs() {
+            var request = ConfigurationFactory.Create();
             var fileInfo = new FileInfo(@"TestFiles\Headers\Headers.tsv");
-            var actual = FileInformationFactory.Create(fileInfo);
+            var actual = FileInformationFactory.Create(fileInfo, request);
 
-            Assert.AreEqual(FileType.TabDelimited, actual.FileType);
+            Assert.AreEqual('\t', actual.Delimiter);
             Assert.AreEqual(3, actual.ColumnCount());
             Assert.AreEqual("Header2", actual.Fields[1].Name);
         }
 
         [Test]
         public void TestSingleColumn() {
-
+            var request = ConfigurationFactory.Create();
             var fileInfo = new FileInfo(@"TestFiles\Headers\Single.txt");
-            var actual = FileInformationFactory.Create(fileInfo);
+            var actual = FileInformationFactory.Create(fileInfo, request);
 
-            Assert.AreEqual(FileType.Unknown, actual.FileType);
+            Assert.AreEqual(default(char), actual.Delimiter);
             Assert.AreEqual(1, actual.ColumnCount());
             Assert.AreEqual("Header1", actual.Fields[0].Name);
             Assert.AreEqual("1024", actual.Fields[0].Length);
@@ -68,7 +72,8 @@ MI,""10,000,000"",Mitten
 CA,""20,000,000"",Sock
 KS,""9,000,000"",Rectangle");
 
-            var actual = FileInformationFactory.Create(new FileInfo(file));
+            var request = ConfigurationFactory.Create();
+            var actual = FileInformationFactory.Create(new FileInfo(file), request);
 
             Assert.AreEqual(3, actual.Fields.Count);
 

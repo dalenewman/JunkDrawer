@@ -1,22 +1,23 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 
 namespace JunkDrawer {
 
     public class FileInformationReader {
+        private readonly InspectionRequest _request;
 
-        private readonly int _sampleSize;
-
-        public FileInformationReader(int sampleSize) {
-            _sampleSize = sampleSize;
+        public FileInformationReader(InspectionRequest request)
+        {
+            _request = request;
         }
 
         public FileInformation Read(FileInfo fileInfo) {
 
-            var lines = new Lines(fileInfo, _sampleSize);
+            var lines = new Lines(fileInfo, _request);
             var bestDelimiter = lines.FindDelimiter();
 
             return new FileInformation(fileInfo) {
-                FileType = bestDelimiter.FileType,
+                Delimiter = bestDelimiter,
                 Fields = lines.InitialFieldTypes()
             };
         }

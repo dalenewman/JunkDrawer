@@ -17,11 +17,10 @@ MI,""10,000,000"",Mitten
 CA,""20,000,000"",Sock
 KS,""9,000,000"",Rectangle");
 
-            var fileInformation = FileInformationFactory.Create(new FileInfo(file));
-            var inspection = new InspectionRequest() {
-                DataTypes = new List<string> { "decimal" }
-            };
-            var actual = new FieldInspector().Inspect(fileInformation, inspection);
+            var request = ConfigurationFactory.Create();
+            request.DataTypes = new List<string> { "decimal" };
+            var fileInformation = FileInformationFactory.Create(new FileInfo(file), request);
+            var actual = new FieldInspector().Inspect(fileInformation, request);
 
             Assert.AreEqual(3, actual.Count);
 

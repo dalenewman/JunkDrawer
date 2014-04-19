@@ -9,7 +9,7 @@ namespace JunkDrawer {
     /// </summary> 
     public static class ListExtension {
 
-        public static List<string> DelimiterSplit(this string src, char delimeter, char quote = '\"') {
+        public static string[] DelimiterSplit(this string src, char delimeter, char quote = '\"') {
             var result = new List<string>();
             var index = 0;
             var start = 0;
@@ -32,7 +32,7 @@ namespace JunkDrawer {
             if (!inQuote) {
                 result.Add(src.Substring(start, index - start).Trim());
             }
-            return result;
+            return result.ToArray();
         }
     }
 }

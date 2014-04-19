@@ -67,7 +67,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Transformalize, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Assemblies\Transformalize.dll</HintPath>
     </Reference>
@@ -75,7 +75,6 @@
   <ItemGroup>
     <Compile Include="ColumnNameGenerator.cs" />
     <Compile Include="ColumnNameValidator.cs" />
-    <Compile Include="Delimiter.cs" />
     <Compile Include="ExcelInformationReader.cs" />
     <Compile Include="FieldInspector.cs" />
     <Compile Include="Field.cs" />
@@ -84,12 +83,9 @@
     <Compile Include="FileInformationReader.cs" />
     <Compile Include="FileLineLoader.cs" />
     <Compile Include="FileImporter.cs" />
-    <Compile Include="FileType.cs" />
-    <Compile Include="FileTypes.cs" />
     <Compile Include="InspectionRequest.cs" />
     <Compile Include="JunkDrawerException.cs" />
     <Compile Include="JunkReporter.cs" />
-    <Compile Include="LineInfo.cs" />
     <Compile Include="ListExtension.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="LineLoader.cs" />
