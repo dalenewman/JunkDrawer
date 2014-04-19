@@ -67,8 +67,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestFieldInspector.cs" />
     <Compile Include="TestIssues.cs" />
-    <Compile Include="TestFileInformationReader.cs" />
+    <Compile Include="TestFileInformationFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

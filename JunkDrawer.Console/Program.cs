@@ -21,11 +21,11 @@ namespace JunkDrawer {
                 Environment.Exit(1);
             }
 
-            var inpection = ((Configuration)ConfigurationManager.GetSection("junkdrawer")).GetInspectionRequest();
+            var inpection = ConfigurationFactory.Create();
 
             logger.Info("Default data type is {0}.", inpection.DefaultType);
             logger.Info("Default string data type length is {0}.", inpection.DefaultLength);
-            logger.Info("Inspecting for {0} data types in the top {1} records.", inpection.DataTypes.Length, inpection.Top);
+            logger.Info("Inspecting for {0} data types in the top {1} records.", inpection.DataTypes.Count, inpection.Top);
             foreach (var type in inpection.DataTypes) {
                 logger.Info("Inspecting for data type: {0}.", type);
             }

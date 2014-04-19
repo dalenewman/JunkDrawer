@@ -1,9 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 
 namespace JunkDrawer {
+
+    public static class ConfigurationFactory {
+        public static InspectionRequest Create() {
+            try {
+                var cfg = ConfigurationManager.GetSection("junkdrawer");
+                if (cfg == null) {
+                    throw new JunkDrawerException("Invalid configuration.  Missing junkdrawer section.");
+                }
+                return ((Configuration)cfg).GetInspectionRequest();
+            } catch (ConfigurationErrorsException ex) {
+                throw new JunkDrawerException("Invalid configuration. {0}", ex.Message);
+            }
+        }
+    }
 
     public class DelimiterElementCollection : ConfigurationElementCollection {
 
@@ -139,7 +152,7 @@ namespace JunkDrawer {
 
         public InspectionRequest GetInspectionRequest() {
             return new InspectionRequest() {
-                DataTypes = Types.Cast<TypeConfigurationElement>().Select(t => t.Type).ToArray(),
+                DataTypes = Types.Cast<TypeConfigurationElement>().Select(t => t.Type).ToList(),
                 DefaultLength = Types.DefaultLength,
                 DefaultType = Types.Default,
                 Delimiters = Delimiters.Cast<DelimiterConfigurationElement>().ToDictionary(d => d.Character[0], d => d.Name),

@@ -87,6 +87,7 @@
     <Compile Include="FileType.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="InspectionRequest.cs" />
+    <Compile Include="JunkDrawerException.cs" />
     <Compile Include="JunkReporter.cs" />
     <Compile Include="LineInfo.cs" />
     <Compile Include="ListExtension.cs" />

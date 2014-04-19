@@ -11,7 +11,7 @@ namespace JunkDrawer {
             Count = count;
         }
 
-        public FileType FileType { get { return FileTypes.DelimiterMap[Character]; } }
+        //public FileType FileType { get { return FileTypes.DelimiterMap[Character]; } }
 
         public override string ToString() {
             return Character.ToString(CultureInfo.InvariantCulture);

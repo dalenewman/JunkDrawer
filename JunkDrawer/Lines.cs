@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using Transformalize.Libs.NLog;
@@ -48,12 +49,18 @@ namespace JunkDrawer {
         }
 
         public List<Field> InitialFieldTypes() {
+
+            var inpection = ConfigurationFactory.Create();
+
             var fieldTypes = new List<Field>();
             var delimiter = FindDelimiter();
             var line = _storage[0];
 
             if (delimiter.FileType == FileType.Unknown) {
-                fieldTypes.Add(new Field(line.Content) { Length = "4000"});
+                fieldTypes.Add(new Field(line.Content) {
+                    Length = inpection.DefaultLength,
+                    Type = inpection.DefaultType
+                });
                 return fieldTypes;
             }
 
@@ -61,11 +68,14 @@ namespace JunkDrawer {
 
             for (var i = 0; i < lineInfo.Values.Count; i++) {
                 var name = lineInfo.Values[i];
+                var field = new Field(name) {
+                    Length = inpection.DefaultLength,
+                    Type = inpection.DefaultType
+                };
                 if (_storage.Any(l => l.DelimiterCounts[delimiter.Character].Values[i].Contains(delimiter.ToString()))) {
-                    fieldTypes.Add(new Field(name, line.Quote));
-                } else {
-                    fieldTypes.Add(new Field(name));
+                    field.Quote = line.Quote;
                 }
+                fieldTypes.Add(field);
             }
 
             return fieldTypes;

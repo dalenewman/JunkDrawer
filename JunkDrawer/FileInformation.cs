@@ -9,7 +9,7 @@ namespace JunkDrawer {
 
         private bool _firstRowIsHeader = true;
         private FileInfo _fileInfo;
-        private FileType _fileType = FileType.Unknown;
+        //private FileType _fileType = FileType.Unknown;
         private List<Field> _fields = new List<Field>();
 
         //properties
@@ -18,10 +18,10 @@ namespace JunkDrawer {
             set { _fileInfo = value; }
         }
 
-        public FileType FileType {
-            get { return _fileType; }
-            set { _fileType = value; }
-        }
+        //public FileType FileType {
+        //    get { return _fileType; }
+        //    set { _fileType = value; }
+        //}
 
         public List<Field> Fields {
             get { return _fields; }
@@ -29,7 +29,7 @@ namespace JunkDrawer {
         }
 
         public string ProcessName { get { return Utility.CleanIdentifier(Path.GetFileNameWithoutExtension(_fileInfo.Name)); } }
-        public string Delimiter { get { return FileTypes.FileTypeMap[FileType]; } }
+        public string Delimiter { get; set;}
         public bool FirstRowIsHeader {
             get { return _firstRowIsHeader; }
             set { _firstRowIsHeader = value; }
@@ -42,13 +42,7 @@ namespace JunkDrawer {
 
         public FileInformation(FileInfo fileInfo, FileType fileType) {
             _fileInfo = fileInfo;
-            _fileType = fileType;
-        }
-
-        public FileInformation(FileInfo fileInfo, FileType fileType, List<Field> fieldTypes) {
-            FileInfo = fileInfo;
-            FileType = fileType;
-            Fields = fieldTypes;
+            //_fileType = fileType;
         }
 
         //methods

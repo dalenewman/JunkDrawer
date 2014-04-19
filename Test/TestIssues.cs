@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using JunkDrawer;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ Thursday,13,4.4,4/1/2014
 Friday,14,5.5,5/1/2014
 Saturday,15,6.6,6/1/2014");
 
-            var dataTypes = new[] { "int32", "double", "datetime" };
+            var dataTypes = new List<string> { "int32", "double", "datetime" };
             var request = new InspectionRequest() { DataTypes = dataTypes };
             var information = FileInformationFactory.Create(new FileInfo(file));
             var fields = new FieldInspector().Inspect(information, request).ToArray();
@@ -56,7 +57,7 @@ Saturday,15,6.6,6/1/2014");
 
             const string file = @"TestFiles\Headers\Issue002.xlsx";
 
-            var dataTypes = new[] { "int32", "datetime" };
+            var dataTypes = new List<string> { "int32", "datetime" };
             var request = new InspectionRequest() { DataTypes = dataTypes };
             var information = FileInformationFactory.Create(new FileInfo(file));
             var fields = new FieldInspector().Inspect(information, request).ToArray();
