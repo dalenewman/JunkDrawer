@@ -12,6 +12,14 @@ namespace JunkDrawer {
 
         private readonly Logger _log = LogManager.GetLogger(string.Empty);
 
+        public List<Field> Inspect(string file) {
+            return Inspect(FileInformationFactory.Create(file));
+        }
+
+        public List<Field> Inspect(FileInformation fileInformation) {
+            return Inspect(fileInformation, ConfigurationFactory.Create());
+        }
+
         public List<Field> Inspect(FileInformation fileInformation, InspectionRequest request) {
 
             var builder = new ProcessBuilder(Utility.TypeCheckPrefix + fileInformation.Identifier().TrimStart(Utility.ImportPrefix.ToCharArray()))

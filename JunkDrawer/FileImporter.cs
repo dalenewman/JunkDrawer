@@ -1,15 +1,26 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Transformalize.Configuration.Builders;
 using Transformalize.Libs.NLog;
+using Transformalize.Libs.Rhino.Etl;
 using Transformalize.Main;
 
 namespace JunkDrawer {
     public class FileImporter {
         private readonly Logger _log = LogManager.GetLogger("JunkDrawer.FileImporter");
 
-        public void Import(FileInfo fileInfo, InspectionRequest request) {
+        public Result Import(string file) {
+            return Import(new FileInfo(file));
+        }
+
+        public Result Import(FileInfo fileInfo) {
+            return Import(fileInfo, ConfigurationFactory.Create());
+        }
+
+        public Result Import(FileInfo fileInfo, InspectionRequest request) {
 
             var fileInformation = FileInformationFactory.Create(fileInfo, request);
             var defaultProcess = ProcessFactory.Create("JunkDrawer")[0];
@@ -30,9 +41,9 @@ namespace JunkDrawer {
                     .PrependProcessNameToOutputName(false)
                     .DetectChanges(false);
 
-            var fieldTypes = new FieldInspector().Inspect(fileInformation, request);
+            var fields = new FieldInspector().Inspect(fileInformation, request);
 
-            foreach (var fieldType in fieldTypes) {
+            foreach (var fieldType in fields) {
                 if (fieldType.Type.Equals("string")) {
                     _log.Info("Using {0} character string for {1}.", fieldType.Length, fieldType.Name);
                 } else {
@@ -49,7 +60,11 @@ namespace JunkDrawer {
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
             ProcessFactory.Create(builder.Process(), new Options { Mode = "init" })[0].Run();
-            ProcessFactory.Create(builder.Process())[0].Run();
+            return new Result {
+                Fields = fields,
+                FileInformation = fileInformation,
+                Rows = ProcessFactory.Create(builder.Process())[0].Run()[entityName]
+            };
         }
 
     }

@@ -5,6 +5,14 @@ using System.Linq;
 namespace JunkDrawer {
     public static class FileInformationFactory {
 
+        public static FileInformation Create(string file) {
+            return Create(new FileInfo(file));
+        }
+
+        public static FileInformation Create(FileInfo fileInfo) {
+            return Create(fileInfo, ConfigurationFactory.Create());
+        }
+
         public static FileInformation Create(FileInfo fileInfo, InspectionRequest request) {
             var ext = fileInfo.Extension.ToLower();
 
