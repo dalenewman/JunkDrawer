@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Transformalize.Configuration.Builders;
 using Transformalize.Libs.NLog;
-using Transformalize.Libs.Rhino.Etl;
 using Transformalize.Main;
 
 namespace JunkDrawer {
@@ -23,7 +20,14 @@ namespace JunkDrawer {
         public Result Import(FileInfo fileInfo, InspectionRequest request) {
 
             var fileInformation = FileInformationFactory.Create(fileInfo, request);
-            var defaultProcess = ProcessFactory.Create("JunkDrawer")[0];
+            Process process;
+
+            try {
+                process = ProcessFactory.Create("JunkDrawer")[0];
+            } catch (TransformalizeException tex) {
+                _log.Error(tex.Message);
+                throw new JunkDrawerException("You must define a JunkDrawer process with an 'output' connection defined in the transformalize configuration section.");
+            }
 
             var entityName = fileInformation.Identifier();
 
@@ -35,8 +39,8 @@ namespace JunkDrawer {
                     .Delimiter(fileInformation.Delimiter.ToString(CultureInfo.InvariantCulture))
                     .Start(fileInformation.FirstRowIsHeader ? 2 : 1)
                 .Connection("output")
-                    .ConnectionString(defaultProcess.OutputConnection.GetConnectionString())
-                    .Provider(defaultProcess.OutputConnection.Type.ToString().ToLower())
+                    .Provider(process.OutputConnection.Type.ToString().ToLower())
+                    .ConnectionString(process.OutputConnection.GetConnectionString())
                 .Entity(entityName)
                     .PrependProcessNameToOutputName(false)
                     .DetectChanges(false);
