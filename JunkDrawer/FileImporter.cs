@@ -9,12 +9,16 @@ namespace JunkDrawer {
     public class FileImporter {
         private readonly Logger _log = LogManager.GetLogger("JunkDrawer.FileImporter");
 
-        public Result Import(string file) {
-            return Import(new FileInfo(file));
+        public Result Import(string file, decimal sample = 100m) {
+            return Import(new FileInfo(file), sample);
         }
 
-        public Result Import(FileInfo fileInfo) {
-            return Import(fileInfo, ConfigurationFactory.Create());
+        public Result Import(FileInfo fileInfo, decimal sample = 100m) {
+            var request = ConfigurationFactory.Create();
+            if (sample > 0m && sample < 100m) {
+                request.Sample = sample;
+            }
+            return Import(fileInfo, request);
         }
 
         public Result Import(FileInfo fileInfo, InspectionRequest request) {
