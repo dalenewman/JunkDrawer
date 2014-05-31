@@ -1,11 +1,12 @@
 using System;
 using System.Configuration;
 using System.Linq;
+using Transformalize.Main.Providers.File;
 
 namespace JunkDrawer {
 
     public static class ConfigurationFactory {
-        public static InspectionRequest Create() {
+        public static FileInspectionRequest Create() {
             try {
                 var cfg = ConfigurationManager.GetSection("junkdrawer");
                 if (cfg == null) {
@@ -150,8 +151,8 @@ namespace JunkDrawer {
             return false;
         }
 
-        public InspectionRequest GetInspectionRequest() {
-            return new InspectionRequest() {
+        public FileInspectionRequest GetInspectionRequest() {
+            return new FileInspectionRequest() {
                 DataTypes = Types.Cast<TypeConfigurationElement>().Select(t => t.Type).ToList(),
                 DefaultLength = Types.DefaultLength,
                 DefaultType = Types.Default,

@@ -73,30 +73,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColumnNameGenerator.cs" />
-    <Compile Include="ColumnNameValidator.cs" />
-    <Compile Include="ExcelInformationReader.cs" />
-    <Compile Include="FieldInspector.cs" />
-    <Compile Include="Field.cs" />
-    <Compile Include="FileInformation.cs" />
-    <Compile Include="FileInformationFactory.cs" />
-    <Compile Include="FileInformationReader.cs" />
-    <Compile Include="FileLineLoader.cs" />
     <Compile Include="FileImporter.cs" />
-    <Compile Include="InspectionRequest.cs" />
     <Compile Include="JunkDrawerException.cs" />
     <Compile Include="JunkReporter.cs" />
-    <Compile Include="ListExtension.cs" />
-    <Compile Include="Line.cs" />
-    <Compile Include="LineLoader.cs" />
-    <Compile Include="Lines.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="LICENSE.txt" />
+    <Content Include="LICENSE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

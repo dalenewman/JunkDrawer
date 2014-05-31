@@ -4,6 +4,7 @@ using System.IO;
 using Transformalize.Configuration.Builders;
 using Transformalize.Libs.NLog;
 using Transformalize.Main;
+using Transformalize.Main.Providers.File;
 
 namespace JunkDrawer {
     public class FileImporter {
@@ -21,7 +22,7 @@ namespace JunkDrawer {
             return Import(fileInfo, request);
         }
 
-        public Result Import(FileInfo fileInfo, InspectionRequest request) {
+        public Result Import(FileInfo fileInfo, FileInspectionRequest request) {
 
             var fileInformation = FileInformationFactory.Create(fileInfo, request);
             Process process;
@@ -33,7 +34,7 @@ namespace JunkDrawer {
                 throw new JunkDrawerException("You must define a JunkDrawer process with an 'output' connection defined in the transformalize configuration section.");
             }
 
-            var entityName = fileInformation.Identifier();
+            var entityName = fileInformation.Identifier("Junk");
 
             var builder = new ProcessBuilder(entityName)
                 .Star(fileInformation.ProcessName)
@@ -51,18 +52,18 @@ namespace JunkDrawer {
 
             var fields = new FieldInspector().Inspect(fileInformation, request);
 
-            foreach (var fieldType in fields) {
-                if (fieldType.Type.Equals("string")) {
-                    _log.Info("Using {0} character string for {1}.", fieldType.Length, fieldType.Name);
+            foreach (var fileField in fields) {
+                if (fileField.Type.Equals("string")) {
+                    _log.Info("Using {0} character string for {1}.", fileField.Length, fileField.Name);
                 } else {
-                    _log.Info("Using {0} for {1}.", fieldType.Type, fieldType.Name);
+                    _log.Info("Using {0} for {1}.", fileField.Type, fileField.Name);
                 }
 
                 builder
-                    .Field(fieldType.Name)
-                    .Length(fieldType.Length)
-                    .Type(fieldType.Type)
-                    .QuotedWith(fieldType.QuoteString());
+                    .Field(fileField.Name)
+                    .Length(fileField.Length)
+                    .Type(fileField.Type)
+                    .QuotedWith(fileField.QuoteString());
             }
 
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
