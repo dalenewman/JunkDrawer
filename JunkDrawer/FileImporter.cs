@@ -68,11 +68,11 @@ namespace JunkDrawer {
 
             _log.Debug(builder.Process().Serialize().Replace(Environment.NewLine, string.Empty));
 
-            ProcessFactory.Create(builder.Process(), new Options { Mode = "init" })[0].Run();
+            ProcessFactory.Create(builder.Process(), new Options { Mode = "init" })[0].ExecuteScaler();
             return new Result {
                 Fields = fields,
                 FileInformation = fileInformation,
-                Rows = ProcessFactory.Create(builder.Process())[0].Run()[entityName]
+                Rows = ProcessFactory.Create(builder.Process())[0].Execute()[entityName]
             };
         }
 
