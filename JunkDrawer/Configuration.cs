@@ -1,12 +1,14 @@
 using System;
 using System.Configuration;
 using System.Linq;
+using Transformalize.Configuration;
+using Transformalize.Main;
 using Transformalize.Main.Providers.File;
 
 namespace JunkDrawer {
 
-    public static class ConfigurationFactory {
-        public static FileInspectionRequest Create() {
+    public static class JunkDrawerConfiguration {
+        public static FileInspectionRequest GetFileInspectionRequest() {
             try {
                 var cfg = ConfigurationManager.GetSection("junkdrawer");
                 if (cfg == null) {
@@ -16,6 +18,18 @@ namespace JunkDrawer {
             } catch (ConfigurationErrorsException ex) {
                 throw new JunkDrawerException("Invalid configuration. {0}", ex.Message);
             }
+        }
+
+        public static ConnectionConfigurationElement GetTransformalizeConnection() {
+            ConnectionConfigurationElement connection;
+
+            try {
+                connection = new ConfigurationFactory("JunkDrawer").Create()[0].Connections["output"];
+            } catch (TransformalizeException tex) {
+                throw new JunkDrawerException("You must define a JunkDrawer process with an 'output' connection defined in the transformalize configuration section. {0}", tex.Message);
+            }
+
+            return connection;
         }
     }
 

@@ -8,7 +8,7 @@ using Transformalize.Main;
 namespace JunkDrawer {
     public class JunkReporter {
 
-        private readonly Logger _log = LogManager.GetLogger("JunkDrawer.JunkReporter");
+        private readonly Logger _log = LogManager.GetLogger("JunkDrawer");
         private const string JUNK_SUMMARY = "JunkSummary";
 
         public void Report() {
