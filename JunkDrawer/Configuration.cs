@@ -97,6 +97,7 @@ namespace JunkDrawer {
         private const string SAMPLE = "sample";
         private const string DEFAULT = "default";
         private const string DEFAULT_LENGTH = "default-length";
+        private const string IGNORE_EMPTY = "ignore-empty";
 
         [ConfigurationProperty(TOP, IsRequired = false, DefaultValue = 0)]
         public int Top {
@@ -108,6 +109,12 @@ namespace JunkDrawer {
         public decimal Sample {
             get { return Convert.ToDecimal(this[SAMPLE]); }
             set { this[SAMPLE] = value; }
+        }
+
+        [ConfigurationProperty(IGNORE_EMPTY, IsRequired = false, DefaultValue = false)]
+        public bool IgnoreEmpty {
+            get { return (bool) this[IGNORE_EMPTY]; }
+            set { this[IGNORE_EMPTY] = value; }
         }
 
         [ConfigurationProperty(DEFAULT, IsRequired = false, DefaultValue = "string")]
@@ -172,7 +179,8 @@ namespace JunkDrawer {
                 DefaultType = Types.Default,
                 Delimiters = Delimiters.Cast<DelimiterConfigurationElement>().ToDictionary(d => d.Character[0], d => d.Name),
                 Top = Types.Top,
-                Sample = Types.Sample
+                Sample = Types.Sample,
+                IgnoreEmpty = Types.IgnoreEmpty
             };
         }
     }
