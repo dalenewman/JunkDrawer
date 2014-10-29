@@ -25,15 +25,23 @@ namespace JunkDrawer {
                 _message = message;
                 _isValid = false;
             } else {
+                var attempts = 0;
                 _fileInfo = new FileInfo(fileName);
+                while (attempts < retries - 1 && !_fileInfo.Exists) {
+                    Console.Beep();
+                    attempts++;
+                    _log.Info("File does't exist yet. Waiting {0}...", attempts);
+                    Thread.Sleep(1000);
+                }
+
                 if (!_fileInfo.Exists) {
                     _message = string.Format("File '{0}' does not exist!", _fileInfo.FullName);
                 } else {
-                    var tries = 0;
-                    while (tries < retries - 1 && FileInUse(_fileInfo)) {
+                    attempts = 0;
+                    while (attempts < retries - 1 && FileInUse(_fileInfo)) {
                         Console.Beep();
-                        tries++;
-                        _log.Info("File is in use. Waiting {0}...", tries);
+                        attempts++;
+                        _log.Info("File is in use. Waiting {0}...", attempts);
                         Thread.Sleep(1000);
                     }
                     if (FileInUse(_fileInfo)) {
@@ -42,7 +50,6 @@ namespace JunkDrawer {
                     } else {
                         _isValid = true;
                     }
-
                 }
             }
         }
