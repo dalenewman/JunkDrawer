@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Transformalize.Libs.NLog;
+using Transformalize.Logging;
 
 namespace JunkDrawer {
     public class Request {
+        private const string PROCESS_NAME = "JunkDrawer";
 
-        private readonly Logger _log = LogManager.GetCurrentClassLogger();
         private readonly bool _isValid;
         private readonly string _message = string.Empty;
         private readonly FileInfo _fileInfo;
@@ -30,7 +30,7 @@ namespace JunkDrawer {
                 while (attempts < retries - 1 && !_fileInfo.Exists) {
                     Console.Beep();
                     attempts++;
-                    _log.Info("File does't exist yet. Waiting {0}...", attempts);
+                    TflLogger.Info(PROCESS_NAME, _fileInfo.Name, "File does't exist yet. Waiting {0}...", attempts);
                     Thread.Sleep(1000);
                 }
 
@@ -41,7 +41,7 @@ namespace JunkDrawer {
                     while (attempts < retries - 1 && FileInUse(_fileInfo)) {
                         Console.Beep();
                         attempts++;
-                        _log.Info("File is in use. Waiting {0}...", attempts);
+                        TflLogger.Info(PROCESS_NAME,_fileInfo.Name, "File is in use. Waiting {0}...", attempts);
                         Thread.Sleep(1000);
                     }
                     if (FileInUse(_fileInfo)) {
@@ -60,7 +60,7 @@ namespace JunkDrawer {
                     return false;
                 }
             } catch (IOException exception) {
-                _log.Debug(exception.Message);
+                TflLogger.Debug(PROCESS_NAME,fileInfo.Name, exception.Message);
                 return true;
             }
         }
