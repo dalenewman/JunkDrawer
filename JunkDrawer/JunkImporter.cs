@@ -1,6 +1,7 @@
 using System.IO;
 using Transformalize.Configuration;
 using Transformalize.Logging;
+using Transformalize.Main;
 using Transformalize.Main.Providers.File;
 
 namespace JunkDrawer {
@@ -9,6 +10,10 @@ namespace JunkDrawer {
 
         public void Import(FileInfo fileInfo) {
             var configuration = new ConfigurationFactory("JunkDrawer").CreateSingle();
+            var process = ProcessFactory.CreateSingle(configuration);
+
+            process.StartLogging();
+
             var fileInspection = configuration.FileInspection.GetInspectionRequest();
             var connection = configuration.Connections["output"];
 
