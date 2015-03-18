@@ -306,16 +306,23 @@ However, you can make as many different configurations as
 you want, and pass them in as the second argument 
 of the jd.exe executable (i.e. `jd sample.txt other.xml`).
 
-### Conclusion
+### Precautions
 
 I called it Junk Drawer because importing files directly 
-into a database can get messy. It ends up an uncontrolled 
-staging area for data. Nevertheless, it empowers your trusted 
-friends to put some data in there and run ad-hoc queries 
-until their heart&#39;s content.
-
-If you&#39;re the acting DBA, and you put your `Junk` on an 
+into a database can get messy. It may end up an uncontrolled 
+staging area for data. If you&#39;re the acting DBA, and you put your `Junk` on an 
 important server, make sure you have monitors in place 
 for disk space, CPU abuse, and excessive resource blocking. 
-You should have this all setup regardless if you have Junk 
-Drawer running.
+
+###Conclusion
+
+Once in place, Junk Drawer can empower your trusted 
+friends to import their data into a Junk database 
+and run ad-hoc queries until their heart&#39;s content.
+
+Of course there are going to be files that are so messed up, 
+that JunkDrawer won't be able to make any sense of them. In 
+that case, you'll have to resort to shouting, head-locks, 
+notepad++, and the wizard.
+
+Thanks for reading.
