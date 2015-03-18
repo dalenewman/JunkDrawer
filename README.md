@@ -203,7 +203,7 @@ Then, the delimiter with the lowest [coefficient
 of variation](http://en.wikipedia.org/wiki/Coefficient_of_variation) 
 is declared the winner.
 
-I'm no statitician, but from what I gather, taking the delimiter 
+I'm no statistician, but from what I gather, taking the delimiter 
 with the lowest coefficient of variation gives us the most 
 consistent delimiter across all lines.
 
