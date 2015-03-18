@@ -1,0 +1,35 @@
+﻿<junk-drawer>
+
+  <connections>
+    <add name="output" provider="sqlserver" server="localhost" database="Junk" />
+  </connections>
+
+  <file-inspection>
+    
+    <add name="default"
+         min-length="64"
+         max-length="4000"
+         sample="100"
+         line-limit="100"
+         ignore-empty="false">
+      <types>
+        <add type="boolean"/>
+        <!--<add type="byte"/>-->
+        <!--<add type="int16"/>-->
+        <add type="int32"/>
+        <add type="int64"/>
+        <!--<add type="single"/>-->
+        <!--<add type="double"/>-->
+        <add type="decimal"/>
+        <add type="datetime"/>
+      </types>
+      <delimiters>
+        <add name="comma" character=","/>
+        <add name="pipe" character="|"/>
+        <add name="tab" character="&#009;"/>
+        <add name="semicolon" character=";"/>
+      </delimiters>
+    </add>
+  </file-inspection>
+
+</junk-drawer>

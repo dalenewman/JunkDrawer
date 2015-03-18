@@ -1,0 +1,4 @@
+﻿Name     WebSite                 Created
+Google   http://www.google.com   9/4/98
+Apple    http://www.apple.com    4/1/1976
+Microsofthttp://www.microsoft.com4/4/1975

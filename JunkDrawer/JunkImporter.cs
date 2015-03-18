@@ -1,30 +1,28 @@
-using System.IO;
-using Transformalize.Configuration;
+using System.Linq;
 using Transformalize.Logging;
-using Transformalize.Main;
 using Transformalize.Main.Providers.File;
 
 namespace JunkDrawer {
 
     public class JunkImporter {
 
-        public void Import(FileInfo fileInfo) {
-            var configuration = new ConfigurationFactory("JunkDrawer").CreateSingle();
-            var process = ProcessFactory.CreateSingle(configuration);
+        public Response Import(Request request) {
 
-            process.StartLogging();
+            var connection = request.Cfg.Connections.First();
+            var fileInspection = request.Cfg.FileInspection.First().GetInspectionRequest(request.FileInfo.FullName);
 
-            var fileInspection = configuration.FileInspection.GetInspectionRequest();
-            var connection = configuration.Connections["output"];
-
-            TflLogger.Info("JunkDrawer", fileInfo.Name, "Default data type is {0}.", fileInspection.DefaultType);
-            TflLogger.Info("JunkDrawer", fileInfo.Name, "Default string data type length is {0}.", fileInspection.DefaultLength);
-            TflLogger.Info("JunkDrawer", fileInfo.Name, "Inspecting for {0} data types.", fileInspection.DataTypes.Count);
-            foreach (var type in fileInspection.DataTypes) {
-                TflLogger.Info("JunkDrawer", fileInfo.Name, "Inspecting for data type: {0}.", type);
+            // If TableName is set, make it the entity name, which is what Tfl uses for the name of the table
+            if (!string.IsNullOrEmpty(request.TableName)) {
+                fileInspection.EntityName = request.TableName;
             }
 
-            new FileImporter().ImportScaler(fileInfo, fileInspection, connection);
+            TflLogger.Info("JunkDrawer", request.FileInfo.Name, "Default data type is {0}.", fileInspection.DefaultType);
+            TflLogger.Info("JunkDrawer", request.FileInfo.Name, "Default string data type length is {0}.", fileInspection.DefaultLength);
+            TflLogger.Info("JunkDrawer", request.FileInfo.Name, "Inspecting for {0} data types.", fileInspection.DataTypes.Count);
+
+            var records = new FileImporter().ImportScaler(fileInspection, connection);
+            return new Response() { TableName = fileInspection.EntityName, Records = records };
+
         }
     }
 }
