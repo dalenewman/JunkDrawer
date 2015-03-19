@@ -1,7 +1,7 @@
 JunkDrawer
 ==============
 JunkDrawer is a tool that imports excel or delimited files
-into a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under 
+into a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under
 GNU General Public License, version 3 (GPL-3.0).
 
 ###Introduction
@@ -86,18 +86,6 @@ called [Junk Drawer](https://github.com/dalenewman/JunkDrawer "Junk Drawer on Gi
 The goal is to make importing an Excel
 or text file to a database easier.
 
-### Requirements
-
-I don&#39;t want staff members to need a copy of Junk Drawer
-on their computer. I just want them to drop a file on a network
-share and have it imported. For myself, I want to be able to 
-right-click on a file and use the _Open With_ (Junk Drawer) option.
-
-For both requirements, all I need is a .NET Console application.
-For the network share, I can enable folder monitoring and 
-an action trigger to execute Junk Drawer with job automation software
-(i.e. [Visual Cron](http://www.visualcron.com/ "Visual Cron")).
-
 ### Configuration
 
 Before you run Junk Drawer for the first time,
@@ -110,16 +98,15 @@ Junk Drawer's configuration file _default.xml_.
   &lt;connections&gt;
     &lt;add name=&quot;output&quot; 
          provider=&quot;sqlserver&quot; 
-         <strong>server</strong>=&quot;localhost&quot; 
-         <strong>database</strong>=&quot;Junk&quot; /&gt;
+        <strong>server</strong>=&quot;localhost&quot; 
+        <strong>database</strong>=&quot;Junk&quot; /&gt;
   &lt;/connections&gt;
-  
   &lt;!-- more later --&gt;
 &lt;/junk-drawer&gt;
 </pre>
 
-**Note**: For a connection, you may use the `server` 
-and `database` attributes, or one called `connection-string`. 
+**Note**: For a connection, you may use the `server`
+and `database` attributes, or one called `connection-string`.
 This lets Junk Drawer know where you want to keep your junk.
 
 ### Get a File
@@ -137,7 +124,7 @@ Grace<strong>,</strong>9/9/2000 11 PM<strong>,</strong>56
 Gavin<strong>,</strong>7/3/2010<strong>,</strong>13
 </pre>
 
-If we save this (above) in a file called _sample.txt_, 
+If we save this (above) in a file called _sample.txt_,
 we could import it from the command line like this:
 
 <pre class="prettyprint" lang="shell">
@@ -148,7 +135,6 @@ Junk Drawer (_jd.exe_) imports the file, and now it can be queried:
 
 <pre class="prettyprint" lang="sql">
 USE Junk
-
 SELECT Name, Birthday, Points 
 FROM sample;
 </pre>
@@ -159,7 +145,8 @@ Name  Birthday            Points
 Dale  1981-03-03 09:00:00 73
 Gavin 2010-07-03 00:00:00 13
 Tara  1990-12-31 00:00:00 1042
-Grace 2000-09-09 23:00:00 56    </pre>
+Grace 2000-09-09 23:00:00 56
+</pre>
 
 The table structure looks similar to this:
 
@@ -173,16 +160,16 @@ CREATE TABLE sample(
 
 ### How Does it Work?
 
-When we see sample text above, it's easy for us 
-to notice the first row is different. We recognize it 
+When we see sample text above, it's easy for us
+to notice the first row is different. We recognize it
 as a set of column names. The lines that follow are records.
 
-Because there are only a few columns (3), and a few records (4), 
-it's easy for us to see that the _comma_ is delimiting the values 
-in each record.  Moreover, we can see `Name` is text, `Birthday` 
+Because there are only a few columns (3), and a few records (4),
+it's easy for us to see that the _comma_ is delimiting the values
+in each record.  Moreover, we can see `Name` is text, `Birthday`
 is a date, and `Points` is numeric.
 
-Junk Drawer just has to do the same thing as we do. 
+Junk Drawer just has to do the same thing as we do.
 It has to figure out three things:
 
 1. the delimiter
@@ -193,24 +180,24 @@ For Excel files, you can skip the first step.
 
 ### Finding the Delimiter
 
-By default, 100 lines are examined. A set of pre-defined 
-delimiters are counted in each line. If any delimiters 
-are found, the average per line and [standard 
-deviation](http://www.mathsisfun.com/data/standard-deviation.html) 
-are calculated. 
+By default, 100 lines are examined. A set of pre-defined
+delimiters are counted in each line. If any delimiters
+are found, the average per line and [standard
+deviation](http://www.mathsisfun.com/data/standard-deviation.html)
+are calculated.
 
-Then, the delimiter with the lowest [coefficient 
-of variation](http://en.wikipedia.org/wiki/Coefficient_of_variation) 
+Then, the delimiter with the lowest [coefficient
+of variation](http://en.wikipedia.org/wiki/Coefficient_of_variation)
 is declared the winner.
 
-I'm no statistician, but from what I gather, taking the delimiter 
-with the lowest coefficient of variation gives us the most 
+I'm no statistician, but from what I gather, taking the delimiter
+with the lowest coefficient of variation gives us the most
 consistent delimiter across all lines.
 
 ### Column Names
 
-We don&#39;t know if the first record is column names, or 
-just another record. So, it is split by the 
+We don&#39;t know if the first record is column names, or
+just another record. So, it is split by the
 winning delimiter and run through a series of tests:
 
 * Are there any duplicate values?
@@ -219,110 +206,123 @@ winning delimiter and run through a series of tests:
 * Are there any numbers?
 * Are there any dates?
 
-If any of the answers are &quot;Yes,&quot; 
-then the first line cannot be used as column names. 
-If this happens, default column names are 
-generated (i.e. A, B, C, etc. like Excel). In the 
-example above; `Name`, `Birthday`, and `Points` 
-answer &quot;No&quot; to all the questions, so 
+If any of the answers are &quot;Yes,&quot;
+then the first line cannot be used as column names.
+If this happens, default column names are
+generated (i.e. A, B, C, etc. like Excel). In the
+example above; `Name`, `Birthday`, and `Points`
+answer &quot;No&quot; to all the questions, so
 they make good column names.
 
 ### Data Types
 
-By default, the entire file is run through data type validation 
-against a set of types in a particular order. This produces a 
-compatible set of data types, but may take some time depending 
-on the size of your file. Here is the _default.xml_ configuration:
+By default, every value of every line is tested against
+a set of types defined in _default.xml_.
 
 <pre class="prettyprint" lang="xml">
 &lt;junk-drawer&gt;
   &lt;!-- connections --&gt;
   &lt;file-inspection&gt;
-    &lt;add name=&quot;default&quot;
-         min-length=&quot;64&quot;
-         max-length=&quot;4000&quot;
-         <strong>sample=&quot;100&quot;</strong>
-         line-limit=&quot;100&quot;&gt;
+    &lt;add name=&quot;default&quot; <strong>sample=&quot;100&quot;</strong>&gt;
       &lt;!-- the pre-defined set of types --&gt;
-      <strong>&lt;types&gt;
+        <strong>&lt;types&gt;
         &lt;add type=&quot;boolean&quot;/&gt;
-        &lt;!--&lt;add type=&quot;byte&quot;/&gt;--&gt;
-        &lt;!--&lt;add type=&quot;int16&quot;/&gt;--&gt;
         &lt;add type=&quot;int32&quot;/&gt;
         &lt;add type=&quot;int64&quot;/&gt;
-        &lt;!--&lt;add type=&quot;single&quot;/&gt;--&gt;
-        &lt;!--&lt;add type=&quot;double&quot;/&gt;--&gt;
         &lt;add type=&quot;decimal&quot;/&gt;
         &lt;add type=&quot;datetime&quot;/&gt;
       &lt;/types&gt;</strong>
-      &lt;!-- the pre-defined set of delimiters --&gt;
-      &lt;delimiters&gt;
-        &lt;add name=&quot;comma&quot; character=&quot;,&quot;/&gt;
-        &lt;add name=&quot;pipe&quot; character=&quot;|&quot;/&gt;
-        &lt;add name=&quot;tab&quot; character=&quot;&amp;#009;&quot;/&gt;
-      &lt;/delimiters&gt;
+      &lt;!-- delimiters --&gt;
     &lt;/add&gt;
   &lt;/file-inspection&gt;
 &lt;/junk-drawer&gt;
 </pre>
 
-For example, if all the `Points` values in the file respond 
-&quot;Yes,&quot; to the question &quot;Are you an integer?,&quot; 
-then I store them in an `INTEGER` in the database. 
-If there are mixed or failing validation results, like a 
-combination of numbers and strings, I default to 
-a string, which is then stored as an `NVARCHAR(x)` in the database. 
 
-The data types are the final piece of information 
-we need to import the file into a database.
+Take `Points` for example:
 
-### Doing it with Code
+* Is 73 a `boolean`?  No
+* Is 73 an `int32`? **Yes**
+* Is 13 an `int32`? **Yes**
+* Is 1042 an `int32`? **Yes**
+* Is 56 an `int32`? **Yes**
 
-JunkDrawer comes with a library and an executable.  If you want to use 
-the library, you can reference _JunkDrawer.dll_ (and [Transformalize.dll](https://github.com/dalenewman/Transformalize)) 
+So, `Points` is compatible with an `int32`, and it is stored as
+an `INTEGER` in the database.
+
+If there are mixed or failing validation results, like a
+combination of numbers and strings, I default to
+a string, which is then stored as an `NVARCHAR(x)` in the database.
+
+If you want to increase the speed of data type
+validation, at the cost of accuracy, change the 
+`sample` size to something less than 100 (100%).
+
+Once all the values are checked, Junk Drawer
+has a compatible set of data types.  The data types
+are the final piece of information we need in
+order to import the file.
+
+### Doing it in Code
+
+JunkDrawer comes with a library and an executable.  If you want to use
+the library, you can reference _JunkDrawer.dll_ (and _[Transformalize.dll](https://github.com/dalenewman/Transformalize)_)
 and run it like this:
 
 <pre class="prettyprint" lang="cs">
-    var cfg = new JunkCfg(File.ReadAllText(@&quot;default.xml&quot;));
-    var request = new Request(@&quot;sample.txt&quot;, cfg);
-    var response = new JunkImporter().Import(request);
+var cfg = new JunkCfg(File.ReadAllText(@&quot;<strong>default.xml</strong>&quot;));
+var request = new Request(@&quot;sample.txt&quot;, cfg);
+var response = new JunkImporter().Import(request);
 
-    Console.WriteLine(&quot;Table: {0}&quot;, response.TableName);
-    Console.WriteLine(&quot;Records: {0}&quot;, response.Records);
+Console.WriteLine(&quot;Table: {0}&quot;, response.TableName);
+Console.WriteLine(&quot;Records: {0}&quot;, response.Records);
 </pre>
 
 This should produce output like this:
 
 <pre class="prettyprint" lang="shell">
-Table: TflAuto3757101240000
+Table: sample
 Records: 4
 </pre>
 
-If you want to name your table something specific, you can 
-pass `TableName` in with the `Request`.
+If you want to name your table something specific, you can
+set `TableName` in the `Request`.
 
-The default configuration comes in the file _default.xml_. 
-However, you can make as many different configurations as 
-you want, and pass them in as the second argument 
-of the jd.exe executable (i.e. `jd sample.txt other.xml`).
+**Note**: Both the executable and the libary need 
+a configuration. I loaded the _default.xml_ 
+configuration above. However, you can make as many 
+different configurations as you want.
+
+To use a custom configuration with the executable, 
+pass the configuration file in as the second argument (i.e. 
+`jd` _sample.txt_ **other.xml**). If you want to know 
+more about the configuration provider, check out my 
+[Cfg-NET](http://www.codeproject.com/Articles/862990/Cfg-NET) 
+article.
 
 ### Precautions
 
-I called it Junk Drawer because importing files directly 
-into a database can get messy. It may end up an uncontrolled 
-staging area for data. If you&#39;re the acting DBA, and you put your `Junk` on an 
-important server, make sure you have monitors in place 
-for disk space, CPU abuse, and excessive resource blocking. 
+####Overwriting Tables
+If you import the same file into Junk Drawer twice, it will 
+overwrite the table.  So, if you run `jd.exe` _sample.txt_ and it 
+creates a `sample` table, then you run `jd.exe` _sample.txt_ again, it 
+will over-write the `sample` table. Don't worry though; it's only 
+your junk.
+
+####Things Might Get Crazy
+I called it Junk Drawer because importing files directly
+into a database can get messy. It may end up an uncontrolled
+staging area for data. If you&#39;re the acting DBA, and you put your `Junk` on an
+important server, make sure you have monitors in place
+for disk space, CPU abuse, and excessive resource blocking.
 
 ###Conclusion
 
-Once in place, Junk Drawer can empower your trusted 
-friends to import their data into a Junk database 
+Once in place, Junk Drawer can empower your trusted
+friends to import their data into a Junk database
 and run ad-hoc queries until their heart&#39;s content.
 
-Of course there are going to be files that are so messed up, 
-that JunkDrawer won't be able to make any sense of them. In 
-that case, you'll have to resort to shouting, head-locks, 
-notepad++, and the wizard.
-
-Thanks for reading.
+Of course there are going to be files that are so messed up,
+that JunkDrawer won't be able to make any sense of them. In
+that case, you'll have to resort to shouting, head-locks,
+and noogies.
