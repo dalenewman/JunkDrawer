@@ -6,8 +6,13 @@ using Transformalize.Main.Providers.File;
 namespace JunkDrawer {
 
     public class JunkImporter {
+        private readonly ILogger _logger;
 
-        public Response Import(Request request, ILogger logger) {
+        public JunkImporter(ILogger logger) {
+            _logger = logger;
+        }
+
+        public Response Import(Request request) {
 
             var connection = request.Cfg.Connections.First();
             var fileInspection = request.Cfg.FileInspection.First().GetInspectionRequest(request.FileInfo.FullName);
@@ -18,13 +23,12 @@ namespace JunkDrawer {
             }
 
             var name = Path.GetFileNameWithoutExtension(request.FileInfo.Name);
-            logger.EntityInfo(name, "Default data type is {0}.", fileInspection.DefaultType);
-            logger.EntityInfo(name, "Default string data type length is {0}.", fileInspection.DefaultLength);
-            logger.EntityInfo(name, "Inspecting for {0} data types.", fileInspection.DataTypes.Count);
+            _logger.EntityInfo(name, "Default data type is {0}.", fileInspection.DefaultType);
+            _logger.EntityInfo(name, "Default string data type length is {0}.", fileInspection.DefaultLength);
+            _logger.EntityInfo(name, "Inspecting for {0} data types.", fileInspection.DataTypes.Count);
 
-            var records = new FileImporter(logger).ImportScaler(fileInspection, connection);
+            var records = new FileImporter(_logger).ImportScaler(fileInspection, connection);
             return new Response() { TableName = fileInspection.EntityName, Records = records };
-
         }
     }
 }

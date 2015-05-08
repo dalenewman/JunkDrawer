@@ -3,16 +3,16 @@ using System.Linq;
 using Transformalize.Configuration;
 using Transformalize.Logging;
 
-namespace Test {
+namespace JunkDrawer {
 
-    public class TestLogger : ILogger {
+    public class ConsoleLogger : ILogger {
 
         private const string LAYOUT = "{0:hh:mm:ss} | {1} | {2} | {3} | {4}";
         private readonly Func<string, string, string, string, object[], string> _formatter = (message, level, process, entity, args) => string.Format(string.Format(LAYOUT, DateTime.Now, level, process, entity, message), args);
 
         public string Name { get; set; }
 
-        public TestLogger() {
+        public ConsoleLogger() {
             Name = "Test";
         }
 

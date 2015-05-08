@@ -267,47 +267,82 @@ Once the values are checked, Junk Drawer
 has a compatible set of data types and it's ready 
 to try and import the file
 
-### Doing it in Code
+### In Code
 
-JunkDrawer comes with a library and an executable.  If you want to use
-the library, you can reference _JunkDrawer.dll_ (and _[Transformalize.dll](https://github.com/dalenewman/Transformalize)_)
-and run it like this:
+JunkDrawer is a library _and_ an executable.
 
-<pre class="prettyprint" lang="cs">
-var cfg = new JunkCfg(File.ReadAllText(@&quot;<strong>default.xml</strong>&quot;));
-var logger = new YourLogger();
-var request = new Request(@&quot;sample.txt&quot;, cfg, logger);
-var response = new JunkImporter(logger).Import(request);
+If you want to use the library, 
+it's available on [Nuget](https://www.nuget.org/packages/JunkDrawer/). 
 
-Console.WriteLine(&quot;Table: {0}&quot;, response.TableName);
-Console.WriteLine(&quot;Records: {0}&quot;, response.Records);
+<pre class="prettyprint" lang="bash">
+PM> Install-Package <strong>JunkDrawer</strong>
 </pre>
 
-This should produce output like this:
+Installing it brings down [Transformalize](https://github.com/dalenewman/Transformalize) 
+and [Cfg-Net](https://github.com/dalenewman/Cfg-NET) as well. 
+Here's a console application example:
+
+<pre class="prettyprint" lang="cs">
+using System;
+using System.IO;
+<strong>using JunkDrawer;
+using Transformalize.Logging;</strong>
+
+namespace ConsoleApplication1 {
+
+    class Program {
+
+        static void Main(string[] args) {
+
+        var cfg = new JunkCfg(File.ReadAllText("default.xml"));
+        if (!cfg.Problems().Any()) {
+            var logger = new NullLogger();
+            var request = new Request("sample.txt", cfg, logger);
+            var response = new JunkImporter(logger).Import(request);
+
+            Console.WriteLine("Table: {0}", response.TableName);
+            Console.WriteLine("Records: {0}", response.Records);
+        } else {
+            foreach (var problem in cfg.Problems()) {
+                Console.Error.WriteLine(problem);
+            }
+        }
+        Console.ReadKey();
+
+        }
+    }
+}
+</pre>
+
+Using [default.xml](https://github.com/dalenewman/JunkDrawer/blob/master/JunkDrawer.Console/default.xml) and 
+[sample.txt](https://github.com/dalenewman/JunkDrawer/blob/master/Test/sample.txt), you should 
+see output like this:
 
 <pre class="prettyprint" lang="shell">
 Table: sample
 Records: 4
 </pre>
 
-If you want to name your table something specific, you can
-set `TableName` in the `Request`.
+#### Table Name
+If you want to name your table something else, you can
+set the `TableName` property in the `Request` object.
 
-**Code Note 1**: Both the executable and the libary need 
-a configuration. I loaded the _default.xml_ 
-configuration above. However, you can make as many 
-different configurations as you want.
+#### Configuration
+The `Request` requires a 'Cfg-NET' configuration. I used _default.xml_ above. 
+However, you can make as many different configurations as you want.
 
-To use a custom configuration with the executable, 
-pass the configuration file in as the second argument (i.e. 
-`jd` _sample.txt_ **other.xml**). If you want to know 
-more about the configuration provider, check out my 
-[Cfg-NET](http://www.codeproject.com/Articles/862990/Cfg-NET) 
-article.
+The executable can also use other configurations.  Just pass the 
+configuration file name in as the second argument:
 
-**Code Note 2**: You must implement ILogger and pass it in. This 
-allows you to use your favorite logging library.  To see an example, 
-take a look at JunkLogger.cs;
+<pre class="prettyprint" lang="shell">
+jd.exe sample.txt <strong>other.xml</strong>
+</pre>
+
+#### Logging
+You have to pass a logger in.  There is a `NullLogger` in 
+Transformalize, or a `ConsoleLogger` in JunkDrawer you can use, or 
+you can implement Transformalize's `ILogger` and use your favorite 
+logging library.  The executable implement's one using [Serilog](https://github.com/serilog/serilog).
 
 ### Precautions
 

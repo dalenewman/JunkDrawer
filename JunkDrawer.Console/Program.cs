@@ -28,7 +28,7 @@ namespace JunkDrawer {
             }
 
             try {
-                new JunkImporter().Import(request, logger);
+                new JunkImporter(logger).Import(request);
             } catch (Exception ex) {
                 logger.EntityError(request.FileInfo.Name, ex, ex.Message);
             }

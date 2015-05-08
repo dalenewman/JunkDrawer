@@ -2,7 +2,7 @@
 
   <connections>
     <add name="output" provider="sqlserver" server="localhost" database="Junk" />
-    <!--<add name="mail" provider="mail" server="mail.scope-services.local" />-->
+    <!--<add name="mail" provider="mail" server="" />-->
   </connections>
 
   <log>
