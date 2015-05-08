@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Sinks.Email</name>
+    </assembly>
+    <members>
+        <member name="T:Serilog.LoggerConfigurationEmailExtensions">
+            <summary>
+            Adds the WriteTo.Email() extension method to <see cref="T:Serilog.LoggerConfiguration"/>.
+            </summary>
+        </member>
+        <member name="M:Serilog.LoggerConfigurationEmailExtensions.Email(Serilog.Configuration.LoggerSinkConfiguration,System.String,System.String,System.String,System.Net.ICredentialsByHost,System.String,Serilog.Events.LogEventLevel,System.Int32,System.Nullable{System.TimeSpan},System.IFormatProvider)">
+            <summary>
+            Adds a sink that sends log events via email.
+            </summary>
+            <param name="loggerConfiguration">The logger configuration.</param>
+            <param name="fromEmail">The email address emails will be sent from</param>
+            <param name="toEmail">The email address emails will be sent to</param>
+            <param name="mailServer">The SMTP email server to use</param>
+            <param name="networkCredential">The network credentials to use to authenticate with mailServer</param>
+            <param name="outputTemplate">A message template describing the format used to write to the sink.
+            the default is "{Timestamp} [{Level}] {Message}{NewLine}{Exception}".</param>
+            <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
+            <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+            <returns>Logger configuration, allowing configuration to continue.</returns>
+            <exception cref="T:System.ArgumentNullException">A required parameter is null.</exception>
+        </member>
+        <member name="M:Serilog.LoggerConfigurationEmailExtensions.Email(Serilog.Configuration.LoggerSinkConfiguration,System.String,System.Collections.Generic.IEnumerable{System.String},System.String,System.Net.ICredentialsByHost,System.String,Serilog.Events.LogEventLevel,System.Int32,System.Nullable{System.TimeSpan},System.IFormatProvider)">
+            <summary>
+            Adds a sink that sends log events via email.
+            </summary>
+            <param name="loggerConfiguration">The logger configuration.</param>
+            <param name="fromEmail">The email address emails will be sent from</param>
+            <param name="toEmails">The email addresses emails will be sent to</param>
+            <param name="mailServer">The SMTP email server to use</param>
+            <param name="networkCredential">The network credentials to use to authenticate with mailServer</param>
+            <param name="outputTemplate">A message template describing the format used to write to the sink.
+            the default is "{Timestamp} [{Level}] {Message}{NewLine}{Exception}".</param>
+            <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
+            <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+            <returns>Logger configuration, allowing configuration to continue.</returns>
+            <exception cref="T:System.ArgumentNullException">A required parameter is null.</exception>
+        </member>
+        <member name="M:Serilog.LoggerConfigurationEmailExtensions.Email(Serilog.Configuration.LoggerSinkConfiguration,Serilog.Sinks.Email.EmailConnectionInfo,System.String,Serilog.Events.LogEventLevel,System.Int32,System.Nullable{System.TimeSpan},System.IFormatProvider)">
+            <summary>
+            Adds a sink that sends log events via email.
+            </summary>
+            <param name="loggerConfiguration">The logger configuration.</param>
+            <param name="connectionInfo">The connection info used for </param>
+            <param name="outputTemplate">A message template describing the format used to write to the sink.
+            the default is "{Timestamp} [{Level}] {Message}{NewLine}{Exception}".</param>
+            <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
+            <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+            <returns>Logger configuration, allowing configuration to continue.</returns>
+            <exception cref="T:System.ArgumentNullException">A required parameter is null.</exception>
+        </member>
+        <member name="T:Serilog.Sinks.Email.EmailConnectionInfo">
+            <summary>
+            Connection information for use by the Email sink.
+            </summary>
+        </member>
+        <member name="F:Serilog.Sinks.Email.EmailConnectionInfo.DefaultPort">
+            <summary>
+            The default port used by for SMTP transfer.
+            </summary>
+        </member>
+        <member name="F:Serilog.Sinks.Email.EmailConnectionInfo.DefaultSubject">
+            <summary>
+            The default subject used for email messages.
+            </summary>
+        </member>
+        <member name="M:Serilog.Sinks.Email.EmailConnectionInfo.#ctor">
+            <summary>
+            Constructs the <see cref="T:Serilog.Sinks.Email.EmailConnectionInfo"/> with the default port and default email subject set.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.NetworkCredentials">
+            <summary>
+            Gets or sets the credentials used for authentication.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.Port">
+            <summary>
+            Gets or sets the port used for the connection.
+            Default value is 25.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.FromEmail">
+            <summary>
+            The email address emails will be sent from.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.ToEmail">
+            <summary>
+            The email address(es) emails will be sent to. Accepts multiple email addresses separated by comma or semicolon.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.EmailSubject">
+            <summary>
+            The subject to use for the email.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.EnableSsl">
+            <summary>
+            Flag as true to use SSL in the SMTP client.
+            </summary>
+        </member>
+        <member name="P:Serilog.Sinks.Email.EmailConnectionInfo.MailServer">
+            <summary>
+            The SMTP email server to use.
+            </summary>
+        </member>
+        <member name="F:Serilog.Sinks.Email.EmailSink.DefaultBatchPostingLimit">
+            <summary>
+            A reasonable default for the number of events posted in
+            each batch.
+            </summary>
+        </member>
+        <member name="F:Serilog.Sinks.Email.EmailSink.DefaultPeriod">
+            <summary>
+            A reasonable default time to wait between checking for event batches.
+            </summary>
+        </member>
+        <member name="M:Serilog.Sinks.Email.EmailSink.#ctor(Serilog.Sinks.Email.EmailConnectionInfo,System.Int32,System.TimeSpan,Serilog.Formatting.ITextFormatter)">
+            <summary>
+            Construct a sink emailing with the specified details.
+            </summary>
+            <param name="connectionInfo">Connection information used to construct the SMTP client and mail messages.</param>
+            <param name="batchSizeLimit">The maximum number of events to post in a single batch.</param>
+            <param name="period">The time to wait between checking for event batches.</param>
+            <param name="textFormatter">Supplies culture-specific formatting information, or null.</param>
+        </member>
+        <member name="M:Serilog.Sinks.Email.EmailSink.SendCompletedCallback(System.Object,System.ComponentModel.AsyncCompletedEventArgs)">
+            <summary>
+            Reports if there is an error in sending an email
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Serilog.Sinks.Email.EmailSink.Dispose(System.Boolean)">
+            <summary>
+            Free resources held by the sink.
+            </summary>
+            <param name="disposing">If true, called because the object is being disposed; if false,
+            the object is being disposed from the finalizer.</param>
+        </member>
+        <member name="M:Serilog.Sinks.Email.EmailSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})">
+            <summary>
+            Emit a batch of log events, running asynchronously.
+            </summary>
+            <param name="events">The events to emit.</param>
+            <remarks>Override either <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})"/> or <see cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})"/>,
+            not both.</remarks>
+        </member>
+    </members>
+</doc>

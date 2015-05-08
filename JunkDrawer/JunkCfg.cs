@@ -21,8 +21,8 @@ namespace JunkDrawer {
 
         protected override void Validate() {
 
-            if (Connections.Count != 1) {
-                AddProblem("You must have one connection defined.");
+            if (Connections.Count < 1) {
+                AddProblem("You must have at least one connection defined.");
             }
 
             if (FileInspection.Count != 1) {
@@ -30,12 +30,11 @@ namespace JunkDrawer {
             }
 
             if (Log.Count == 0) {
-                //  <add name="file" provider="file" level="Informational" folder="." />
                 var log = this.GetDefaultOf<TflLog>(l => {
                     l.Name = "file";
                     l.Provider = "file";
                     l.Level = "Informational";
-                    l.Folder = ".";
+                    l.File = "Junk-Drawer-{Date}.log";
                 });
                 Log.Add(log);
             }

@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Transformalize.Libs.SemanticLogging;
-using Transformalize.Logging;
 
 namespace JunkDrawer {
 
     public class Program {
 
-        private const string PROCESS_NAME = "JunkDrawer";
         private const int ERROR = 1;
 
         static void Main(string[] args) {
@@ -22,26 +18,21 @@ namespace JunkDrawer {
                 Environment.Exit(ERROR);
             }
 
-            var listener = new ObservableEventListener();
-            listener.EnableEvents(TflEventSource.Log, EventLevel.Informational);
-            var subscription = listener.LogToConsole(new LegacyLogFormatter());
+            var cfg = LoadConfiguration(args);
+            var logger = new JunkLogger(cfg) { Name = Path.GetFileNameWithoutExtension(args[0]) };
 
-            var request = new Request(args[0], LoadConfiguration(args));
+            var request = new Request(args[0], cfg, logger);
             if (!request.IsValid) {
-                TflLogger.Error(PROCESS_NAME, string.Empty, request.Message);
+                logger.Error(request.Message);
                 Environment.Exit(ERROR);
             }
 
             try {
-                new JunkImporter().Import(request);
+                new JunkImporter().Import(request, logger);
             } catch (Exception ex) {
-                TflLogger.Error(PROCESS_NAME, request.FileInfo.Name, ex.Message);
-                TflLogger.Debug(PROCESS_NAME, request.FileInfo.Name, ex.StackTrace);
+                logger.EntityError(request.FileInfo.Name, ex, ex.Message);
             }
 
-            subscription.Dispose();
-            listener.DisableEvents(TflEventSource.Log);
-            listener.Dispose();
         }
 
         private static JunkCfg LoadConfiguration(IList<string> args) {

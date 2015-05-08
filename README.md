@@ -46,11 +46,11 @@ This wastes my time.&quot;_
 
 At this, the programmer started shouting assembly language
 and put the data analyst in a head lock.
-Balling up his fist, he pressed his knuckles against
-the analyst&#39;s head; rubbing _back_ and _forth_.
+Balling up his fist, he pressed his knuckles hard against
+the analyst's head and rubbed _back_ and _forth_.
 
-**programmer**: _&quot;You come to my cube, without a ticket,
-complaining about YOUR time being wasted?&quot;_
+**programmer**: _"You come to my cube, without a ticket,
+complaining about YOUR time being wasted?"_
 
 ---
 
@@ -59,11 +59,11 @@ Sadly, this scenario happens a lot in IT offices.
 Just recently, while forcing an staff member to learn `SQL`,
 he asked me something similar:
 
-**staff**: _&quot;SQL is great, but how do I get these files
-into the database?&quot;_
+**staff**: _"SQL is great, but how do I get these files
+into the database?"_
 
 I began to explain the data import wizard,
-but it didn&#39;t feel right. I felt bad that he&#39;d have
+but it didn't feel right. I felt bad that he'd have
 to run the wizard every time he wanted to query data.
 I knew it would take him forever, and he'd probably give up.
 Also, I knew the conversation would most likely
@@ -75,10 +75,10 @@ of another way.
 
 I tell people that if you can think of it,
 then it already exists. You just have to Google it.
-I should have followed my own advice, but I didn&#39;t. See,
-I&#39;m a programmer. I have these times where _all_ I want to do
-is program. I&#39;m not even a great programmer (as indicated by
-the comments below), but I just love it, and I don&#39;t care what
+I should have followed my own advice, but I didn't. See,
+I'm a programmer. I have these times where _all_ I want to do
+is program. I'm not even a great programmer (as indicated by
+the comments below), but I just love it, and I don't care what
 anyone thinks because it makes me _happy, happy, happy_.
 
 So, I decided to bypass Google and create an open source project
@@ -90,7 +90,7 @@ or text file to a database easier.
 
 Before you run Junk Drawer for the first time,
 make sure you create a `Junk` database for all the
-files you&#39;re going to import. Then, update
+files you're going to import. Then, update
 Junk Drawer's configuration file _default.xml_.
 
 <pre class="prettyprint" lang="xml">
@@ -111,8 +111,8 @@ This lets Junk Drawer know where you want to keep your junk.
 
 ### Get a File
 
-Now, in order for Junk Drawer to work, the file must be either
-an Excel file, or some kind of delimited text file.
+In order for Junk Drawer to work, the file must be either
+an Excel file, or some a delimited text file.
 
 Here's a sample text file:
 
@@ -124,17 +124,18 @@ Grace<strong>,</strong>9/9/2000 11 PM<strong>,</strong>56
 Gavin<strong>,</strong>7/3/2010<strong>,</strong>13
 </pre>
 
-If we save this (above) in a file called _sample.txt_,
+If we save this in a file called _sample.txt_,
 we could import it from the command line like this:
 
 <pre class="prettyprint" lang="shell">
 jd.exe c:\sample.txt
 </pre>
 
-Junk Drawer (_jd.exe_) imports the file, and now it can be queried:
+Junk Drawer (_jd.exe_) imports the file.  Now it can be queried:
 
 <pre class="prettyprint" lang="sql">
 USE Junk
+
 SELECT Name, Birthday, Points 
 FROM sample;
 </pre>
@@ -164,22 +165,22 @@ When we see sample text above, it's easy for us
 to notice the first row is different. We recognize it
 as a set of column names. The lines that follow are records.
 
-Because there are only a few columns (3), and a few records (4),
-it's easy for us to see that the _comma_ is delimiting the values
-in each record.  Moreover, we can see `Name` is text, `Birthday`
+Because there are only a few columns and records,
+it's easy for us to see a _comma_ is delimiting the values
+in each record.  Moreover, we see `Name` is text, `Birthday`
 is a date, and `Points` is numeric.
 
-Junk Drawer just has to do the same thing as we do.
-It has to figure out three things:
+Junk Drawer has to do the same thing. It has to figure 
+out three things:
 
 1. the delimiter
 2. the column names (if available)
 3. the column data types
 
-For Excel files, you can skip the first step.
+For excel files, the first step is skipped.
 
 ### Finding the Delimiter
-
+ 
 By default, 100 lines are examined. A set of pre-defined
 delimiters are counted in each line. If any delimiters
 are found, the average per line and [standard
@@ -190,13 +191,13 @@ Then, the delimiter with the lowest [coefficient
 of variation](http://en.wikipedia.org/wiki/Coefficient_of_variation)
 is declared the winner.
 
-I'm no statistician, but from what I gather, taking the delimiter
-with the lowest coefficient of variation gives us the most
-consistent delimiter across all lines.
+I'm no statistician, but I gather taking the delimiter
+with the lowest coefficient of variation provides the most
+consistent delimiter in the records.
 
 ### Column Names
 
-We don&#39;t know if the first record is column names, or
+We don't know if the first record is column names, or
 just another record. So, it is split by the
 winning delimiter and run through a series of tests:
 
@@ -206,17 +207,17 @@ winning delimiter and run through a series of tests:
 * Are there any numbers?
 * Are there any dates?
 
-If any of the answers are &quot;Yes,&quot;
-then the first line cannot be used as column names.
+If any of the answers are _Yes_, 
+the first line cannot be used as column names.
 If this happens, default column names are
 generated (i.e. A, B, C, etc. like Excel). In the
 example above; `Name`, `Birthday`, and `Points`
-answer &quot;No&quot; to all the questions, so
+answer _No_ to all the questions, so
 they make good column names.
 
 ### Data Types
 
-By default, every value of every line is tested against
+By default, 100% of the lines are tested against
 a set of types defined in _default.xml_.
 
 <pre class="prettyprint" lang="xml">
@@ -238,7 +239,6 @@ a set of types defined in _default.xml_.
 &lt;/junk-drawer&gt;
 </pre>
 
-
 Take `Points` for example:
 
 * Is 73 a `boolean`?  No
@@ -258,10 +258,14 @@ If you want to increase the speed of data type
 validation, at the cost of accuracy, change the 
 `sample` size to something less than 100 (100%).
 
-Once all the values are checked, Junk Drawer
-has a compatible set of data types.  The data types
-are the final piece of information we need in
-order to import the file.
+Also, the less data types you check for, the faster 
+it runs.  For example, if you remove _ALL_ the types 
+from the configuration, everything is stored as a string, 
+and sometimes that's all you need.
+
+Once the values are checked, Junk Drawer
+has a compatible set of data types and it's ready 
+to try and import the file
 
 ### Doing it in Code
 
@@ -271,8 +275,9 @@ and run it like this:
 
 <pre class="prettyprint" lang="cs">
 var cfg = new JunkCfg(File.ReadAllText(@&quot;<strong>default.xml</strong>&quot;));
-var request = new Request(@&quot;sample.txt&quot;, cfg);
-var response = new JunkImporter().Import(request);
+var logger = new YourLogger();
+var request = new Request(@&quot;sample.txt&quot;, cfg, logger);
+var response = new JunkImporter(logger).Import(request);
 
 Console.WriteLine(&quot;Table: {0}&quot;, response.TableName);
 Console.WriteLine(&quot;Records: {0}&quot;, response.Records);
@@ -288,7 +293,7 @@ Records: 4
 If you want to name your table something specific, you can
 set `TableName` in the `Request`.
 
-**Note**: Both the executable and the libary need 
+**Code Note 1**: Both the executable and the libary need 
 a configuration. I loaded the _default.xml_ 
 configuration above. However, you can make as many 
 different configurations as you want.
@@ -299,6 +304,10 @@ pass the configuration file in as the second argument (i.e.
 more about the configuration provider, check out my 
 [Cfg-NET](http://www.codeproject.com/Articles/862990/Cfg-NET) 
 article.
+
+**Code Note 2**: You must implement ILogger and pass it in. This 
+allows you to use your favorite logging library.  To see an example, 
+take a look at JunkLogger.cs;
 
 ### Precautions
 

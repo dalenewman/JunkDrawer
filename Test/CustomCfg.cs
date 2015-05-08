@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using JunkDrawer;
 using NUnit.Framework;
 
@@ -20,5 +21,6 @@ namespace Test {
             Assert.AreEqual(0, jd.Problems().Count);
 
         }
+
     }
 }

@@ -16,7 +16,7 @@ namespace JunkDrawer {
         public string Message { get; private set; }
         public string TableName { get; set; }
 
-        public Request(string fileName, JunkCfg cfg) {
+        public Request(string fileName, JunkCfg cfg, ILogger logger) {
 
             Cfg = cfg;
             FileInfo = new FileInfo(fileName);
@@ -30,16 +30,16 @@ namespace JunkDrawer {
                 attempts++;
 
                 if (retries == 0) {
-                    TflLogger.Info(PROCESS_NAME, FileInfo.Name, "File does't exist.", attempts);
+                    logger.EntityInfo(FileInfo.Name, "File does't exist.", attempts);
                     IsValid = false;
                     return;
                 }
 
-                TflLogger.Warn(PROCESS_NAME, FileInfo.Name, "Waiting");
+                logger.Warn(PROCESS_NAME, FileInfo.Name, "Waiting");
 
                 while (attempts < retries && !FileInfo.Exists) {
                     Console.Beep();
-                    TflLogger.Info(PROCESS_NAME, FileInfo.Name, ".");
+                    logger.EntityInfo(FileInfo.Name, ".");
                     attempts++;
                     Thread.Sleep(1000);
                 }
@@ -53,17 +53,17 @@ namespace JunkDrawer {
 
             // If we made it this far, the file exists
 
-            if (FileInUse(FileInfo)) {
+            if (FileInUse(FileInfo, logger)) {
                 Console.Beep();
-                TflLogger.Info(PROCESS_NAME, FileInfo.Name, "File is locked by another process.");
+                logger.EntityInfo(FileInfo.Name, "File is locked by another process.");
                 if (attempts < retries) {
-                    while (attempts < retries && FileInUse(FileInfo)) {
+                    while (attempts < retries && FileInUse(FileInfo, logger)) {
                         Console.Beep();
                         attempts++;
-                        TflLogger.Info(PROCESS_NAME, FileInfo.Name, "File is in use. Attempt number {0}...", attempts);
+                        logger.EntityInfo(FileInfo.Name, "File is in use. Attempt number {0}...", attempts);
                         Thread.Sleep(1000);
                     }
-                    if (FileInUse(FileInfo)) {
+                    if (FileInUse(FileInfo, logger)) {
                         Message = string.Format("Can not open file {0}.", FileInfo.Name);
                         IsValid = false;
                         return;
@@ -74,13 +74,13 @@ namespace JunkDrawer {
             IsValid = true;
         }
 
-        private static bool FileInUse(FileSystemInfo fileInfo) {
+        private static bool FileInUse(FileSystemInfo fileInfo, ILogger logger) {
             try {
                 using (Stream stream = new FileStream(fileInfo.FullName, FileMode.Open)) {
                     return false;
                 }
             } catch (IOException exception) {
-                TflLogger.Debug(PROCESS_NAME, fileInfo.Name, exception.Message);
+                logger.EntityDebug(fileInfo.Name, exception.Message);
                 return true;
             }
         }

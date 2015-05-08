@@ -7,17 +7,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JunkDrawer.Console", "JunkD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{63CEAF77-1A00-4BCA-AF27-74985DEB721F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assemblies", "Assemblies", "{A3B89755-972F-44D4-A372-7F162C7053EF}"
-	ProjectSection(SolutionItems) = preProject
-		Assemblies\Transformalize.dll = Assemblies\Transformalize.dll
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JunkDrawer", "JunkDrawer\JunkDrawer.csproj", "{35022C73-D66E-43AA-814E-AF8CE6B96294}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3FEA4376-D633-46AC-B169-79894D91D255}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		WE-Markdown.css = WE-Markdown.css
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7F0ADD0C-EF2C-4DBD-895D-E1AECBD9F6FD}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Global
