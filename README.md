@@ -4,12 +4,12 @@ JunkDrawer is a tool that imports excel or delimited files
 into a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under
 GNU General Public License, version 3 (GPL-3.0).
 
-###Introduction
+### Introduction
 
-**analyst**: &quot;_Is there something that just
-automatically imports files into a database?_&quot;
+**analyst**: "*Is there something that just
+automatically imports files into a database?*"
 
-**programmer**: &quot;_No. You have to use the data import wizard._&quot;
+**programmer**: "*No. You have to use the data import wizard.*"
 
 The data analyst sighed as he recalled the wizard.
 
@@ -93,17 +93,17 @@ make sure you create a `Junk` database for all the
 files you're going to import. Then, update
 Junk Drawer's configuration file _default.xml_.
 
-<pre class="prettyprint" lang="xml">
-&lt;junk-drawer&gt;
-  &lt;connections&gt;
-    &lt;add name=&quot;output&quot; 
-         provider=&quot;sqlserver&quot; 
-        <strong>server</strong>=&quot;localhost&quot; 
-        <strong>database</strong>=&quot;Junk&quot; /&gt;
-  &lt;/connections&gt;
-  &lt;!-- more later --&gt;
-&lt;/junk-drawer&gt;
-</pre>
+```xml
+<junk-drawer>
+  <connections>
+    <add name="output" 
+         provider="sqlserver" 
+        <strong>server</strong>="localhost" 
+        <strong>database</strong>="Junk" />
+  </connections>
+  <!-- snip -->
+</junk-drawer>
+```
 
 **Note**: For a connection, you may use the `server`
 and `database` attributes, or one called `connection-string`.
@@ -116,48 +116,46 @@ an Excel file, or some a delimited text file.
 
 Here's a sample text file:
 
-<pre class="prettyprint" lang="text">
-<strong>Name,Birthday,Points</strong>
-Dale<strong>,</strong>3/3/1981 9 AM<strong>,</strong>73
-Tara<strong>,</strong>12/31/1990<strong>,</strong>1042
-Grace<strong>,</strong>9/9/2000 11 PM<strong>,</strong>56
-Gavin<strong>,</strong>7/3/2010<strong>,</strong>13
-</pre>
+```bash
+Name,Birthday,Points
+Dale,3/3/1981 9 AM,73
+Tara,12/31/1990,1042
+Grace,9/9/2000 11 PM,56
+Gavin,7/3/2010,13
+```
 
 If we save this in a file called _sample.txt_,
 we could import it from the command line like this:
 
-<pre class="prettyprint" lang="shell">
-jd.exe c:\sample.txt
-</pre>
+`jd.exe c:\sample.txt`
 
 Junk Drawer (_jd.exe_) imports the file.  Now it can be queried:
 
-<pre class="prettyprint" lang="sql">
+```sql
 USE Junk
 
 SELECT Name, Birthday, Points 
 FROM sample;
-</pre>
+```
 
-<pre class="prettyprint" lang="text">
+```bash
 Name  Birthday            Points
 ----- ------------------- -----------
 Dale  1981-03-03 09:00:00 73
 Gavin 2010-07-03 00:00:00 13
 Tara  1990-12-31 00:00:00 1042
 Grace 2000-09-09 23:00:00 56
-</pre>
+```
 
 The table structure looks similar to this:
 
-<pre class="prettyprint" lang="sql">
+```sql
 CREATE TABLE sample(
     BirthDay DATETIME,
     Name NVARCHAR(5),
     Points INT
 );
-</pre>
+```
 
 ### How Does it Work?
 
@@ -220,24 +218,24 @@ they make good column names.
 By default, 100% of the lines are tested against
 a set of types defined in _default.xml_.
 
-<pre class="prettyprint" lang="xml">
-&lt;junk-drawer&gt;
-  &lt;!-- connections --&gt;
-  &lt;file-inspection&gt;
-    &lt;add name=&quot;default&quot; <strong>sample=&quot;100&quot;</strong>&gt;
-      &lt;!-- the pre-defined set of types --&gt;
-        <strong>&lt;types&gt;
-        &lt;add type=&quot;boolean&quot;/&gt;
-        &lt;add type=&quot;int32&quot;/&gt;
-        &lt;add type=&quot;int64&quot;/&gt;
-        &lt;add type=&quot;decimal&quot;/&gt;
-        &lt;add type=&quot;datetime&quot;/&gt;
-      &lt;/types&gt;</strong>
-      &lt;!-- delimiters --&gt;
-    &lt;/add&gt;
-  &lt;/file-inspection&gt;
-&lt;/junk-drawer&gt;
-</pre>
+```xml
+<junk-drawer>
+  <!-- connections -->
+  <file-inspection>
+    <add name="default" <strong>sample="100"</strong>>
+      <!-- the pre-defined set of types -->
+        <strong><types>
+        <add type="boolean"/>
+        <add type="int32"/>
+        <add type="int64"/>
+        <add type="decimal"/>
+        <add type="datetime"/>
+      </types></strong>
+      <!-- delimiters -->
+    </add>
+  </file-inspection>
+</junk-drawer>
+```
 
 Take `Points` for example:
 
@@ -274,19 +272,17 @@ JunkDrawer is a library _and_ an executable.
 If you want to use the library, 
 it's available on [Nuget](https://www.nuget.org/packages/JunkDrawer/). 
 
-<pre class="prettyprint" lang="bash">
-PM> Install-Package <strong>JunkDrawer</strong>
-</pre>
+`PM> Install-Package JunkDrawer`
 
 Installing it brings down [Transformalize](https://github.com/dalenewman/Transformalize) 
 and [Cfg-Net](https://github.com/dalenewman/Cfg-NET) as well. 
 Here's a console application example:
 
-<pre class="prettyprint" lang="cs">
+```csharp
 using System;
 using System.IO;
-<strong>using JunkDrawer;
-using Transformalize.Logging;</strong>
+using JunkDrawer;
+using Transformalize.Logging;
 
 namespace ConsoleApplication1 {
 
@@ -312,16 +308,16 @@ namespace ConsoleApplication1 {
         }
     }
 }
-</pre>
+```
 
 Using [default.xml](https://github.com/dalenewman/JunkDrawer/blob/master/JunkDrawer.Console/default.xml) and 
 [sample.txt](https://github.com/dalenewman/JunkDrawer/blob/master/Test/sample.txt), you should 
 see output like this:
 
-<pre class="prettyprint" lang="shell">
+```bash
 Table: sample
 Records: 4
-</pre>
+```
 
 #### Table Name
 If you want to name your table something else, you can
@@ -334,9 +330,7 @@ However, you can make as many different configurations as you want.
 The executable can also use other configurations.  Just pass the 
 configuration file name in as the second argument:
 
-<pre class="prettyprint" lang="shell">
-jd.exe sample.txt <strong>other.xml</strong>
-</pre>
+`jd.exe sample.txt other.xml`
 
 #### Logging
 You have to pass a logger in.  There is a `NullLogger` in 
@@ -346,21 +340,21 @@ logging library.  The executable implement's one using [Serilog](https://github.
 
 ### Precautions
 
-####Overwriting Tables
+#### Overwriting Tables
 If you import the same file into Junk Drawer twice, it will 
 overwrite the table.  So, if you run `jd.exe` _sample.txt_ and it 
 creates a `sample` table, then you run `jd.exe` _sample.txt_ again, it 
 will over-write the `sample` table. Don't worry though; it's only 
 your junk.
 
-####Things Might Get Crazy
+#### Things Might Get Crazy
 I called it Junk Drawer because importing files directly
 into a database can get messy. It may end up an uncontrolled
 staging area for data. If you&#39;re the acting DBA, and you put your `Junk` on an
 important server, make sure you have monitors in place
 for disk space, CPU abuse, and excessive resource blocking.
 
-###Conclusion
+### Conclusion
 
 Once in place, Junk Drawer can empower your trusted
 friends to import their data into a Junk database

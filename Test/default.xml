@@ -1,34 +1,37 @@
-﻿<junk-drawer>
+﻿<junk-drawer retries="3">
 
   <connections>
-    <add name="output" provider="sqlserver" server="localhost" database="Junk" />
-  </connections>
 
-  <file-inspection>
-    <add name="default"
-         sample="100"
+    <add name="input"
+         provider="file"
+         file="*.*"
          min-length="64"
          max-length="4000"
-         line-limit="100">
+         sample="100">
+      <delimiters>
+          <add name="comma" character=","/>
+          <add name="pipe" character="|"/>
+          <add name="tab" character="&#009;"/>
+          <add name="semicolon" character=";"/>
+      </delimiters>
       <types>
-        <add type="boolean"/>
+        <add type="bool"/>
         <!--<add type="byte"/>-->
-        <!--<add type="int16"/>-->
-        <add type="int32"/>
-        <add type="int64"/>
+        <!--<add type="short"/>-->
+        <add type="int"/>
+        <!--<add type="long"/>-->
         <!--<add type="single"/>-->
         <!--<add type="double"/>-->
         <add type="decimal"/>
         <add type="datetime"/>
       </types>
-      <delimiters>
-        <add name="comma" character=","/>
-        <add name="pipe" character="|"/>
-        <add name="tab" character="&#009;"/>
-        <add name="semicolon" character=";"/>
-      </delimiters>
     </add>
-  </file-inspection>
+
+    <add name="output"
+         provider="sqlserver"
+         server="localhost"
+         database="Junk" />
+
+  </connections>
 
 </junk-drawer>
-

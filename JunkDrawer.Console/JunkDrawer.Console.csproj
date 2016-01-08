@@ -63,30 +63,33 @@
     <StartupObject>JunkDrawer.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CfgNet">
-      <HintPath>..\packages\Cfg-NET.0.0.7\lib\CfgNet.dll</HintPath>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Serilog.1.5.5\lib\net45\Serilog.dll</HintPath>
+    <Reference Include="Cfg.Net.Reader, Version=0.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Reader.0.0.9\lib\Cfg.Net.Reader.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Serilog.1.5.5\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    <Reference Include="CfgNet, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.4.2\lib\CfgNet.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Serilog.Sinks.Email, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Serilog.Sinks.Email.1.5.13\lib\net45\Serilog.Sinks.Email.dll</HintPath>
+    <Reference Include="Pipeline.Desktop">
+      <HintPath>..\..\Pipeline.Net\Pipeline.Desktop\bin\Debug\Pipeline.Desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="Pipeline.Logging.NLog">
+      <HintPath>..\..\Pipeline.Net\Pipeline.Desktop\bin\Debug\Pipeline.Logging.NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="Pipeline.Portable">
+      <HintPath>..\..\Pipeline.Net\Pipeline.Desktop\bin\Debug\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="Transformalize, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Transformalize.0.0.5\lib\Transformalize.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JunkLogger.cs" />
+    <Compile Include="JunkModule.cs" />
+    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -99,6 +102,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Files\Excel.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -129,6 +135,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="sample.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shorthand.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

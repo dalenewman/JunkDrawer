@@ -1,41 +1,38 @@
-﻿<junk-drawer>
+﻿<junk-drawer retries="3">
 
   <connections>
-    <add name="output" provider="sqlserver" server="localhost" database="Junk" />
-    <!--<add name="mail" provider="mail" server="" />-->
-  </connections>
 
-  <log>
-    <add name="file" file="Junk-Drawer-{Date}.log" level="info" />
-    <!--<add name="mail" connection="mail" from="" to="" level="error" />-->
-  </log>
-  
-  <file-inspection>
-    
-    <add name="default"
+    <add name="input"
+         provider="file"
+         file="*.*"
          min-length="64"
-         max-length="4000"
-         sample="100"
-         line-limit="100"
-         ignore-empty="true">
-      <types>
-        <add type="boolean"/>
-        <!--<add type="byte"/>-->
-        <!--<add type="int16"/>-->
-        <add type="int32"/>
-        <!--<add type="int64"/>-->
-        <!--<add type="single"/>-->
-        <!--<add type="double"/>-->
-        <add type="decimal"/>
-        <add type="datetime"/>
-      </types>
+         max-length="255"
+         check-types="true"
+         check-lengths="true">
       <delimiters>
         <add name="comma" character=","/>
         <add name="pipe" character="|"/>
         <add name="tab" character="&#009;"/>
         <add name="semicolon" character=";"/>
       </delimiters>
+      <types>
+        <add type="bool"/>
+        <add type="byte"/>
+        <add type="short"/>
+        <add type="int"/>
+        <add type="long"/>
+        <add type="single"/>
+        <add type="double"/>
+        <add type="decimal"/>
+        <add type="datetime"/>
+      </types>
     </add>
-  </file-inspection>
+
+    <add name="output"
+         provider="sqlserver"
+         server="localhost"
+         database="Junk" />
+
+  </connections>
 
 </junk-drawer>

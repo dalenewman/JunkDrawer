@@ -1,51 +1,45 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using Transformalize.Logging;
 
 namespace JunkDrawer {
 
     public class Request {
 
-        private const string PROCESS_NAME = "JunkDrawer";
-
         public bool IsValid { get; private set; }
-        public FileInfo FileInfo { get; private set; }
-        public JunkCfg Cfg { get; private set; }
+        public FileInfo FileInfo { get;}
         public string Message { get; private set; }
         public string TableName { get; set; }
+        public string Configuration { get; set; }
+        public string Extension { get; set; }
 
-        public Request(string fileName, JunkCfg cfg, ILogger logger) {
+        public Request(string fileName, string configuration, int retries = 3) {
 
-            Cfg = cfg;
             FileInfo = new FileInfo(fileName);
+            Extension = FileInfo.Extension.ToLower();
+            Configuration = configuration;
             Message = string.Empty;
 
             var attempts = 0;
-            var retries = Cfg.FileInspection.First().Retries;
 
             if (!FileInfo.Exists) {
                 Console.Beep();
                 attempts++;
 
                 if (retries == 0) {
-                    logger.EntityInfo(FileInfo.Name, "File does't exist.", attempts);
+                    Message = $"File {FileInfo.Name} does not exist!";
                     IsValid = false;
                     return;
                 }
 
-                logger.Warn(PROCESS_NAME, FileInfo.Name, "Waiting");
-
                 while (attempts < retries && !FileInfo.Exists) {
                     Console.Beep();
-                    logger.EntityInfo(FileInfo.Name, ".");
                     attempts++;
                     Thread.Sleep(1000);
                 }
 
                 if (!FileInfo.Exists) {
-                    Message = string.Format("File '{0}' just doesn't exist!", FileInfo.FullName);
+                    Message = $"File '{FileInfo.FullName}' just doesn't exist!  I looked for it {retries} times.";
                     IsValid = false;
                     return;
                 }
@@ -53,18 +47,16 @@ namespace JunkDrawer {
 
             // If we made it this far, the file exists
 
-            if (FileInUse(FileInfo, logger)) {
+            if (FileInUse(FileInfo)) {
                 Console.Beep();
-                logger.EntityInfo(FileInfo.Name, "File is locked by another process.");
                 if (attempts < retries) {
-                    while (attempts < retries && FileInUse(FileInfo, logger)) {
+                    while (attempts < retries && FileInUse(FileInfo)) {
                         Console.Beep();
                         attempts++;
-                        logger.EntityInfo(FileInfo.Name, "File is in use. Attempt number {0}...", attempts);
                         Thread.Sleep(1000);
                     }
-                    if (FileInUse(FileInfo, logger)) {
-                        Message = string.Format("Can not open file {0}.", FileInfo.Name);
+                    if (FileInUse(FileInfo)) {
+                        Message = $"Can not open file {FileInfo.Name}. I tried opening it {retries} times.";
                         IsValid = false;
                         return;
                     }
@@ -74,13 +66,12 @@ namespace JunkDrawer {
             IsValid = true;
         }
 
-        private static bool FileInUse(FileSystemInfo fileInfo, ILogger logger) {
+        private static bool FileInUse(FileSystemInfo fileInfo) {
             try {
                 using (Stream stream = new FileStream(fileInfo.FullName, FileMode.Open)) {
                     return false;
                 }
-            } catch (IOException exception) {
-                logger.EntityDebug(fileInfo.Name, exception.Message);
+            } catch (IOException) {
                 return true;
             }
         }

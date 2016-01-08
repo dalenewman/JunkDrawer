@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using Cfg.Net.Reader;
 using Dapper;
 using JunkDrawer;
 using NUnit.Framework;
@@ -12,14 +13,13 @@ namespace Test {
     [TestFixture]
     public class SqlServerIntegration {
 
-        private const string CONNECTION_STRING = "server=localhost;database=junk;trusted_connection=true;";
+        private const string ConnectionString = "server=localhost;database=junk;trusted_connection=true;";
 
         [Test]
         public void Demo() {
 
-            var cfg = new JunkCfg(File.ReadAllText(@"default.xml"));
             var logger = new ConsoleLogger();
-            var request = new Request(@"sample.txt", cfg, logger);
+            var request = new Request(@"sample.txt", "default.xml");
             var response = new JunkImporter(logger).Import(request);
 
             Console.WriteLine("Table: {0}", response.TableName);
@@ -37,12 +37,11 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var cfg = new JunkCfg(File.ReadAllText(@"default.xml"));
             var logger = new ConsoleLogger();
-            var response = new JunkImporter(logger).Import(new Request(fileName, cfg, logger));
+            var response = new JunkImporter(logger).Import(new Request(fileName, @"default.xml"));
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
             }
 
@@ -66,10 +65,10 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var companies = new List<Abc>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<Abc>("SELECT A,B,C FROM " + response.TableName + ";"));
             }
 
@@ -96,10 +95,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
             }
 
@@ -119,10 +118,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             const string fileName = @"Files\Excel.xls";
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var companies = new List<CompanyForOldExcel>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<CompanyForOldExcel>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
             }
 
@@ -142,10 +141,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             const string fileName = @"Files\Excel.xlsx";
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
             }
 
@@ -171,10 +170,10 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
             }
 
@@ -200,10 +199,10 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
             }
 
@@ -229,10 +228,10 @@ Microsofthttp://www.microsoft.com4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, new JunkCfg(File.ReadAllText(@"default.xml")), new ConsoleLogger()));
+            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
             var lines = new List<string>();
 
-            using (var cn = new SqlConnection(CONNECTION_STRING)) {
+            using (var cn = new SqlConnection(ConnectionString)) {
                 lines.AddRange(cn.Query<string>("SELECT [Name     WebSite                 Created] FROM " + response.TableName + ";"));
             }
 

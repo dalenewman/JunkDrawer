@@ -1,69 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
+using Autofac;
+using Pipeline.Configuration;
+using Pipeline.Contracts;
+using Environment = System.Environment;
 
 namespace JunkDrawer {
 
     public class Program {
 
-        private const int ERROR = 1;
+        private const int Error = 1;
 
         static void Main(string[] args) {
 
             if (args == null || args.Length == 0) {
                 Console.Error.WriteLine("You must pass in the name of a file you'd like to import into your junk drawer.");
                 WriteUsage();
-                Environment.Exit(ERROR);
+                Environment.Exit(Error);
             }
 
-            var cfg = LoadConfiguration(args);
-            var logger = new JunkLogger(cfg) { Name = Path.GetFileNameWithoutExtension(args[0]) };
-
-            var request = new Request(args[0], cfg, logger);
+            // check if request has valid file
+            var request = new Request(args[0], args.Length > 1 ? args[1] : "default.xml", 3);
             if (!request.IsValid) {
-                logger.Error(request.Message);
-                Environment.Exit(ERROR);
+                Console.Error.WriteLine(request.Message);
+                Environment.Exit(Error);
             }
 
             try {
-                new JunkImporter(logger).Import(request);
+                //register
+                var builder = new ContainerBuilder();
+                builder.RegisterModule(new JunkModule(request));
+
+                using (var scope = builder.Build().BeginLifetimeScope()) {
+                    // resolve
+                    var cfg = scope.Resolve<JunkCfg>();
+
+                    if (cfg.Errors().Any()) {
+                        foreach (var error in cfg.Errors()) {
+                            Console.Error.WriteLine(error);
+                        }
+                        Environment.Exit(Error);
+                    }
+
+
+                    var reader = scope.Resolve<ISchemaReader>(new TypedParameter(typeof (Connection), cfg.Input()));
+
+                    var schema = reader.Read();
+
+                    Console.WriteLine(schema.Entities.First().Fields.Count());
+
+                }  // release
+
+
             } catch (Exception ex) {
-                logger.EntityError(request.FileInfo.Name, ex, ex.Message);
+                Console.Error.WriteLine(ex.Message);
             }
 
-        }
-
-        private static JunkCfg LoadConfiguration(IList<string> args) {
-
-            FileInfo fileInfo = null;
-
-            if (args.Count > 1 && File.Exists(args[1])) {
-                fileInfo = new FileInfo(args[1]);
-            } else {
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                if (path != null) {
-                    var def = path.TrimEnd('\\') + "\\default.xml";
-                    fileInfo = new FileInfo(def);
-                }
-            }
-
-            if (fileInfo == null) {
-                Console.Error.WriteLine("Could not load JunkDrawer configuration.  Make sure default.xml is located where jd.exe is, or pass in a configuration file as the second argument.");
-                Environment.Exit(ERROR);
-            }
-
-            var cfg = new JunkCfg(File.ReadAllText(fileInfo.FullName));
-            var problems = cfg.Problems();
-            if (!problems.Any())
-                return cfg;
-
-            foreach (var problem in problems) {
-                Console.Error.WriteLine(problem);
-            }
-            Environment.Exit(ERROR);
-            return cfg;
         }
 
         private static void WriteUsage() {

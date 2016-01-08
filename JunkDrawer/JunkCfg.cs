@@ -1,49 +1,36 @@
 using System.Collections.Generic;
-using Transformalize.Configuration;
-using Transformalize.Libs.Cfg.Net;
+using System.Linq;
+using Cfg.Net;
+using Cfg.Net.Contracts;
+using Pipeline.Configuration;
 
 namespace JunkDrawer {
 
     public class JunkCfg : CfgNode {
 
-        public JunkCfg(string cfg) {
+        public JunkCfg(string cfg, params IDependency[] dependencies) : base(dependencies) {
             Load(cfg);
         }
 
-        [Cfg(required = false)]
-        public List<TflConnection> Connections { get; set; }
+        [Cfg(value = 3)]
+        public int Retries { get; set; }
 
-        [Cfg]
-        public List<TflLog> Log { get; set; }
-
-        [Cfg(required = false)]
-        public List<JunkFileInspection> FileInspection { get; set; }
+        [Cfg(required = true)]
+        public List<Connection> Connections { get; set; }
 
         protected override void Validate() {
-
-            if (Connections.Count < 1) {
-                AddProblem("You must have at least one connection defined.");
+            if (Connections.Count < 2) {
+                Error("You need two connections defined; the first one for input, the last one for output.");
             }
+        }
 
-            if (FileInspection.Count != 1) {
-                AddProblem("You must have one file inspection defined.");
-            }
+        public Connection Input() {
+            return Connections.First();
+        }
 
-            if (Log.Count == 0) {
-                var log = this.GetDefaultOf<TflLog>(l => {
-                    l.Name = "file";
-                    l.Provider = "file";
-                    l.Level = "Informational";
-                    l.File = "Junk-Drawer-{Date}.log";
-                });
-                Log.Add(log);
-            }
+        public Connection Output() {
+            return Connections.Last();
         }
     }
 
-    public class JunkFileInspection : TflFileInspection {
-
-        [Cfg(value = 5)]
-        public int Retries { get; set; }
-    }
 }

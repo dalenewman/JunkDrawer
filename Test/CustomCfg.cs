@@ -13,11 +13,11 @@ namespace Test {
 
             var jd = new JunkCfg(File.ReadAllText(@"default.xml"));
 
-            foreach (var problem in jd.Problems()) {
+            foreach (var problem in jd.Errors()) {
                 Console.WriteLine(problem);
             }
 
-            Assert.AreEqual(0, jd.Problems().Count);
+            Assert.AreEqual(0, jd.Errors().Length);
 
         }
 
