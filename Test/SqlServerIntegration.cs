@@ -1,11 +1,27 @@
-﻿using System;
+﻿#region license
+// JunkDrawer
+// Copyright 2013 Dale Newman
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//      http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using Cfg.Net.Reader;
 using Dapper;
 using JunkDrawer;
+using JunkDrawer.Autofac;
 using NUnit.Framework;
 
 namespace Test {
@@ -18,12 +34,15 @@ namespace Test {
         [Test]
         public void Demo() {
 
-            var logger = new ConsoleLogger();
-            var request = new Request(@"sample.txt", "default.xml");
-            var response = new JunkImporter(logger).Import(request);
+            JunkResponse response;
+            var request = new JunkRequest(@"C:\Code\JunkDrawer\Test\sample.txt", "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                response = scope.Resolve<JunkImporter>().Import();
+            }
 
-            Console.WriteLine("Table: {0}", response.TableName);
-            Console.WriteLine("Records: {0}", response.Records);
+            Assert.AreEqual("sample", response.TableName);
+            Assert.AreEqual(4, response.Records);
+
         }
 
         [Test]
@@ -37,8 +56,13 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var logger = new ConsoleLogger();
-            var response = new JunkImporter(logger).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -65,7 +89,13 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
             var companies = new List<Abc>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -95,7 +125,13 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -116,9 +152,15 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
         [Test]
         public void ExcelXls() {
 
-            const string fileName = @"Files\Excel.xls";
+            const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xls";
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
             var companies = new List<CompanyForOldExcel>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -139,9 +181,15 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
         [Test]
         public void ExcelXlsx() {
 
-            const string fileName = @"Files\Excel.xlsx";
+            const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xlsx";
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -170,7 +218,13 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -199,7 +253,12 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                response = scope.Resolve<JunkImporter>().Import();
+            }
+
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
@@ -228,7 +287,12 @@ Microsofthttp://www.microsoft.com4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            var response = new JunkImporter(new ConsoleLogger()).Import(new Request(fileName, @"default.xml"));
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml");
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                response = scope.Resolve<JunkImporter>().Import();
+            }
+
             var lines = new List<string>();
 
             using (var cn = new SqlConnection(ConnectionString)) {

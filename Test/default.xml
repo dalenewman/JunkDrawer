@@ -1,13 +1,12 @@
-﻿<junk-drawer retries="3">
+﻿<jd retries="3">
 
   <connections>
 
     <add name="input"
          provider="file"
          file="*.*"
-         min-length="64"
-         max-length="4000"
-         sample="100">
+         min-length="32"
+         max-length="4000">
       <delimiters>
           <add name="comma" character=","/>
           <add name="pipe" character="|"/>
@@ -16,12 +15,12 @@
       </delimiters>
       <types>
         <add type="bool"/>
-        <!--<add type="byte"/>-->
-        <!--<add type="short"/>-->
+        <add type="byte"/>
+        <add type="short"/>
         <add type="int"/>
-        <!--<add type="long"/>-->
-        <!--<add type="single"/>-->
-        <!--<add type="double"/>-->
+        <add type="long"/>
+        <add type="single"/>
+        <add type="double"/>
         <add type="decimal"/>
         <add type="datetime"/>
       </types>
@@ -30,8 +29,9 @@
     <add name="output"
          provider="sqlserver"
          server="localhost"
-         database="Junk" />
+         database="Junk"
+         drop-control="false"/>
 
   </connections>
 
-</junk-drawer>
+</jd>

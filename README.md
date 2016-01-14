@@ -1,8 +1,8 @@
 JunkDrawer
 ==============
-JunkDrawer is a tool that imports excel or delimited files
-into a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under
-GNU General Public License, version 3 (GPL-3.0).
+JunkDrawer imports an excel or delimited file into 
+a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under
+Apache 2.
 
 ### Introduction
 
@@ -15,7 +15,8 @@ The data analyst sighed as he recalled the wizard.
 
 <img src="http://www.codeproject.com/KB/database/716239/SqlServerImportExportWizard.png" class="img-responsive img-thumbnail" alt="SQL Server Import Wizard" />
 
-Using the wizard to import a text file goes something like this:
+Using the wizard to import a text file into SQL Server 
+goes something like this:
 
 *   Install SQL Server Management Studio.
 *   Find Tasks and choose Import Data.
@@ -29,330 +30,307 @@ Using the wizard to import a text file goes something like this:
 *   Choose if you want to save the SSIS package for later.
 *   Execute it
 
-**programmer**: _&quot;The wizard helps you import any kind of file._&quot;
+**programmer**: &quot;*The wizard helps you import any kind of file.*&quot;
 
-**analyst**: _&quot;That&#39;s great.
-But, it would be better if I didn&#39;t have to answer
-so many questions and the program just figured it out
-and imported the file.&quot;_
+**analyst**: &quot;*That's great.
+But, it would be better if a program just figured it out
+for me.*&quot;
 
-**programmer**: _&quot;Sorry. You have to follow the wizard.
+**programmer**: &quot;*Sorry. You have to use the wizard.
 If you get an error message, fix the problem
-and try again.&quot;_
+and try again.*&quot;
 
-**analyst**: _&quot;I get a lot of different files.
+**analyst**: &quot;*I get a lot of different files.
 Using the wizard is repetitive.
-This wastes my time.&quot;_
+This wastes my time.*&quot;
 
-At this, the programmer started shouting assembly language
+At this, the programmer shouted assembly language
 and put the data analyst in a head lock.
-Balling up his fist, he pressed his knuckles hard against
-the analyst's head and rubbed _back_ and _forth_.
+Balling his fist, he pressed his knuckles hard against
+the analyst's head and rubbed *back* and *forth*.
 
-**programmer**: _"You come to my cube, without a ticket,
-complaining about YOUR time being wasted?"_
+**programmer**: &quot;*You come to my cube, without a ticket,
+complaining about YOUR time being wasted?*&quot;
 
 ---
 
-Sadly, this scenario happens a lot in IT offices.
+Sadly, this scenario happens a lot in IT offices. Recently, 
+while forcing a staff member to learn `SQL`,
+he said:
 
-Just recently, while forcing an staff member to learn `SQL`,
-he asked me something similar:
+**staff**: &quot;*SQL is great, but how do I get these files
+into the database?*&quot;
 
-**staff**: _"SQL is great, but how do I get these files
-into the database?"_
-
-I began to explain the data import wizard,
-but it didn't feel right. I felt bad that he'd have
-to run the wizard every time he wanted to query data.
-I knew it would take him forever, and he'd probably give up.
-Also, I knew the conversation would most likely
+I thought of the import wizard, but it didn't feel right. 
+If he found out that he'd have to run the wizard every time 
+and most likely deal with error messages, it would be a 
+stumbling block for him. Also, I knew the conversation would most likely
 end in a head-lock (as depicted above).
-So, instead of giving him the beat down, I tried to think
-of another way.
 
----
-
-I tell people that if you can think of it,
-then it already exists. You just have to Google it.
-I should have followed my own advice, but I didn't. See,
-I'm a programmer. I have these times where _all_ I want to do
-is program. I'm not even a great programmer (as indicated by
-the comments below), but I just love it, and I don't care what
-anyone thinks because it makes me _happy, happy, happy_.
-
-So, I decided to bypass Google and create an open source project
-called [Junk Drawer](https://github.com/dalenewman/JunkDrawer "Junk Drawer on GitHub").
-The goal is to make importing an Excel
-or text file to a database easier.
+So, instead of giving him the beat down, I decided to create a program that 
+makes it easier to import an Excel or text file into a database.
 
 ### Configuration
 
-Before you run Junk Drawer for the first time,
-make sure you create a `Junk` database for all the
-files you're going to import. Then, update
-Junk Drawer's configuration file _default.xml_.
+Junk Drawer refers to files as junk, and the 
+database as a drawer.  The file is an input, and 
+the database is an output; both are connections. 
+Open Junk Drawer's default configuration file 
+*default.xml*.
 
 ```xml
-<junk-drawer>
+<jd>
   <connections>
+    <add name="input" 
+         provider="file" 
+         file="*.*" />
     <add name="output" 
          provider="sqlserver" 
-        <strong>server</strong>="localhost" 
-        <strong>database</strong>="Junk" />
+         server="localhost" 
+         database="Junk" />
   </connections>
-  <!-- snip -->
-</junk-drawer>
+</jd>
 ```
 
-**Note**: For a connection, you may use the `server`
-and `database` attributes, or one called `connection-string`.
-This lets Junk Drawer know where you want to keep your junk.
+The file is `*.*`, but this is changed at run-time. 
+ The database is `Junk` on my local SQL Server.
 
 ### Get a File
 
-In order for Junk Drawer to work, the file must be either
-an Excel file, or some a delimited text file.
+The file must be Excel (e.g. `.xls`, `.xlsx`), or a delimited 
+text file (e.g. `.csv`, `.txt`).
 
-Here's a sample text file:
-
-```bash
-Name,Birthday,Points
-Dale,3/3/1981 9 AM,73
-Tara,12/31/1990,1042
-Grace,9/9/2000 11 PM,56
-Gavin,7/3/2010,13
-```
-
-If we save this in a file called _sample.txt_,
-we could import it from the command line like this:
-
-`jd.exe c:\sample.txt`
-
-Junk Drawer (_jd.exe_) imports the file.  Now it can be queried:
-
-```sql
-USE Junk
-
-SELECT Name, Birthday, Points 
-FROM sample;
-```
+I searched Google for `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv).  Here's a sample:
 
 ```bash
-Name  Birthday            Points
------ ------------------- -----------
-Dale  1981-03-03 09:00:00 73
-Gavin 2010-07-03 00:00:00 13
-Tara  1990-12-31 00:00:00 1042
-Grace 2000-09-09 23:00:00 56
+Code,Name,Hex,Red,Green,Blue
+air_force_blue_raf,"Air Force Blue (Raf)",#5d8aa8,93,138,168
+air_force_blue_usaf,"Air Force Blue (Usaf)",#00308f,0,48,143
+air_superiority_blue,"Air Superiority Blue",#72a0c1,114,160,193
+alabama_crimson,"Alabama Crimson",#a32638,163,38,56
+alice_blue,"Alice Blue",#f0f8ff,240,248,255
+alizarin_crimson,"Alizarin Crimson",#e32636,227,38,54
+alloy_orange,"Alloy Orange",#c46210,196,98,16
+almond,"Almond",#efdecd,239,222,205
 ```
 
-The table structure looks similar to this:
+Junk Drawer (*jd.exe*) imports it from the command line 
+like this:
+
+`jd.exe c:\temp\colors.csv`
+
+Now it can be queried:
 
 ```sql
-CREATE TABLE sample(
-    BirthDay DATETIME,
-    Name NVARCHAR(5),
-    Points INT
+USE Junk;
+
+SELECT TOP 10 * FROM colors;
+```
+
+```bash
+Code                  Name                   Hex     Red Green Blue
+--------------------- ---------------------- ------- --- ----- ----
+air_force_blue_raf    Air Force Blue (Raf)   #5d8aa8 93  138   168
+air_force_blue_usaf   Air Force Blue (Usaf)  #00308f 0   48    143
+air_superiority_blue  Air Superiority Blue   #72a0c1 114 160   193
+alabama_crimson       Alabama Crimson        #a32638 163 38    56
+alice_blue            Alice Blue             #f0f8ff 240 248   255
+alizarin_crimson      Alizarin Crimson       #e32636 227 38    54
+alloy_orange          Alloy Orange           #c46210 196 98    16
+almond                Almond                 #efdecd 239 222   205
+amaranth              Amaranth               #e52b50 229 43    80
+amber                 Amber                  #ffbf00 255 191   0
+```
+
+The resulting data structure is similar to this:
+
+```sql
+CREATE TABLE colors(
+    Code NVARCHAR(40),
+    Name NVARCHAR(42),
+    Hex NVARCHAR(8),
+    Red TINYINT,
+    Green TINYINT,
+    Blue TINYINT
 );
 ```
 
 ### How Does it Work?
 
-When we see sample text above, it's easy for us
-to notice the first row is different. We recognize it
-as a set of column names. The lines that follow are records.
+When we see *colors.csv* above, it's easy for us
+to notice the first row is a header, and subsequent 
+lines are records.
 
-Because there are only a few columns and records,
-it's easy for us to see a _comma_ is delimiting the values
-in each record.  Moreover, we see `Name` is text, `Birthday`
-is a date, and `Points` is numeric.
+Because there are few columns and records,
+we can see a _comma_ delimits the values. 
+Moreover, we see `Code` , `Name`, and `Hex` 
+are text, and `Red`, `Green`, and `Blue` are numeric.
 
-Junk Drawer has to do the same thing. It has to figure 
-out three things:
+Junk Drawer has to see what we see:
 
 1. the delimiter
 2. the column names (if available)
 3. the column data types
 
-For excel files, the first step is skipped.
+For excel files, the delimiter isn't necessary.
 
 ### Finding the Delimiter
  
-By default, 100 lines are examined. A set of pre-defined
-delimiters are counted in each line. If any delimiters
-are found, the average per line and [standard
+100 lines are examined for delimiters. If delimiters
+are found, the average number per line and [standard
 deviation](http://www.mathsisfun.com/data/standard-deviation.html)
-are calculated.
+is calculated.
 
 Then, the delimiter with the lowest [coefficient
 of variation](http://en.wikipedia.org/wiki/Coefficient_of_variation)
-is declared the winner.
+is declared winner.  This provides us with the most 
+consistent delimiter across the first 100 records.
 
-I'm no statistician, but I gather taking the delimiter
-with the lowest coefficient of variation provides the most
-consistent delimiter in the records.
+The default delimiters searched for are comma, pipe, tab, and semicolon. 
+If you want to search for others, configure them in the input connection like this:
+
+```xml
+<add name="input" provider="file" file="*.*">
+    <delimiters>
+        <add name="comma" character=","/>
+        <add name="pipe" character="|"/>
+        <add name="tab" character="&#009;"/>
+        <add name="semicolon" character=";"/>
+    </delimiters>
+</add>
+```
 
 ### Column Names
 
-We don't know if the first record is column names, or
-just another record. So, it is split by the
-winning delimiter and run through a series of tests:
+Now we must determine if the first record is column names, or data. 
+So, we split it by the winning delimiter and tested:
 
-* Are there any duplicate values?
-* Are there any empty values?
-* Are there any white space values?
-* Are there any numbers?
-* Are there any dates?
+* Are there duplicate values?
+* Are there empty values?
+* Are there white space values?
+* Are there numbers?
+* Are there dates?
 
-If any of the answers are _Yes_, 
-the first line cannot be used as column names.
-If this happens, default column names are
-generated (i.e. A, B, C, etc. like Excel). In the
-example above; `Name`, `Birthday`, and `Points`
-answer _No_ to all the questions, so
-they make good column names.
+If the answer is *Yes* to any question above, 
+the first line cannot be column names.
+If this happens, Excel-like column names are generated (i.e. A, B, C). 
+In *colors.csv*, the first line answers _No_ to the 
+questions, so it is used for column names.
 
 ### Data Types
 
-By default, 100% of the lines are tested against
-a set of types defined in _default.xml_.
+Initially, every field is a considered to be a `string`. 
+Often, when you're importing a file just to run some ad-hoc 
+queries, strings are fine.  However, if you want to "type-check" 
+the data, add types into your input connection like this: 
 
 ```xml
-<junk-drawer>
-  <!-- connections -->
-  <file-inspection>
-    <add name="default" <strong>sample="100"</strong>>
-      <!-- the pre-defined set of types -->
-        <strong><types>
-        <add type="boolean"/>
-        <add type="int32"/>
-        <add type="int64"/>
+<add name="input" provider="file" file="*.*">
+    <types>
+        <add type="bool"/>
+        <add type="byte"/>
+        <add type="short"/>
+        <add type="int"/>
+        <add type="long"/>
+        <add type="single"/>
+        <add type="double"/>
         <add type="decimal"/>
         <add type="datetime"/>
-      </types></strong>
-      <!-- delimiters -->
-    </add>
-  </file-inspection>
-</junk-drawer>
+    </types>
+</add>
 ```
 
-Take `Points` for example:
+Types are checked in the order they appear.  So, be 
+sure to add more restrictive data types first.  For example, 
+a `byte` allows 0 to 255, and a `short` allows -32,768 to 32,767. 
+If you test for `short` before you test for `byte`, all the `bytes` 
+will end up as `shorts`.
 
-* Is 73 a `boolean`?  No
-* Is 73 an `int32`? **Yes**
-* Is 13 an `int32`? **Yes**
-* Is 1042 an `int32`? **Yes**
-* Is 56 an `int32`? **Yes**
+Every value in the file is tested.  The first type where 
+all the values are convertable wins. If none of the types 
+allow all the values, a string is used.
 
-So, `Points` is compatible with an `int32`, and it is stored as
-an `INTEGER` in the database.
+A `string` is tested for length.  A field 
+assumes the length of the longest value in the file (+1).  If you want 
+control over string length, add `min-length` 
+and/or `max-length` to the connection:
 
-If there are mixed or failing validation results, like a
-combination of numbers and strings, I default to
-a string, which is then stored as an `NVARCHAR(x)` in the database.
+```xml
+<add name="input" 
+     provider="file" 
+     file="*.*"
+     min-length="64"
+     max-length="4000" />
+```
 
-If you want to increase the speed of data type
-validation, at the cost of accuracy, change the 
-`sample` size to something less than 100 (100%).
-
-Also, the less data types you check for, the faster 
-it runs.  For example, if you remove _ALL_ the types 
-from the configuration, everything is stored as a string, 
-and sometimes that's all you need.
-
-Once the values are checked, Junk Drawer
-has a compatible set of data types and it's ready 
-to try and import the file
+Once the values are type and/or length checked, Junk Drawer
+tries to import the file
 
 ### In Code
 
-JunkDrawer is a library _and_ an executable.
-
-If you want to use the library, 
-it's available on [Nuget](https://www.nuget.org/packages/JunkDrawer/). 
-
-`PM> Install-Package JunkDrawer`
-
-Installing it brings down [Transformalize](https://github.com/dalenewman/Transformalize) 
-and [Cfg-Net](https://github.com/dalenewman/Cfg-NET) as well. 
-Here's a console application example:
+JunkDrawer may be used in code like this:
 
 ```csharp
-using System;
-using System.IO;
-using JunkDrawer;
-using Transformalize.Logging;
-
-namespace ConsoleApplication1 {
-
-    class Program {
-
-        static void Main(string[] args) {
-
-        var cfg = new JunkCfg(File.ReadAllText("default.xml"));
-        if (!cfg.Problems().Any()) {
-            var logger = new NullLogger();
-            var request = new Request("sample.txt", cfg, logger);
-            var response = new JunkImporter(logger).Import(request);
-
-            Console.WriteLine("Table: {0}", response.TableName);
-            Console.WriteLine("Records: {0}", response.Records);
-        } else {
-            foreach (var problem in cfg.Problems()) {
-                Console.Error.WriteLine(problem);
-            }
-        }
-        Console.ReadKey();
-
-        }
-    }
+JunkResponse response;
+var request = new JunkRequest(@"c:\temp\colors.csv", "default.xml");
+using (var scope = new AutofacJunkBootstrapper(request)) {
+    response = scope.Resolve<JunkImporter>().Import();
 }
+
 ```
 
-Using [default.xml](https://github.com/dalenewman/JunkDrawer/blob/master/JunkDrawer.Console/default.xml) and 
-[sample.txt](https://github.com/dalenewman/JunkDrawer/blob/master/Test/sample.txt), you should 
-see output like this:
+In the case above, I'm using [Autofac](http://autofac.org/) to wire up the 
+`JunkImporter` dependencies.  A `JunkDrawer.Autofac` project is 
+included in the solution.
 
-```bash
-Table: sample
-Records: 4
-```
+### Options
 
 #### Table Name
-If you want to name your table something else, you can
-set the `TableName` property in the `Request` object.
+By default, Junk Drawer creates a view named after your 
+file (without the extension).  For example, `colors.csv` is 
+named `colors`. If you want to name your table something else, you can
+set the `TableName` property in `JunkRequest`.
 
 #### Configuration
-The `Request` requires a 'Cfg-NET' configuration. I used _default.xml_ above. 
-However, you can make as many different configurations as you want.
 
-The executable can also use other configurations.  Just pass the 
-configuration file name in as the second argument:
+You pass in the name of the file you want to import, and 
+an optional configuration file. If you do not provide 
+a configuration, *default.xml* is used.
 
-`jd.exe sample.txt other.xml`
+You can make as many configurations as you want.  For example, 
+let's say I wanted to import into SQLite instead of SQL Server. 
+I could create *sqlite.xml* like this:
 
-#### Logging
-You have to pass a logger in.  There is a `NullLogger` in 
-Transformalize, or a `ConsoleLogger` in JunkDrawer you can use, or 
-you can implement Transformalize's `ILogger` and use your favorite 
-logging library.  The executable implement's one using [Serilog](https://github.com/serilog/serilog).
+```xml
+<jd>
+    <connections>
+        <add name="input" provider="file" file="*.*" />
+        <add name="output"
+             provider="sqlite"
+             file="c:\temp\junk.sqlite3" />
+    </connections>
+</jd>
+```
+
+Now you can run this to import the file into SQLite:
+
+`jd.exe c:\temp\colors.csv sqlite.xml`
+
 
 ### Precautions
 
-#### Overwriting Tables
-If you import the same file into Junk Drawer twice, it will 
-overwrite the table.  So, if you run `jd.exe` _sample.txt_ and it 
-creates a `sample` table, then you run `jd.exe` _sample.txt_ again, it 
-will over-write the `sample` table. Don't worry though; it's only 
+#### Junk Overwrite
+
+If you import the same file into Junk Drawer twice, it overwrites 
+the previous table.  Don't worry though; it's only 
 your junk.
 
-#### Things Might Get Crazy
-I called it Junk Drawer because importing files directly
-into a database can get messy. It may end up an uncontrolled
-staging area for data. If you&#39;re the acting DBA, and you put your `Junk` on an
-important server, make sure you have monitors in place
-for disk space, CPU abuse, and excessive resource blocking.
+#### Junk Overflow
+
+I called it Junk Drawer because allowing folks to 
+import files directly into a database can create a mess. 
+You may want to keep an eye on it, or put your Junk database 
+on an isolated test server where it can do no harm.
 
 ### Conclusion
 
@@ -363,4 +341,4 @@ and run ad-hoc queries until their heart&#39;s content.
 Of course there are going to be files that are so messed up,
 that JunkDrawer won't be able to make any sense of them. In
 that case, you'll have to resort to shouting, head-locks,
-and noogies.
+and noogies (aka the import wizard).

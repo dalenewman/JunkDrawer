@@ -52,13 +52,17 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cfg.Net.Reader, Version=0.0.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.0.9\lib\Cfg.Net.Reader.dll</HintPath>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Cfg.Net.Reader, Version=0.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Cfg.Net\Cfg.Net.Reader\bin\Debug\Cfg.Net.Reader.dll</HintPath>
+    </Reference>
     <Reference Include="CfgNet, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.4.2\lib\CfgNet.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Cfg.Net\Cfg.Net.Reader\bin\Debug\CfgNet.dll</HintPath>
     </Reference>
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -81,9 +85,7 @@
   <ItemGroup>
     <Compile Include="Abc.cs" />
     <Compile Include="Company.cs" />
-    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CustomCfg.cs" />
     <Compile Include="SqlServerIntegration.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -99,9 +101,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JunkDrawer.Console\JunkDrawer.Console.csproj">
-      <Project>{f0746701-e447-4ef7-9644-88f2ba350d4a}</Project>
-      <Name>JunkDrawer.Console</Name>
+    <ProjectReference Include="..\JunkDrawer.Autofac\JunkDrawer.Autofac.csproj">
+      <Project>{88510d10-831b-4f9d-8f04-20b990bfd0e1}</Project>
+      <Name>JunkDrawer.Autofac</Name>
     </ProjectReference>
     <ProjectReference Include="..\JunkDrawer\JunkDrawer.csproj">
       <Project>{35022c73-d66e-43aa-814e-af8ce6b96294}</Project>
