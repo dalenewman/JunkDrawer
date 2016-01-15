@@ -203,19 +203,19 @@ If you want to search for others, configure them in the input connection like th
 ### Column Names
 
 Now we must determine if the first record is column names, or data. 
-So, we split it by the winning delimiter and tested:
+So, we split it by the winning delimiter and test for:
 
-* Are there duplicate values?
-* Are there empty values?
-* Are there white space values?
-* Are there numbers?
-* Are there dates?
+* duplicate values
+* empty values
+* white space values
+* numbers
+* dates
 
-If the answer is *Yes* to any question above, 
-the first line cannot be column names.
-If this happens, Excel-like column names are generated (i.e. A, B, C). 
-In *colors.csv*, the first line answers _No_ to the 
-questions, so it is used for column names.
+If there are any of the above, the first line is not suitable 
+for column names.  Excel-like column names are generated (i.e. A, B, C) 
+if necessary.  In *colors.csv*, the first line doesn't have any 
+duplicates, empties, white space values, numbers, or dates, 
+so it is used for column names.
 
 ### Data Types
 
