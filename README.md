@@ -70,13 +70,14 @@ end in a head-lock (as depicted above).
 So, instead of giving him the beat down, I decided to create a program that 
 makes it easier to import an Excel or text file into a database.
 
-### Configuration
+### Getting Started
 
 Junk Drawer refers to files as junk, and the 
 database as a drawer.  The file is an input, and 
-the database is an output; both are connections. 
-Open Junk Drawer's default configuration file 
-*default.xml*.
+the database is an output.  Both are connections. 
+
+To configure the connections, open Junk Drawer's default 
+configuration file *default.xml*.
 
 ```xml
 <jd>
@@ -92,15 +93,21 @@ Open Junk Drawer's default configuration file
 </jd>
 ```
 
-The file is `*.*`, but this is changed at run-time. 
- The database is `Junk` on my local SQL Server.
+The input is set to a file.  The file `*.*` is changed to your 
+file at run-time. The output is set to a local SQL Server database named Junk. 
+For SQL Server, the default database connection uses trusted security. 
+If you're using a native account, you may add a `user` and 
+`password` attribute.  You may also use a `connection-string` attribute 
+instead.
 
 ### Get a File
 
 The file must be Excel (e.g. `.xls`, `.xlsx`), or a delimited 
 text file (e.g. `.csv`, `.txt`).
 
-I searched Google for `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv).  Here's a sample:
+I searched Google for `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv). You 
+can find some pretty neat stuff on Google with the `filetype` term. 
+Here's a sample of *colors.csv*:
 
 ```bash
 Code,Name,Hex,Red,Green,Blue
@@ -124,7 +131,8 @@ Now it can be queried:
 ```sql
 USE Junk;
 
-SELECT TOP 10 * FROM colors;
+SELECT TOP 10 Code, Name, Hex, Red, Green, Blue
+FROM colors;
 ```
 
 ```bash
@@ -157,22 +165,20 @@ CREATE TABLE colors(
 
 ### How Does it Work?
 
-When we see *colors.csv* above, it's easy for us
-to notice the first row is a header, and subsequent 
-lines are records.
+When we glance at *colors.csv* above, it's easy for us
+to see the first row is a header, and subsequent 
+rows are records.
 
-Because there are few columns and records,
-we can see a _comma_ delimits the values. 
-Moreover, we see `Code` , `Name`, and `Hex` 
-are text, and `Red`, `Green`, and `Blue` are numeric.
+Moreover, we see that a _comma_ delimits the values.  We 
+also recognize patterns with the fields.  We see that `Code`, 
+`Name`, and `Hex` are text, and `Red`, `Green`, and `Blue` 
+are numeric.
 
-Junk Drawer has to see what we see:
+Junk Drawer has to see the same thing as we do:
 
 1. the delimiter
 2. the column names (if available)
 3. the column data types
-
-For excel files, the delimiter isn't necessary.
 
 ### Finding the Delimiter
  
@@ -187,7 +193,8 @@ is declared winner.  This provides us with the most
 consistent delimiter across the first 100 records.
 
 The default delimiters searched for are comma, pipe, tab, and semicolon. 
-If you want to search for others, configure them in the input connection like this:
+If you want control over the delimiters, configure them in 
+the input connection like this:
 
 ```xml
 <add name="input" provider="file" file="*.*">
@@ -202,27 +209,27 @@ If you want to search for others, configure them in the input connection like th
 
 ### Column Names
 
-Now we must determine if the first record is column names, or data. 
-So, we split it by the winning delimiter and test for:
+The first line is split by the winning delimiter 
+and tested for:
 
-* duplicate values
-* empty values
+* duplicates
+* empties
 * white space values
 * numbers
 * dates
 
 If there are any of the above, the first line is not suitable 
-for column names.  Excel-like column names are generated (i.e. A, B, C) 
+for column names. Excel-like column names are generated (i.e. A, B, C) 
 if necessary.  In *colors.csv*, the first line doesn't have any 
 duplicates, empties, white space values, numbers, or dates, 
-so it is used for column names.
+so it is used as column names.
 
 ### Data Types
 
-Initially, every field is a considered to be a `string`. 
-Often, when you're importing a file just to run some ad-hoc 
-queries, strings are fine.  However, if you want to "type-check" 
-the data, add types into your input connection like this: 
+Initially, every field is considered a `string`. 
+Often, when importing a file for ad-hoc queries, 
+strings are fine. However, if you want to *type-check* 
+the data, add types into the input connection like this: 
 
 ```xml
 <add name="input" provider="file" file="*.*">
@@ -240,20 +247,20 @@ the data, add types into your input connection like this:
 </add>
 ```
 
-Types are checked in the order they appear.  So, be 
-sure to add more restrictive data types first.  For example, 
-a `byte` allows 0 to 255, and a `short` allows -32,768 to 32,767. 
-If you test for `short` before you test for `byte`, all the `bytes` 
-will end up as `shorts`.
+Types are checked in the order they appear. Be sure to add 
+more restrictive data types first.  For example, a `byte` 
+allows 0 to 255, and a `short` allows -32,768 to 32,767. 
+If you test for `short` first, and then for `byte`, all 
+the *would-be* `bytes` end up as `shorts`.
 
-Every value in the file is tested.  The first type where 
-all the values are convertable wins. If none of the types 
-allow all the values, a string is used.
+Every value in a field is checked for type compatibility. 
+The first type that provies compatible is used. If no type 
+is compatible, a `string` is used.
 
-A `string` is tested for length.  A field 
-assumes the length of the longest value in the file (+1).  If you want 
-control over string length, add `min-length` 
-and/or `max-length` to the connection:
+A `string` is tested for length. A field assumes the length 
+of the longest value in the file (+1). If you want control 
+over string length, add `min-length` and/or `max-length` to 
+the connection:
 
 ```xml
 <add name="input" 
@@ -278,27 +285,28 @@ using (var scope = new AutofacJunkBootstrapper(request)) {
 }
 
 ```
+Just like the *jd.exe* executable, `JunkRequest` requires the 
+file name you want to import, and a configuration.
 
 In the case above, I'm using [Autofac](http://autofac.org/) to wire up the 
 `JunkImporter` dependencies.  A `JunkDrawer.Autofac` project is 
-included in the solution.
+included in the solution to demonstrate how `JunkImporter` is composed.
 
 ### Options
 
 #### Table Name
 By default, Junk Drawer creates a view named after your 
 file (without the extension).  For example, `colors.csv` is 
-named `colors`. If you want to name your table something else, you can
+named `colors`. If you want to name your table something else, 
 set the `TableName` property in `JunkRequest`.
 
 #### Configuration
 
-You pass in the name of the file you want to import, and 
-an optional configuration file. If you do not provide 
-a configuration, *default.xml* is used.
+If you do not provide a configuration, *default.xml* is used.
 
-You can make as many configurations as you want.  For example, 
-let's say I wanted to import into SQLite instead of SQL Server. 
+The configuration is file based.  You may make as 
+many configurations as you want.  For example, 
+if I wanted to import into SQLite instead of SQL Server. 
 I could create *sqlite.xml* like this:
 
 ```xml
@@ -312,10 +320,12 @@ I could create *sqlite.xml* like this:
 </jd>
 ```
 
-Now you can run this to import the file into SQLite:
+Now you can import *colors.csv* into SQLite:
 
 `jd.exe c:\temp\colors.csv sqlite.xml`
 
+Once imported, you may use something like 
+[DB Browser for SQLite](http://sqlitebrowser.org/) to query it.
 
 ### Precautions
 
@@ -330,15 +340,15 @@ your junk.
 I called it Junk Drawer because allowing folks to 
 import files directly into a database can create a mess. 
 You may want to keep an eye on it, or put your Junk database 
-on an isolated test server where it can do no harm.
+on an isolated test server where it can't hurt anybody.
 
 ### Conclusion
 
 Once in place, Junk Drawer can empower your trusted
 friends to import their data into a Junk database
-and run ad-hoc queries until their heart&#39;s content.
+and run ad-hoc queries until their heart's content.
 
-Of course there are going to be files that are so messed up,
-that JunkDrawer won't be able to make any sense of them. In
-that case, you'll have to resort to shouting, head-locks,
+Of course, there are files that are so messed up that 
+JunkDrawer won't be able import them. In that case, 
+you'll have to resort to shouting, head-locks,
 and noogies (aka the import wizard).
