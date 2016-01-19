@@ -15,17 +15,21 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Cfg.Net.Contracts;
 using Cfg.Net.Ext;
 using Cfg.Net.Reader;
 using Pipeline;
+using Pipeline.Actions;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
 using Pipeline.Desktop;
 using Pipeline.Desktop.Actions;
+using Pipeline.Desktop.Modules;
 using Pipeline.Logging.NLog;
+using Pipeline.Nulls;
 
 namespace JunkDrawer.Autofac {
     public class JunkModule : Module {
@@ -38,15 +42,16 @@ namespace JunkDrawer.Autofac {
         public static string ProcessName = "JunkDrawer";
         protected override void Load(ContainerBuilder builder) {
 
-            // Cfg-Net Setup
-            builder.RegisterType<SourceDetector>().As<ISourceDetector>();
+            // Cfg-Net Setup for JunkCfg
+            builder.RegisterType<SourceDetector>();
             builder.RegisterType<FileReader>();
             builder.RegisterType<WebReader>();
 
-            builder.Register<IReader>(ctx => new DefaultReader(
-                ctx.Resolve<ISourceDetector>(),
-                ctx.Resolve<FileReader>(),
-                new ReTryingReader(ctx.Resolve<WebReader>(),3)
+            builder.Register<IReader>(ctx =>
+                new DefaultReader(
+                    ctx.Resolve<SourceDetector>(),
+                    ctx.Resolve<FileReader>(),
+                    new ReTryingReader(ctx.Resolve<WebReader>(), 3)
                 )
             );
 
@@ -62,9 +67,21 @@ namespace JunkDrawer.Autofac {
                     input.Provider = "excel";
                 }
                 return cfg;
-            }).As<JunkCfg>();
+            }).As<JunkCfg>().InstancePerLifetimeScope();
 
-            // Pipeline.Net Setup
+            // Cfg-Net setup for Transformalize
+            builder.Register<IValidators>(ctx => new Validators(new Dictionary<string, IValidator> {
+                { "js", new NullValidator() },
+                {"cron", new NullValidator() }
+            }));
+
+            builder.Register((ctx, p) => {
+                var root = new Root(ctx.Resolve<IValidators>());
+                root.Load(p.Named<string>("cfg"));
+                return root;
+            }).As<Root>().InstancePerLifetimeScope();
+
+            // Junk Drawer Setup
             builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().InstancePerLifetimeScope();
             builder.Register(ctx => new PipelineContext(ctx.Resolve<IPipelineLogger>(), new Process { Name = ProcessName }.WithDefaults())).As<IContext>();
 
@@ -75,17 +92,43 @@ namespace JunkDrawer.Autofac {
 
             // Write Configuration based on schema results and JunkRequest
             builder.Register<ICreateConfiguration>(c => new JunkConfigurationCreator(c.Resolve<JunkCfg>(), _junkRequest, c.Resolve<ISchemaReader>())).As<ICreateConfiguration>();
+            builder.Register(c => c.Resolve<ICreateConfiguration>().Create()).Named<string>("cfg").InstancePerLifetimeScope();
 
-            // Create action with configuration writer and action node
-            builder.Register(c => new ActionNode {
-                Action = "tfl",
-                Shorthand = string.Empty,
-                Content = c.Resolve<ICreateConfiguration>().Create()
-            }.WithDefaults()).As<ActionNode>();
-            builder.Register(c => new PipelineAction(c.Resolve<ActionNode>(), c.Resolve<IContext>())).As<PipelineAction>();
+            builder.Register<IAction>(c =>
+            {
+                var root = c.Resolve<Root>(new NamedParameter("cfg", c.ResolveNamed<string>("cfg")));
+                var context = c.Resolve<IContext>();
+                foreach (var warning in root.Warnings()) {
+                    context.Warn(warning);
+                }
+                if (root.Errors().Any()) {
+                    foreach (var error in root.Errors()) {
+                        context.Error(error);
+                    }
+                    return new NullAction();
+                }
 
-            // Final product is a JunkImporter that executes action (above)
-            builder.Register(c => new JunkImporter(c.Resolve<PipelineAction>())).As<JunkImporter>();
+                var nested = new ContainerBuilder();
+
+                nested.RegisterInstance(c.Resolve<IPipelineLogger>());
+                nested.RegisterModule(new ConnectionModule(root));
+                nested.RegisterModule(new EntityControlModule(root));
+                nested.RegisterModule(new EntityInputModule(root));
+                nested.RegisterModule(new EntityOutputModule(root));
+                nested.RegisterModule(new EntityMasterUpdateModule(root));
+                nested.RegisterModule(new EntityPipelineModule(root));
+                nested.RegisterModule(new ProcessPipelineModule(root));
+                nested.RegisterModule(new ProcessControlModule(root));
+
+                return new PipelineAction(nested, root);
+            }).As<IAction>();
+
+            // Final product is a JunkImporter that executes the action above
+            builder.Register(c =>
+            {
+                var root = c.Resolve<Root>(new NamedParameter("cfg", c.ResolveNamed<string>("cfg")));
+                return new JunkImporter(root, c.Resolve<IAction>());
+            }).As<JunkImporter>();
         }
     }
 }

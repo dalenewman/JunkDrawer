@@ -60,11 +60,13 @@
       <HintPath>..\packages\Cfg-NET.0.4.2\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Pipeline.Desktop">
-      <HintPath>..\..\Pipeline.Net\Pipeline.Desktop\bin\Debug\Pipeline.Desktop.dll</HintPath>
+    <Reference Include="Pipeline.Desktop, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Desktop.dll</HintPath>
     </Reference>
-    <Reference Include="Pipeline.Portable">
-      <HintPath>..\..\Pipeline.Net\Pipeline.Portable\bin\Debug\Pipeline.Portable.dll</HintPath>
+    <Reference Include="Pipeline.Portable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
