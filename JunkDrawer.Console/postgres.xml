@@ -1,0 +1,10 @@
+﻿<jd>
+  <connections>
+    <add name="input" provider="file" file="*.*" />
+    <add name="output"
+         provider="postgresql"
+         database="Junk"
+         user="postgres"
+         password="********"/>
+  </connections>
+</jd>

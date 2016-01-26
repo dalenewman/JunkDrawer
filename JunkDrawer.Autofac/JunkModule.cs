@@ -14,20 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Cfg.Net.Contracts;
 using Cfg.Net.Ext;
 using Cfg.Net.Reader;
+using JunkDrawer.Autofac.Modules;
 using Pipeline;
 using Pipeline.Actions;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
-using Pipeline.Desktop;
-using Pipeline.Desktop.Actions;
-using Pipeline.Desktop.Modules;
 using Pipeline.Logging.NLog;
 using Pipeline.Nulls;
 
@@ -115,9 +112,7 @@ namespace JunkDrawer.Autofac {
                 nested.RegisterModule(new EntityControlModule(root));
                 nested.RegisterModule(new EntityInputModule(root));
                 nested.RegisterModule(new EntityOutputModule(root));
-                nested.RegisterModule(new EntityMasterUpdateModule(root));
                 nested.RegisterModule(new EntityPipelineModule(root));
-                nested.RegisterModule(new ProcessPipelineModule(root));
                 nested.RegisterModule(new ProcessControlModule(root));
 
                 return new PipelineAction(nested, root);

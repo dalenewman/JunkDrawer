@@ -122,9 +122,7 @@
     <add name="htmldecode" signature="none" target="t" />
     <add name="insert" signature="insert" target="t" />
     <add name="is" signature="type" target="t" />
-    <add name="javascript" signature="script" target="t" />
     <add name="join" signature="separator" target="t" />
-    <add name="js" signature="script" target="t" />
     <add name="last" signature="dayofweek" target="t" />
     <add name="left" signature="length" target="t" />
     <add name="map" signature="map" target="t" />

@@ -352,3 +352,21 @@ Of course, there are files that are so messed up that
 JunkDrawer won't be able import them. In that case, 
 you'll have to resort to shouting, head-locks,
 and noogies (aka the import wizard).
+
+### Credits
+
+Junk Drawer is not possible without:
+
+* [Microsoft .NET](https://www.microsoft.com/net)
+* [Cfg-Net](https://github.com/dalenewman/Cfg-NET) - Apache 2
+* [AutoFac](http://autofac.org/) - MIT
+* [Dapper](https://github.com/StackExchange/dapper-dot-net) - Apache 2
+* [System.Data.SQLite](https://system.data.sqlite.org)
+* [Npgsql](http://www.npgsql.org/)
+* [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
+* [FileHelpers](http://www.filehelpers.net/) - MIT
+* [ExcelDataReader](https://github.com/ExcelDataReader/ExcelDataReader) - MIT
+* [SharpZipLib](https://icsharpcode.github.io/SharpZipLib/) - GNU
+* [Nlog](http://nlog-project.org/) - BSD
+
+

@@ -1,4 +1,4 @@
-﻿#region license
+#region license
 // JunkDrawer
 // Copyright 2013 Dale Newman
 // 
@@ -14,9 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-namespace JunkDrawer {
-    public class JunkResponse {
-        public string TableName { get; set; } = string.Empty;
-        public long Records { get; set; } = 0;
+using Autofac;
+using Pipeline.Configuration;
+
+namespace JunkDrawer.Autofac.Modules {
+    public abstract class ProcessModule : Module {
+        readonly Root _root;
+
+        protected ProcessModule(Root root) {
+            _root = root;
+        }
+
+        protected abstract void RegisterProcess(ContainerBuilder builder, Process process);
+
+        protected override void Load(ContainerBuilder builder) {
+            foreach (var process in _root.Processes) {
+                RegisterProcess(builder, process);
+            }
+        }
     }
 }
