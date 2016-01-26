@@ -247,15 +247,14 @@ the data, add types into the input connection like this:
 </add>
 ```
 
-Types are checked in the order they appear. Be sure to add 
-more restrictive data types first.  For example, a `byte` 
-allows 0 to 255, and a `short` allows -32,768 to 32,767. 
-If you test for `short` first, and then for `byte`, all 
-the *would-be* `bytes` end up as `shorts`.
+Currently, types are checked in the order they appear. So, to select the 
+most efficient type, add more restrictive types first. For example, if 
+you test for a `short` (-32,768-32,767), before a `byte` (0-255), 
+any *would-be* `bytes` end up as `shorts`.
 
-Every value in a field is checked for type compatibility. 
-The first type that provies compatible is used. If no type 
-is compatible, a `string` is used.
+Every value in a field is checked against a type's restrictions. 
+The first compatible type is used. If no type allows all the values, 
+a `string` is used.
 
 A `string` is tested for length. A field assumes the length 
 of the longest value in the file (+1). If you want control 
@@ -297,7 +296,7 @@ included in the solution to demonstrate how `JunkImporter` is composed.
 #### Table Name
 By default, Junk Drawer creates a view named after your 
 file (without the extension).  For example, `colors.csv` is 
-named `colors`. If you want to name your table something else, 
+named `colors`. If you want to name your view something else, 
 set the `TableName` property in `JunkRequest`.
 
 #### Configuration
@@ -306,8 +305,8 @@ If you do not provide a configuration, *default.xml* is used.
 
 The configuration is file based.  You may make as 
 many configurations as you want.  For example, 
-if I wanted to import into SQLite instead of SQL Server. 
-I could create *sqlite.xml* like this:
+to import into SQLite instead of SQL Server, create 
+a configuration like this:
 
 ```xml
 <jd>
@@ -320,12 +319,11 @@ I could create *sqlite.xml* like this:
 </jd>
 ```
 
-Now you can import *colors.csv* into SQLite:
+Save it as *sqlite.xml*.  Now import *colors.csv* into SQLite:
 
 `jd.exe c:\temp\colors.csv sqlite.xml`
 
-Once imported, you may use something like 
-[DB Browser for SQLite](http://sqlitebrowser.org/) to query it.
+MySql and PostgreSql are also supported.
 
 ### Precautions
 
@@ -348,25 +346,24 @@ Once in place, Junk Drawer can empower your trusted
 friends to import their data into a Junk database
 and run ad-hoc queries until their heart's content.
 
-Of course, there are files that are so messed up that 
-JunkDrawer won't be able import them. In that case, 
-you'll have to resort to shouting, head-locks,
-and noogies (aka the import wizard).
+Of course, there are files out there that are so 
+jacked up that Junk Drawer won't be able handle them. 
+In that case, you'll have to resort to shouting, head-locks,
+and noogies (or an import wizard).
 
 ### Credits
 
 Junk Drawer is not possible without:
 
 * [Microsoft .NET](https://www.microsoft.com/net)
-* [Cfg-Net](https://github.com/dalenewman/Cfg-NET) - Apache 2
 * [AutoFac](http://autofac.org/) - MIT
 * [Dapper](https://github.com/StackExchange/dapper-dot-net) - Apache 2
-* [System.Data.SQLite](https://system.data.sqlite.org)
-* [Npgsql](http://www.npgsql.org/)
-* [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
 * [FileHelpers](http://www.filehelpers.net/) - MIT
 * [ExcelDataReader](https://github.com/ExcelDataReader/ExcelDataReader) - MIT
 * [SharpZipLib](https://icsharpcode.github.io/SharpZipLib/) - GNU
 * [Nlog](http://nlog-project.org/) - BSD
-
+* [Cfg-Net](https://github.com/dalenewman/Cfg-NET) - Apache 2
+* [System.Data.SQLite](https://system.data.sqlite.org)
+* [Npgsql](http://www.npgsql.org/)
+* [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
 
