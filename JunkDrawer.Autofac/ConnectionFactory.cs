@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cfg.Net.Contracts;
-using Pipeline;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
 using Pipeline.Desktop;
@@ -63,8 +62,8 @@ namespace JunkDrawer.Autofac {
                     /* file and excel are different, have to load the content and check it to determine schema */
                     var fileInfo = new FileInfo(Path.IsPathRooted(input.Connection.File) ? input.Connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, input.Connection.File));
                     var cfg = input.Connection.Provider == "file" ? new FileInspection(input, fileInfo, 100).Create() : new ExcelInspection(input, fileInfo, 100).Create();
-                    var validators = new Cfg.Net.Contracts.Validators(new Dictionary<string, IValidator> {
-                        { "js", new JintParser() },
+                    var validators = new Validators(new Dictionary<string, IValidator> {
+                        { "js", new NullValidator() },
                         { "cron", new NullValidator() }
                     });
                     var root = new Root(validators);

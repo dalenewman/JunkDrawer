@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
@@ -60,7 +62,7 @@ namespace JunkDrawer.Autofac {
                 // modify the input provider based on the file name requested
                 var input = cfg.Connections.First();
                 input.File = _junkRequest.FileInfo.FullName;
-                if (_junkRequest.Extension.StartsWith(".xls")) {
+                if (_junkRequest.Extension.StartsWith(".xls", StringComparison.OrdinalIgnoreCase)) {
                     input.Provider = "excel";
                 }
                 return cfg;
@@ -80,7 +82,7 @@ namespace JunkDrawer.Autofac {
 
             // Junk Drawer Setup
             builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().InstancePerLifetimeScope();
-            builder.Register(ctx => new PipelineContext(ctx.Resolve<IPipelineLogger>(), new Process { Name = ProcessName }.WithDefaults())).As<IContext>();
+            builder.Register(ctx => new PipelineContext(ctx.Resolve<IPipelineLogger>(), new Process { Name = ProcessName, Key = ProcessName }.WithDefaults())).As<IContext>();
 
             // ConnectionFactory, and Context to Create Schema Reader
             builder.RegisterType<ConnectionFactory>();
