@@ -1,5 +1,5 @@
 #region license
-// JunkDrawer
+// Transformalize
 // Copyright 2013 Dale Newman
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
+using System.Linq;
 using Autofac;
 using Pipeline;
 using Pipeline.Configuration;
@@ -33,12 +35,13 @@ namespace JunkDrawer.Autofac.Modules {
 
             builder.Register(ctx => {
                 var output = ctx.ResolveNamed<OutputContext>(entity.Key);
+                var rowFactory = ctx.ResolveNamed<IRowFactory>(entity.Key, new NamedParameter("capacity", output.GetAllEntityFields().Count()));
                 var cf = ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key);
                 switch (output.Connection.Provider) {
                     case "sqlite":
-                        return new TypedEntityMatchingKeysReader(new AdoEntityMatchingKeysReader(output, cf), output);
+                        return new TypedEntityMatchingKeysReader(new AdoEntityMatchingKeysReader(output, cf, rowFactory), output);
                     default:
-                        return (ITakeAndReturnRows)new AdoEntityMatchingKeysReader(output, cf);
+                        return (ITakeAndReturnRows)new AdoEntityMatchingKeysReader(output, cf, rowFactory);
                 }
             }).Named<ITakeAndReturnRows>(entity.Key);
 

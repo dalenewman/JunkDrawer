@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
+using System;
 using System.Linq;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
@@ -21,28 +23,31 @@ using Pipeline.Contracts;
 namespace JunkDrawer {
     public class JunkImporter : IResolvable {
         private readonly Root _root;
-        private readonly IAction _pipelineAction;
+        private readonly IRunTimeExecute _executor;
 
         public JunkImporter(
             Root root,
-            IAction pipelineAction
+           IRunTimeExecute executor
         ) {
             _root = root;
-            _pipelineAction = pipelineAction;
+            _executor = executor;
         }
 
         public JunkResponse Import() {
 
-            var response = _pipelineAction.Execute();
-            if (response.Code != 200)
+            try {
+                _executor.Execute(_root);
+                var entity = _root.Processes.First().Entities.First();
+
+                return new JunkResponse {
+                    Records = entity.Inserts,
+                    TableName = entity.Alias
+                };
+
+            } catch (Exception) {
                 return new JunkResponse();
+            }
 
-            var entity = _root.Processes.First().Entities.First();
-
-            return new JunkResponse {
-                Records = entity.Inserts,
-                TableName = entity.Alias
-            };
         }
 
     }

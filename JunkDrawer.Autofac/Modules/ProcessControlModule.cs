@@ -1,5 +1,5 @@
 ﻿#region license
-// JunkDrawer
+// Transformalize
 // Copyright 2013 Dale Newman
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
@@ -46,6 +47,9 @@ namespace JunkDrawer.Autofac.Modules {
                         pipeline.Register(ctx.ResolveNamed<IEntityDeleteHandler>(entity.Key));
                     }
                 }
+
+                // process-level pipeline
+                // pipelines.Add(ctx.ResolveNamed<IPipeline>(process.Key));
 
                 var outputProvider = process.Connections.First(c => c.Name == "output").Provider;
                 var context = new PipelineContext(ctx.Resolve<IPipelineLogger>(), process);

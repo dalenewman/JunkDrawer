@@ -1,5 +1,5 @@
 #region license
-// JunkDrawer
+// Transformalize
 // Copyright 2013 Dale Newman
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
 using Autofac;
 using Pipeline;
 using Pipeline.Configuration;
@@ -31,19 +32,25 @@ namespace JunkDrawer.Autofac.Modules {
         public override void LoadEntity(ContainerBuilder builder, Process process, Entity entity) {
             builder.Register<IRead>(ctx => {
                 var input = ctx.ResolveNamed<InputContext>(entity.Key);
+                var rowFactory = ctx.ResolveNamed<IRowFactory>(entity.Key, new NamedParameter("capacity", input.RowCapacity));
 
                 switch (input.Connection.Provider) {
                     case "internal":
-                        return new DataSetEntityReader(input);
+                        return new DataSetEntityReader(input, rowFactory);
                     case "file":
-                        return new DelimitedFileReader(input);
+                        return new DelimitedFileReader(input, rowFactory, new NullRowCondition());
                     case "excel":
-                        return new ExcelReader(input);
+                        return new ExcelReader(input, rowFactory);
                     case "mysql":
                     case "postgresql":
                     case "sqlite":
                     case "sqlserver":
-                        return new AdoInputReader(input, input.InputFields, ctx.ResolveNamed<IConnectionFactory>(input.Connection.Key));
+                        return new AdoInputReader(
+                            input,
+                            input.InputFields,
+                            ctx.ResolveNamed<IConnectionFactory>(input.Connection.Key),
+                            rowFactory
+                        );
                     default:
                         return new NullEntityReader();
                 }

@@ -27,44 +27,46 @@ namespace JunkDrawer {
 
         static void Main(string[] args) {
 
-            if (args == null || args.Length == 0) {
-                Console.Error.WriteLine("You must pass in the name of a file you'd like to import into your junk drawer.");
-                WriteUsage();
-                Environment.Exit(Error);
-            }
+            var options = new Options();
+            if (args.Length > 0 && CommandLine.Parser.Default.ParseArguments(args, options)) {
 
-            var file = args[0];
-            var config = args.Length > 1 ? args[1] : "default.xml";
+                // check if request has valid file
+                var request = new JunkRequest(options.File, options.Configuration);
+                if (!request.IsValid) {
+                    Console.Error.WriteLine(request.Message);
+                    Environment.Exit(Error);
+                }
 
-            // check if request has valid file
-            var request = new JunkRequest(file, config);
-            if (!request.IsValid) {
-                Console.Error.WriteLine(request.Message);
-                Environment.Exit(Error);
-            }
+                try {
 
-            try {
+                    using (var bootstrapper = new AutofacJunkBootstrapper(request)) {
 
-                using (var bootstrapper = new AutofacJunkBootstrapper(request)) {
-
-                    var cfg = bootstrapper.Resolve<JunkCfg>();
-                    if (cfg.Errors().Any()) {
-                        foreach (var error in cfg.Errors()) {
-                            Console.Error.WriteLine(error);
+                        var cfg = bootstrapper.Resolve<JunkCfg>();
+                        if (cfg.Errors().Any()) {
+                            foreach (var error in cfg.Errors()) {
+                                Console.Error.WriteLine(error);
+                                Environment.ExitCode = Error;
+                            }
+                        } else {
+                            var response = bootstrapper.Resolve<JunkImporter>().Import();
+                            if (response.Records != 0)
+                                return;
+                            Console.Error.WriteLine("Did not import any records!");
                             Environment.ExitCode = Error;
                         }
-                    } else {
-                        var response = bootstrapper.Resolve<JunkImporter>().Import();
-                        if (response.Records != 0)
-                            return;
-                        Console.Error.WriteLine("Did not import any records!");
-                        Environment.ExitCode = Error;
                     }
+                } catch (Exception ex) {
+                    Console.Error.WriteLine(ex.Message);
+                    Environment.ExitCode = Error;
                 }
-            } catch (Exception ex) {
-                Console.Error.WriteLine(ex.Message);
-                Environment.ExitCode = Error;
+
+                Environment.ExitCode = 0;
+            } else {
+                Console.Error.WriteLine(options.GetUsage());
+                Environment.ExitCode = 1;
             }
+
+
         }
 
         private static void WriteUsage() {

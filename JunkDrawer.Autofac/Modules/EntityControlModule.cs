@@ -1,5 +1,5 @@
 #region license
-// JunkDrawer
+// Transformalize
 // Copyright 2013 Dale Newman
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
 using Autofac;
 using Pipeline;
 using Pipeline.Configuration;
@@ -36,17 +37,10 @@ namespace JunkDrawer.Autofac.Modules {
 
         public override void LoadEntity(ContainerBuilder builder, Process process, Entity entity) {
 
-            builder.Register<IContext>(ctx => new PipelineContext(ctx.Resolve<IPipelineLogger>(), process, entity)).Named<IContext>(entity.Key).InstancePerLifetimeScope();
-            builder.Register<IIncrement>(ctx => new Incrementer(ctx.ResolveNamed<IContext>(entity.Key))).Named<IIncrement>(entity.Key).InstancePerDependency();
-            builder.Register(ctx => new InputContext(ctx.ResolveNamed<IContext>(entity.Key), ctx.ResolveNamed<IIncrement>(entity.Key))).Named<InputContext>(entity.Key).InstancePerLifetimeScope();
-            builder.Register(ctx => new OutputContext(ctx.ResolveNamed<IContext>(entity.Key), ctx.ResolveNamed<IIncrement>(entity.Key))).Named<OutputContext>(entity.Key).InstancePerLifetimeScope();
-
             builder.Register<IOutputController>(ctx => {
 
                 var input = ctx.ResolveNamed<InputContext>(entity.Key);
                 var output = ctx.ResolveNamed<OutputContext>(entity.Key);
-                IAction initializer;
-                var cf = ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key);
 
                 IVersionDetector inputDetector;
                 switch (input.Connection.Provider) {
@@ -66,13 +60,13 @@ namespace JunkDrawer.Autofac.Modules {
                     case "postgresql":
                     case "sqlite":
                     case "sqlserver":
-                        initializer = process.Mode == "init" ? (IAction)new AdoEntityInitializer(output, cf) : new NullInitializer();
+                        var initializer = process.Mode == "init" ? (IAction)new AdoEntityInitializer(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)) : new NullInitializer();
                         return new AdoOutputController(
                             output,
                             initializer,
                             inputDetector,
-                            new AdoOutputVersionDetector(output, cf),
-                            cf
+                            new AdoOutputVersionDetector(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)),
+                            ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)
                         );
                     default:
                         return new NullOutputController();

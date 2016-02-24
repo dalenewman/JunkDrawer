@@ -50,43 +50,43 @@
     </Reference>
     <Reference Include="Pipeline.Desktop, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Desktop.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Desktop.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Logging.NLog, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Logging.NLog.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Logging.NLog.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Portable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.Ado, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.Ado.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.Ado.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.Excel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.Excel.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.Excel.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.File, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.File.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.File.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.MySql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.MySql.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.MySql.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.PostgreSql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.PostgreSql.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.PostgreSql.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.SQLite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.SQLite.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.SqlServer, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.SqlServer.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -102,20 +102,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutofacJunkBootstrapper.cs" />
-    <Compile Include="ConnectionFactory.cs" />
     <Compile Include="JunkModule.cs" />
+    <Compile Include="Modules\AdoModule.cs" />
     <Compile Include="Modules\ConnectionModule.cs" />
+    <Compile Include="Modules\ContextModule.cs" />
     <Compile Include="Modules\EntityControlModule.cs" />
     <Compile Include="Modules\EntityInputModule.cs" />
     <Compile Include="Modules\EntityModule.cs" />
     <Compile Include="Modules\EntityOutputModule.cs" />
     <Compile Include="Modules\EntityPipelineModule.cs" />
+    <Compile Include="Modules\FileSchemaModule.cs" />
     <Compile Include="Modules\ProcessControlModule.cs" />
     <Compile Include="Modules\ProcessModule.cs" />
-    <Compile Include="PipelineAction.cs" />
-    <Compile Include="PipelineRunner.cs" />
+    <Compile Include="Modules\RootModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunTimeExecutor.cs" />
+    <Compile Include="RunTimeRunner.cs" />
     <Compile Include="TransformFactory.cs" />
+    <Compile Include="UnloadedRootModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

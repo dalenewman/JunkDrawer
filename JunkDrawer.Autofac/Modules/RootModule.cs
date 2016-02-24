@@ -1,0 +1,75 @@
+﻿#region license
+// Transformalize
+// Copyright 2013 Dale Newman
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//      http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+
+using System.Collections.Generic;
+using System.Linq;
+using Autofac;
+using Cfg.Net.Contracts;
+using Cfg.Net.Reader;
+using Pipeline.Configuration;
+using Pipeline.Nulls;
+
+// ReSharper disable PossibleMultipleEnumeration
+
+namespace JunkDrawer.Autofac.Modules {
+    public class RootModule : Module {
+
+        protected override void Load(ContainerBuilder builder) {
+
+            builder.RegisterType<SourceDetector>().As<ISourceDetector>();
+            builder.RegisterType<FileReader>().Named<IReader>("file");
+            builder.RegisterType<WebReader>().Named<IReader>("web");
+
+            builder.Register<IReader>(ctx => new DefaultReader(
+                ctx.Resolve<ISourceDetector>(),
+                ctx.ResolveNamed<IReader>("file"),
+                new ReTryingReader(ctx.ResolveNamed<IReader>("web"), 3))
+            );
+
+            builder.Register<IValidators>(ctx => new Validators(new Dictionary<string, IValidator> {
+                { "js", new NullValidator() }
+            }));
+
+            builder.Register((ctx, p) => {
+                var root = new Root(ctx.Resolve<IValidators>(), ctx.Resolve<IReader>());
+                switch (p.Count()) {
+                    case 3:
+                        root.Load(
+                            p.Named<string>("cfg"),
+                            p.Named<string>("shorthand"),
+                            p.Named<Dictionary<string, string>>("parameters")
+                        );
+                        break;
+                    case 2:
+                        root.Load(
+                            p.Named<string>("cfg"),
+                            p.Named<string>("shorthand")
+                        );
+                        break;
+                    case 1:
+                        root.Load(p.Named<string>("cfg"));
+                        break;
+                    default:
+                        root.Load(p.Named<string>("cfg"));
+                        break;
+                }
+                return root;
+            }).As<Root>();
+
+        }
+    }
+}

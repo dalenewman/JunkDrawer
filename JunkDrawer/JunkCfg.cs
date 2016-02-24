@@ -22,21 +22,18 @@ using Pipeline.Configuration;
 
 namespace JunkDrawer {
 
-    public class JunkCfg : CfgNode, IResolvable {
+    public class JunkCfg :CfgNode, IResolvable {
 
         public JunkCfg(string cfg, params IDependency[] dependencies) : base(dependencies) {
             Load(cfg);
         }
-
-        [Cfg(value = 3)]
-        public int Retries { get; set; }
 
         [Cfg(required = true)]
         public List<Connection> Connections { get; set; }
 
         protected override void Validate() {
             if (Connections.Count < 2) {
-                Error("You need two connections defined; the first one for input, the last one for output.");
+                Error("You need two connections defined; the first an input, the last an output.");
             }
         }
 
