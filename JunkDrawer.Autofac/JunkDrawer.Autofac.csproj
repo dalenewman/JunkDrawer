@@ -36,12 +36,12 @@
       <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Cfg.Net.Reader, Version=0.0.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.0.9\lib\Cfg.Net.Reader.dll</HintPath>
+    <Reference Include="Cfg.Net.Reader, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Reader.0.1.0\lib\Cfg.Net.Reader.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CfgNet, Version=0.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.5.1\lib\CfgNet.dll</HintPath>
+    <Reference Include="CfgNet, Version=0.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.5.3\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -50,43 +50,46 @@
     </Reference>
     <Reference Include="Pipeline.Desktop, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Desktop.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="Pipeline.Ioc.Autofac">
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Ioc.Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Logging.NLog, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Logging.NLog.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Logging.NLog.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Portable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Portable.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.Ado, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.Ado.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.Ado.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.Excel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.Excel.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.Excel.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.File, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.File.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.File.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.MySql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.MySql.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.MySql.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.PostgreSql, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.PostgreSql.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.PostgreSql.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.SQLite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.SQLite.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.SqlServer, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.SqlServer.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

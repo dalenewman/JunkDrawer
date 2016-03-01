@@ -124,7 +124,7 @@ almond,"Almond",#efdecd,239,222,205
 Junk Drawer (*jd.exe*) imports it from the command line 
 like this:
 
-`jd.exe c:\temp\colors.csv`
+`jd.exe -f c:\temp\colors.csv`
 
 Now it can be queried:
 
@@ -321,7 +321,7 @@ a configuration like this:
 
 Save it as *sqlite.xml*.  Now import *colors.csv* into SQLite:
 
-`jd.exe c:\temp\colors.csv sqlite.xml`
+`jd.exe -f c:\temp\colors.csv -c sqlite.xml`
 
 MySql and PostgreSql are also supported.
 
@@ -360,10 +360,10 @@ Junk Drawer is not possible without:
 * [Dapper](https://github.com/StackExchange/dapper-dot-net) - Apache 2
 * [FileHelpers](http://www.filehelpers.net/) - MIT
 * [ExcelDataReader](https://github.com/ExcelDataReader/ExcelDataReader) - MIT
-* [SharpZipLib](https://icsharpcode.github.io/SharpZipLib/) - GNU
+    * [SharpZipLib](https://icsharpcode.github.io/SharpZipLib/) - GNU
 * [Nlog](http://nlog-project.org/) - BSD
 * [Cfg-Net](https://github.com/dalenewman/Cfg-NET) - Apache 2
+* [Command Line Parser](https://github.com/gsscoder/commandline) - MIT
 * [System.Data.SQLite](https://system.data.sqlite.org)
 * [Npgsql](http://www.npgsql.org/)
 * [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
-
