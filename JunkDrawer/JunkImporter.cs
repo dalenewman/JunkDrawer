@@ -22,22 +22,22 @@ using Pipeline.Contracts;
 
 namespace JunkDrawer {
     public class JunkImporter : IResolvable {
-        private readonly Root _root;
+        private readonly Process _process;
         private readonly IRunTimeExecute _executor;
 
         public JunkImporter(
-            Root root,
+            Process process,
            IRunTimeExecute executor
         ) {
-            _root = root;
+            _process = process;
             _executor = executor;
         }
 
         public JunkResponse Import() {
 
             try {
-                _executor.Execute(_root);
-                var entity = _root.Processes.First().Entities.First();
+                _executor.Execute(_process);
+                var entity = _process.Entities.First();
 
                 return new JunkResponse {
                     Records = entity.Inserts,

@@ -21,7 +21,6 @@ using Autofac;
 using JunkDrawer.Autofac.Modules;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
-using Pipeline.Logging.NLog;
 using Pipeline.Nulls;
 
 namespace JunkDrawer.Autofac {
@@ -32,39 +31,38 @@ namespace JunkDrawer.Autofac {
             _context = context;
         }
 
-        public IEnumerable<IRow> Run(Root root) {
+        public IEnumerable<IRow> Run(Process process) {
 
-            foreach (var warning in root.Warnings()) {
+            foreach (var warning in process.Warnings()) {
                 _context.Warn(warning);
             }
 
-            if (root.Errors().Any()) {
-                foreach (var error in root.Errors()) {
+            if (process.Errors().Any()) {
+                foreach (var error in process.Errors()) {
                     _context.Error(error);
                 }
                 _context.Error("The configuration errors must be fixed before this job will run.");
                 return Enumerable.Empty<IRow>();
             }
 
-            var name = string.Join("-", root.Processes.Select(p => p.Name));
             var container = new ContainerBuilder();
-            container.RegisterInstance(new NLogPipelineLogger(name, _context.LogLevel)).As<IPipelineLogger>().SingleInstance();
+            container.RegisterInstance(_context.Logger).As<IPipelineLogger>().SingleInstance();
             container.RegisterModule(new RootModule());
-            container.RegisterModule(new ContextModule(root));
-            container.RegisterModule(new AdoModule(root));
-            container.RegisterModule(new EntityControlModule(root));
+            container.RegisterModule(new ContextModule(process));
+            container.RegisterModule(new AdoModule(process));
+            container.RegisterModule(new EntityControlModule(process));
 
-            var entity = root.Processes.First().Entities.First();
+            var entity = process.Entities.First();
             container.RegisterType<NullUpdater>().Named<IUpdate>(entity.Key);
             container.RegisterType<NullDeleteHandler>().Named<IEntityDeleteHandler>(entity.Key);
 
-            container.RegisterModule(new EntityInputModule(root));
-            container.RegisterModule(new EntityOutputModule(root));
-            container.RegisterModule(new EntityPipelineModule(root));
-            container.RegisterModule(new ProcessControlModule(root));
+            container.RegisterModule(new EntityInputModule(process));
+            container.RegisterModule(new EntityOutputModule(process));
+            container.RegisterModule(new EntityPipelineModule(process));
+            container.RegisterModule(new ProcessControlModule(process));
 
             using (var scope = container.Build().BeginLifetimeScope()) {
-                return scope.ResolveNamed<IProcessController>(root.Processes[0].Key).Run();
+                return scope.ResolveNamed<IProcessController>(process.Key).Run();
             }
         }
     }

@@ -21,23 +21,27 @@ using Pipeline.Configuration;
 using Pipeline.Contracts;
 
 namespace JunkDrawer.Autofac.Modules {
-    public class ContextModule : ProcessModule {
-        public ContextModule(Root root) : base(root) {
+    public class ContextModule : Module {
+        private readonly Process _process;
+
+        public ContextModule(Process process)
+        {
+            _process = process;
         }
 
-        protected override void RegisterProcess(ContainerBuilder builder, Process process) {
+        protected override void Load(ContainerBuilder builder) {
 
             // Process Context
-            builder.Register<IContext>((ctx, p) => new PipelineContext(ctx.Resolve<IPipelineLogger>(), process)).Named<IContext>(process.Key);
+            builder.Register<IContext>((ctx, p) => new PipelineContext(ctx.Resolve<IPipelineLogger>(), _process)).Named<IContext>(_process.Key);
 
             // Connection Context
-            foreach (var connection in process.Connections) {
-                builder.Register(ctx => new ConnectionContext(ctx.ResolveNamed<IContext>(process.Key), connection)).Named<IConnectionContext>(connection.Key);
+            foreach (var connection in _process.Connections) {
+                builder.Register(ctx => new ConnectionContext(ctx.ResolveNamed<IContext>(_process.Key), connection)).Named<IConnectionContext>(connection.Key);
             }
 
             // Entity Context
-            foreach (var entity in process.Entities) {
-                builder.Register<IContext>((ctx, p) => new PipelineContext(ctx.Resolve<IPipelineLogger>(), process, entity)).Named<IContext>(entity.Key);
+            foreach (var entity in _process.Entities) {
+                builder.Register<IContext>((ctx, p) => new PipelineContext(ctx.Resolve<IPipelineLogger>(), _process, entity)).Named<IContext>(entity.Key);
 
                 builder.Register<IIncrement>(ctx => new Incrementer(ctx.ResolveNamed<IContext>(entity.Key))).Named<IIncrement>(entity.Key).InstancePerDependency();
 

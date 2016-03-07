@@ -33,7 +33,7 @@ namespace JunkDrawer.Autofac.Modules {
     /// </summary>
     public class EntityControlModule : EntityModule {
 
-        public EntityControlModule(Root root) : base(root) { }
+        public EntityControlModule(Process process) : base(process) { }
 
         public override void LoadEntity(ContainerBuilder builder, Process process, Entity entity) {
 

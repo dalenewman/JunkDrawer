@@ -29,7 +29,7 @@ using Pipeline.Provider.SqlServer;
 
 namespace JunkDrawer.Autofac.Modules {
     public class EntityOutputModule : EntityModule {
-        public EntityOutputModule(Root root) : base(root) { }
+        public EntityOutputModule(Process process) : base(process) { }
 
         public override void LoadEntity(ContainerBuilder builder, Process process, Entity entity) {
 

@@ -27,7 +27,7 @@ using Pipeline.Provider.File;
 namespace JunkDrawer.Autofac.Modules {
     public class EntityInputModule : EntityModule {
 
-        public EntityInputModule(Root root) : base(root) { }
+        public EntityInputModule(Process process):base(process) { }
 
         public override void LoadEntity(ContainerBuilder builder, Process process, Entity entity) {
             builder.Register<IRead>(ctx => {

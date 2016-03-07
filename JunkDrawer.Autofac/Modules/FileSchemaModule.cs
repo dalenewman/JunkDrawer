@@ -28,11 +28,15 @@ using Pipeline.Provider.Excel;
 using Pipeline.Provider.File;
 
 namespace JunkDrawer.Autofac.Modules {
-    public class FileSchemaModule : ProcessModule {
-        public FileSchemaModule(Root root) : base(root) { }
+    public class FileSchemaModule : Module {
+        private readonly Process _process;
+        public FileSchemaModule(Process process)
+        {
+            _process = process;
+        }
 
-        protected override void RegisterProcess(ContainerBuilder builder, Process process) {
-            foreach (var connection in process.Connections.Where(c => c.Provider.In("file", "excel"))) {
+        protected override void Load(ContainerBuilder builder) {
+            foreach (var connection in _process.Connections.Where(c => c.Provider.In("file", "excel"))) {
                 builder.Register<ISchemaReader>(ctx => {
                     /* file and excel are different, have to load the content and check it to determine schema */
                     var fileInfo = new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
@@ -40,21 +44,21 @@ namespace JunkDrawer.Autofac.Modules {
                     var cfg = connection.Provider == "file" ?
                         new FileInspection(context, fileInfo, 100).Create() :
                         new ExcelInspection(context, fileInfo, 100).Create();
-                    var root = ctx.Resolve<Root>();
-                    root.Load(cfg);
+                    var process = ctx.Resolve<Process>();
+                    process.Load(cfg);
 
-                    foreach (var warning in root.Warnings()) {
+                    foreach (var warning in process.Warnings()) {
                         context.Warn(warning);
                     }
 
-                    if (root.Errors().Any()) {
-                        foreach (var error in root.Errors()) {
+                    if (process.Errors().Any()) {
+                        foreach (var error in process.Errors()) {
                             context.Error(error);
                         }
                         return new NullSchemaReader();
                     }
 
-                    return new SchemaReader(context, new RunTimeRunner(context), root);
+                    return new SchemaReader(context, new RunTimeRunner(context), process);
 
                 }).Named<ISchemaReader>(connection.Key);
             }

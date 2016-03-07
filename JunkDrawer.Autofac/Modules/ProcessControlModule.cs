@@ -19,19 +19,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Pipeline;
-using Pipeline.Configuration;
 using Pipeline.Contracts;
 using Pipeline.Provider.Ado;
 using Process = Pipeline.Configuration.Process;
 
 namespace JunkDrawer.Autofac.Modules {
-    public class ProcessControlModule : ProcessModule {
 
-        public ProcessControlModule(Root root) : base(root) { }
+    public class ProcessControlModule : Module {
+        private readonly Process _process;
 
-        protected override void RegisterProcess(ContainerBuilder builder, Process process) {
+        public ProcessControlModule(Process process)
+        {
+            _process = process;
+        }
 
-            if (!process.Enabled)
+        protected override void Load(ContainerBuilder builder) {
+
+            if (!_process.Enabled)
                 return;
 
             builder.Register<IProcessController>(ctx => {
@@ -39,11 +43,11 @@ namespace JunkDrawer.Autofac.Modules {
                 var pipelines = new List<IPipeline>();
 
                 // entity-level pipelines
-                foreach (var entity in process.Entities) {
+                foreach (var entity in _process.Entities) {
                     var pipeline = ctx.ResolveNamed<IPipeline>(entity.Key);
 
                     pipelines.Add(pipeline);
-                    if (entity.Delete && process.Mode != "init") {
+                    if (entity.Delete && _process.Mode != "init") {
                         pipeline.Register(ctx.ResolveNamed<IEntityDeleteHandler>(entity.Key));
                     }
                 }
@@ -51,13 +55,13 @@ namespace JunkDrawer.Autofac.Modules {
                 // process-level pipeline
                 // pipelines.Add(ctx.ResolveNamed<IPipeline>(process.Key));
 
-                var outputProvider = process.Connections.First(c => c.Name == "output").Provider;
-                var context = new PipelineContext(ctx.Resolve<IPipelineLogger>(), process);
+                var outputProvider = _process.Connections.First(c => c.Name == "output").Provider;
+                var context = new PipelineContext(ctx.Resolve<IPipelineLogger>(), _process);
 
                 var controller = new ProcessController(pipelines, context);
 
                 // output initialization
-                if (process.Mode == "init") {
+                if (_process.Mode == "init") {
                     var output = new OutputContext(context, new Incrementer(context));
                     switch (outputProvider) {
                         case "mysql":
@@ -71,9 +75,7 @@ namespace JunkDrawer.Autofac.Modules {
                 }
 
                 return controller;
-            }).Named<IProcessController>(process.Key);
+            }).Named<IProcessController>(_process.Key);
         }
-
-
     }
 }

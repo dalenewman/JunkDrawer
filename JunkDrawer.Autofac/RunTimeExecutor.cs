@@ -33,40 +33,36 @@ namespace JunkDrawer.Autofac {
             _context = context;
         }
 
-        public void Execute(Root root) {
+        public void Execute(Process process) {
 
-            foreach (var warning in root.Warnings()) {
+            foreach (var warning in process.Warnings()) {
                 _context.Warn(warning);
             }
 
-            if (root.Errors().Any()) {
-                foreach (var error in root.Errors()) {
+            if (process.Errors().Any()) {
+                foreach (var error in process.Errors()) {
                     _context.Error(error);
                 }
                 _context.Error("The configuration errors must be fixed before this job will run.");
                 return;
             }
 
-            var name = string.Join("-", root.Processes.Select(p => p.Name));
-
             var builder = new ContainerBuilder();
-            builder.RegisterInstance(new NLogPipelineLogger(name, _context.LogLevel)).As<IPipelineLogger>();
+            builder.RegisterInstance(_context.Logger).As<IPipelineLogger>();
             builder.RegisterModule(new RootModule());
-            builder.RegisterModule(new ContextModule(root));
-            builder.RegisterModule(new AdoModule(root));
-            builder.RegisterModule(new EntityControlModule(root));
-            builder.RegisterModule(new EntityInputModule(root));
-            builder.RegisterModule(new EntityOutputModule(root));
-            builder.RegisterModule(new EntityPipelineModule(root));
-            builder.RegisterModule(new ProcessControlModule(root));
+            builder.RegisterModule(new ContextModule(process));
+            builder.RegisterModule(new AdoModule(process));
+            builder.RegisterModule(new EntityControlModule(process));
+            builder.RegisterModule(new EntityInputModule(process));
+            builder.RegisterModule(new EntityOutputModule(process));
+            builder.RegisterModule(new EntityPipelineModule(process));
+            builder.RegisterModule(new ProcessControlModule(process));
 
             using (var scope = builder.Build().BeginLifetimeScope()) {
-                foreach (var process in root.Processes) {
-                    try {
-                        scope.ResolveNamed<IProcessController>(process.Key).Execute();
-                    } catch (Exception ex) {
-                        _context.Error(ex.Message);
-                    }
+                try {
+                    scope.ResolveNamed<IProcessController>(process.Key).Execute();
+                } catch (Exception ex) {
+                    _context.Error(ex.Message);
                 }
             }
         }
@@ -75,12 +71,12 @@ namespace JunkDrawer.Autofac {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new RootModule());
             using (var scope = builder.Build().BeginLifetimeScope()) {
-                var root = scope.Resolve<Root>(
+                var process = scope.Resolve<Process>(
                     new NamedParameter("cfg", cfg),
                     new NamedParameter("shorthand", shorthand),
                     new NamedParameter("parameters", parameters)
                 );
-                Execute(root);
+                Execute(process);
             }
         }
 

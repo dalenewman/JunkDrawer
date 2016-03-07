@@ -40,17 +40,11 @@ namespace JunkDrawer.Autofac {
                 new ReTryingReader(ctx.ResolveNamed<IReader>("web"), attempts: 3))
             );
 
-            builder.Register<IValidators>(ctx => 
-                new Validators(new Dictionary<string, IValidator> {
-                    { "js", new NullValidator() }
-                }
-            ));
-
-            builder.Register((ctx, p) => new Root(
-                ctx.Resolve<IValidators>(),
+            builder.Register((ctx, p) => new Process(
+                new NullValidator("js"),
                 ctx.Resolve<IReader>(),
                 ctx.Resolve<ISerializer>()
-            )).As<Root>().InstancePerDependency();
+            )).As<Process>();
 
         }
     }

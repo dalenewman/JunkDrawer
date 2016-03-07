@@ -40,35 +40,31 @@ namespace JunkDrawer.Autofac.Modules {
                 new ReTryingReader(ctx.ResolveNamed<IReader>("web"), 3))
             );
 
-            builder.Register<IValidators>(ctx => new Validators(new Dictionary<string, IValidator> {
-                { "js", new NullValidator() }
-            }));
-
             builder.Register((ctx, p) => {
-                var root = new Root(ctx.Resolve<IValidators>(), ctx.Resolve<IReader>());
+                var process = new Process(new NullValidator("js"), ctx.Resolve<IReader>());
                 switch (p.Count()) {
                     case 3:
-                        root.Load(
+                        process.Load(
                             p.Named<string>("cfg"),
                             p.Named<string>("shorthand"),
                             p.Named<Dictionary<string, string>>("parameters")
                         );
                         break;
                     case 2:
-                        root.Load(
+                        process.Load(
                             p.Named<string>("cfg"),
                             p.Named<string>("shorthand")
                         );
                         break;
                     case 1:
-                        root.Load(p.Named<string>("cfg"));
+                        process.Load(p.Named<string>("cfg"));
                         break;
                     default:
-                        root.Load(p.Named<string>("cfg"));
+                        process.Load(p.Named<string>("cfg"));
                         break;
                 }
-                return root;
-            }).As<Root>();
+                return process;
+            }).As<Process>();
 
         }
     }

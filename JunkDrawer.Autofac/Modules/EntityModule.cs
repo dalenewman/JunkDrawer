@@ -23,18 +23,16 @@ namespace JunkDrawer.Autofac.Modules {
     /// Inherit from EntityModule and override LoadEntity when want to perform something on every entity.
     /// </summary>
     public abstract class EntityModule : Module {
-        readonly Root _root;
+        private readonly Process _process;
 
-        protected EntityModule(Root root) {
-            _root = root;
+        protected EntityModule(Process process) {
+            _process = process;
         }
 
         protected override void Load(ContainerBuilder builder) {
-            foreach (var process in _root.Processes) {
-                foreach (var e in process.Entities) {
-                    var entity = e;
-                    LoadEntity(builder, process, entity);
-                }
+            foreach (var e in _process.Entities) {
+                var entity = e;
+                LoadEntity(builder, _process, entity);
             }
         }
 

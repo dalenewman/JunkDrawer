@@ -29,7 +29,7 @@ namespace JunkDrawer.Autofac.Modules {
 
     public class EntityPipelineModule : EntityModule {
 
-        public EntityPipelineModule(Root root) : base(root) { }
+        public EntityPipelineModule(Process process) : base(process) { }
 
         public override void LoadEntity(ContainerBuilder builder, Process process, Entity entity) {
             var type = process.Pipeline == "defer" ? entity.Pipeline : process.Pipeline;

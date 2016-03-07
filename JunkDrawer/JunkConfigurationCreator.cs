@@ -48,7 +48,7 @@ namespace JunkDrawer {
             }
             process.Mode = "init";
 
-            return new Root { Processes = new List<Process> { process } }.WithDefaults().Serialize();
+            return process.Serialize();
         }
     }
 }

@@ -27,12 +27,16 @@ using Pipeline.Provider.SqlServer;
 using Pipeline.Provider.SQLite;
 
 namespace JunkDrawer.Autofac.Modules {
-    public class AdoModule : ProcessModule {
+    public class AdoModule : Module {
+        private readonly Process _process;
 
-        public AdoModule(Root root) : base(root) { }
+        public AdoModule(Process process)
+        {
+            _process = process;
+        }
 
-        protected override void RegisterProcess(ContainerBuilder builder, Process process) {
-            foreach (var connection in process.Connections.Where(c => c.Provider.In("sqlserver", "mysql", "postgresql", "sqlite"))) {
+        protected override void Load(ContainerBuilder builder) {
+            foreach (var connection in _process.Connections.Where(c => c.Provider.In("sqlserver", "mysql", "postgresql", "sqlite"))) {
 
                 // Connection Factory
                 builder.Register<IConnectionFactory>(ctx => {

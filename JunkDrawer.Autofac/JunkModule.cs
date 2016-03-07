@@ -73,10 +73,10 @@ namespace JunkDrawer.Autofac {
             }).As<JunkCfg>();
 
             builder.Register((ctx, p) => {
-                var root = new Root(new Validators("js", new NullValidator()));
-                root.Load(p.Named<string>("cfg"));
-                return root;
-            }).As<Root>();
+                var process = new Process(new NullValidator("js"));
+                process.Load(p.Named<string>("cfg"));
+                return process;
+            }).As<Process>();
 
             // Junk Drawer Setup
             builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>();
@@ -89,9 +89,9 @@ namespace JunkDrawer.Autofac {
                 var cfg = connection.Provider == "file" ?
                     new FileInspection(context, fileInfo, 100).Create() :
                     new ExcelInspection(context, fileInfo, 100).Create();
-                var root = ctx.Resolve<Root>(new NamedParameter("cfg", cfg));
-                root.Processes.First().Pipeline = "linq";
-                return new SchemaReader(context, new RunTimeRunner(context), root);
+                var process = ctx.Resolve<Process>(new NamedParameter("cfg", cfg));
+                process.Pipeline = "linq";
+                return new SchemaReader(context, new RunTimeRunner(context), process);
             }).As<ISchemaReader>();
 
             // Write Configuration based on schema results and JunkRequest
@@ -101,8 +101,8 @@ namespace JunkDrawer.Autofac {
 
             // Final product is a JunkImporter that executes the action above
             builder.Register(c => {
-                var root = c.Resolve<Root>(new NamedParameter("cfg", c.ResolveNamed<string>("cfg")));
-                return new JunkImporter(root, c.Resolve<IRunTimeExecute>());
+                var process = c.Resolve<Process>(new NamedParameter("cfg", c.ResolveNamed<string>("cfg")));
+                return new JunkImporter(process, c.Resolve<IRunTimeExecute>());
             }).As<JunkImporter>();
         }
     }
