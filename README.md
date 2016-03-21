@@ -164,7 +164,7 @@ CREATE TABLE colors(
 ```
 
 **Note**: The actual table has auto-generated column names. However, a 
-view is also created, and it has friendly column names (if available).
+view is also created with friendly column names (if available).
 
 ### How Does it Work?
 
