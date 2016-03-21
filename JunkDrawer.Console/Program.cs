@@ -28,26 +28,35 @@ namespace JunkDrawer {
         static void Main(string[] args) {
 
             var options = new Options();
-            if (args.Length > 0 && CommandLine.Parser.Default.ParseArguments(args, options)) {
+            if (CommandLine.Parser.Default.ParseArguments(args, options))
+            {
 
                 // check if request has valid file
-                var request = new JunkRequest(options.File, options.Configuration);
-                if (!request.IsValid) {
+                var request = new JunkRequest(options.File, options.Configuration, options.Types);
+                if (!request.IsValid)
+                {
                     Console.Error.WriteLine(request.Message);
                     Environment.Exit(Error);
                 }
 
-                try {
+                try
+                {
 
-                    using (var bootstrapper = new AutofacJunkBootstrapper(request)) {
+                    using (var bootstrapper = new AutofacJunkBootstrapper(request))
+                    {
 
                         var cfg = bootstrapper.Resolve<JunkCfg>();
-                        if (cfg.Errors().Any()) {
-                            foreach (var error in cfg.Errors()) {
+
+                        if (cfg.Errors().Any())
+                        {
+                            foreach (var error in cfg.Errors())
+                            {
                                 Console.Error.WriteLine(error);
                                 Environment.ExitCode = Error;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             var response = bootstrapper.Resolve<JunkImporter>().Import();
                             if (response.Records != 0)
                                 return;
@@ -55,22 +64,17 @@ namespace JunkDrawer {
                             Environment.ExitCode = Error;
                         }
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Console.Error.WriteLine(ex.Message);
                     Environment.ExitCode = Error;
                 }
 
                 Environment.ExitCode = 0;
-            } else {
-                Console.Error.WriteLine(options.GetUsage());
-                Environment.ExitCode = 1;
             }
 
-
         }
 
-        private static void WriteUsage() {
-            Console.WriteLine("Usage: jd.exe <filename> (<config>)");
-        }
     }
 }

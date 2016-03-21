@@ -29,7 +29,6 @@ using Pipeline.Contracts;
 using Pipeline.Desktop;
 using Pipeline.Logging.NLog;
 using Pipeline.Nulls;
-using Pipeline.Provider.Ado;
 using Pipeline.Provider.Excel;
 using Pipeline.Provider.File;
 
@@ -46,17 +45,24 @@ namespace JunkDrawer.Autofac {
         protected override void Load(ContainerBuilder builder) {
 
             // Cfg-Net Setup for JunkCfg
-            builder.RegisterType<SourceDetector>();
             builder.RegisterType<FileReader>();
             builder.RegisterType<WebReader>();
 
             builder.Register<IReader>(ctx =>
                 new DefaultReader(
-                    ctx.Resolve<SourceDetector>(),
                     ctx.Resolve<FileReader>(),
                     new ReTryingReader(ctx.Resolve<WebReader>(), 3)
                 )
             );
+
+            builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
+
+            var entityName = Pipeline.Utility.Identifier(_junkRequest.FileInfo.Name);
+            builder.Register(ctx => new PipelineContext(
+                ctx.Resolve<IPipelineLogger>(),
+                new Process { Name = ProcessName, Key = ProcessName }.WithDefaults(),
+                new Entity { Name = entityName, Alias = entityName, Key = entityName }.WithDefaults()
+            )).As<IContext>();
 
             builder.Register(ctx => {
                 var cfg = new JunkCfg(
@@ -69,18 +75,29 @@ namespace JunkDrawer.Autofac {
                 if (_junkRequest.Extension.StartsWith(".xls", StringComparison.OrdinalIgnoreCase)) {
                     input.Provider = "excel";
                 }
+
+                // modify the types if provided from command line
+                if (_junkRequest.Types == null || !_junkRequest.Types.Any(t => Constants.TypeSet().Contains(t)))
+                    return cfg;
+
+                var context = ctx.Resolve<IContext>();
+                context.Warn("Manually over-riding types from command line");
+                cfg.Input().Types.Clear();
+                foreach (var type in _junkRequest.Types.Where(type => Constants.TypeSet().Contains(type))) {
+                    cfg.Input().Types.Add(new TflType(type).WithDefaults());
+                    context.Warn($"Check for {type}.");
+                }
+
                 return cfg;
-            }).As<JunkCfg>();
+            }).As<JunkCfg>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
-                var process = new Process(new NullValidator("js"));
+                var process = new Process(new NullValidator("js"), new NullValidator("sh"));
                 process.Load(p.Named<string>("cfg"));
                 return process;
             }).As<Process>();
 
             // Junk Drawer Setup
-            builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>();
-            builder.Register(ctx => new PipelineContext(ctx.Resolve<IPipelineLogger>(), new Process { Name = ProcessName, Key = ProcessName }.WithDefaults())).As<IContext>();
 
             builder.Register<ISchemaReader>(ctx => {
                 var connection = ctx.Resolve<JunkCfg>().Input();

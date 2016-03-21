@@ -163,6 +163,9 @@ CREATE TABLE colors(
 );
 ```
 
+**Note**: The actual table has auto-generated column names. However, a 
+view is also created, and it has friendly column names (if available).
+
 ### How Does it Work?
 
 When we glance at *colors.csv* above, it's easy for us

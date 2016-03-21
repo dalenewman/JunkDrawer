@@ -52,7 +52,7 @@ namespace JunkDrawer.Autofac.Modules {
                             rowFactory
                         );
                     default:
-                        return new NullEntityReader();
+                        return new NullReader(input);
                 }
             }).Named<IRead>(entity.Key);
 

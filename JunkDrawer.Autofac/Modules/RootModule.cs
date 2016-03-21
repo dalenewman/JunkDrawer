@@ -30,30 +30,21 @@ namespace JunkDrawer.Autofac.Modules {
 
         protected override void Load(ContainerBuilder builder) {
 
-            builder.RegisterType<SourceDetector>().As<ISourceDetector>();
             builder.RegisterType<FileReader>().Named<IReader>("file");
             builder.RegisterType<WebReader>().Named<IReader>("web");
 
             builder.Register<IReader>(ctx => new DefaultReader(
-                ctx.Resolve<ISourceDetector>(),
                 ctx.ResolveNamed<IReader>("file"),
                 new ReTryingReader(ctx.ResolveNamed<IReader>("web"), 3))
             );
 
             builder.Register((ctx, p) => {
-                var process = new Process(new NullValidator("js"), ctx.Resolve<IReader>());
+                var process = new Process(new NullValidator("js"), new NullValidator("sh"), ctx.Resolve<IReader>());
                 switch (p.Count()) {
-                    case 3:
-                        process.Load(
-                            p.Named<string>("cfg"),
-                            p.Named<string>("shorthand"),
-                            p.Named<Dictionary<string, string>>("parameters")
-                        );
-                        break;
                     case 2:
                         process.Load(
                             p.Named<string>("cfg"),
-                            p.Named<string>("shorthand")
+                            p.Named<Dictionary<string, string>>("parameters")
                         );
                         break;
                     case 1:

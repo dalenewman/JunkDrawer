@@ -15,6 +15,7 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
 using CommandLine;
 using CommandLine.Text;
 
@@ -22,11 +23,14 @@ namespace JunkDrawer {
 
     public class Options {
 
-        [Option('f', "file", Required = true, DefaultValue = "", HelpText = "The file.")]
+        [Option('f', "file", Required = true, HelpText = "The file to import.")]
         public string File { get; set; }
 
-        [Option('c', "config", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file (default.xml).")]
+        [Option('c', "config", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file.")]
         public string Configuration { get; set; }
+
+        [OptionList('t', "types", Separator = ',', HelpText = "Specify types to check for, separated by commas. Note: this is usually set by the configuration file, but you can override it here.")]
+        public IList<string> Types { get; set; }
 
         [HelpOption]
         public string GetUsage() {

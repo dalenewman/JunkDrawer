@@ -65,12 +65,12 @@
     <StartupObject>JunkDrawer.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cfg.Net.Reader, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.1.0\lib\Cfg.Net.Reader.dll</HintPath>
+    <Reference Include="Cfg.Net.Reader, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Reader.0.1.1\lib\Cfg.Net.Reader.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CfgNet, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.6.2\lib\CfgNet.dll</HintPath>
+    <Reference Include="CfgNet, Version=0.6.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.6.5\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
@@ -103,6 +103,10 @@
     <Reference Include="Npgsql, Version=3.0.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.3.0.5\lib\net45\Npgsql.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

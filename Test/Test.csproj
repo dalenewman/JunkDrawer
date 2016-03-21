@@ -54,12 +54,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cfg.Net.Reader, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.1.0\lib\Cfg.Net.Reader.dll</HintPath>
+    <Reference Include="Cfg.Net.Reader, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Reader.0.1.1\lib\Cfg.Net.Reader.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CfgNet, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.6.2\lib\CfgNet.dll</HintPath>
+    <Reference Include="CfgNet, Version=0.6.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.6.5\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -91,6 +91,10 @@
     <Reference Include="Pipeline.Portable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
+    </Reference>
+    <Reference Include="Pipeline.Provider.Excel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.Excel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -133,6 +137,9 @@
     <Content Include="default.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Files\CsvWithDoubleQuotesAroundHeaders.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="sample.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

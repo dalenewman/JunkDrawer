@@ -36,12 +36,12 @@
       <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Cfg.Net.Reader, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.1.0\lib\Cfg.Net.Reader.dll</HintPath>
+    <Reference Include="Cfg.Net.Reader, Version=0.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Reader.0.1.1\lib\Cfg.Net.Reader.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CfgNet, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.6.2\lib\CfgNet.dll</HintPath>
+    <Reference Include="CfgNet, Version=0.6.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.6.5\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">

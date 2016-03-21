@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
@@ -29,7 +31,16 @@ namespace JunkDrawer {
         public string Configuration { get; set; }
         public string Extension { get; set; }
 
-        public JunkRequest(string fileName, string configuration, int retries = 3) {
+        public IList<string> Types { get; set; }
+
+        public JunkRequest(
+            string fileName, 
+            string configuration, 
+            IList<string> types,
+            int retries = 3, 
+            int sleep = 1000
+        ) {
+            Types = types;
 
             FileInfo = new FileInfo(fileName);
             Extension = FileInfo.Extension.ToLower();
@@ -49,7 +60,7 @@ namespace JunkDrawer {
 
                 while (attempts < retries && !FileInfo.Exists) {
                     attempts++;
-                    Thread.Sleep(1000);
+                    Thread.Sleep(sleep);
                 }
 
                 if (!FileInfo.Exists) {
@@ -66,7 +77,7 @@ namespace JunkDrawer {
                     while (attempts < retries && FileInUse(FileInfo)) {
                         Console.Beep();
                         attempts++;
-                        Thread.Sleep(1000);
+                        Thread.Sleep(sleep);
                     }
                     if (FileInUse(FileInfo)) {
                         Message = $"Can not open file {FileInfo.Name}. I tried opening it {retries} times.";

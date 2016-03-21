@@ -28,20 +28,19 @@ namespace JunkDrawer.Autofac {
 
         protected override void Load(ContainerBuilder builder) {
 
-            builder.RegisterType<SourceDetector>().As<ISourceDetector>();
             builder.RegisterType<FileReader>().Named<IReader>("file");
             builder.RegisterType<WebReader>().Named<IReader>("web");
             builder.RegisterType<JsonSerializer>().As<ISerializer>();
             //builder.RegisterType<XmlSerializer>().As<ISerializer>();
 
             builder.Register<IReader>(ctx => new DefaultReader(
-                ctx.Resolve<ISourceDetector>(),
                 ctx.ResolveNamed<IReader>("file"),
                 new ReTryingReader(ctx.ResolveNamed<IReader>("web"), attempts: 3))
             );
 
             builder.Register((ctx, p) => new Process(
                 new NullValidator("js"),
+                new NullValidator("sh"),
                 ctx.Resolve<IReader>(),
                 ctx.Resolve<ISerializer>()
             )).As<Process>();

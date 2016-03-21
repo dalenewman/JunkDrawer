@@ -35,7 +35,7 @@ namespace Test {
         public void Demo() {
 
             JunkResponse response;
-            var request = new JunkRequest(@"C:\Code\JunkDrawer\Test\sample.txt", "default.xml");
+            var request = new JunkRequest(@"C:\Code\JunkDrawer\Test\sample.txt", "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 response = scope.Resolve<JunkImporter>().Import();
             }
@@ -57,7 +57,7 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -91,7 +91,7 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -127,7 +127,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -150,13 +150,72 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             Assert.AreEqual(Convert.ToDateTime("1/25/1964"), nike.Created);
         }
 
+
+        [Test]
+        public void CsvWithQuotedColumnNames() {
+
+            const string content = @"""Name"",""WebSite"",""Created""
+""Google"",http://www.google.com,9/4/98
+Apple,http://www.apple.com,""April, 1 1976""
+Microsoft,""http://www.microsoft.com"",4/4/1975
+""Nike, Inc."",http://www.nike.com,1/25/1964";
+
+            var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
+            File.WriteAllText(fileName, content);
+
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml", null);
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
+            var companies = new List<Company>();
+
+            using (var cn = new SqlConnection(ConnectionString)) {
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+            }
+
+            Assert.AreEqual(4, companies.Count);
+
+        }
+
+        [Test]
+        public void CsvWithMissingAndQuotedColumnNames() {
+
+            const string content = @",,""Created""
+""Google"",http://www.google.com,9/4/98
+Apple,http://www.apple.com,""April, 1 1976""
+Microsoft,""http://www.microsoft.com"",4/4/1975
+""Nike, Inc."",http://www.nike.com,1/25/1964";
+
+            var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
+            File.WriteAllText(fileName, content);
+
+            JunkResponse response;
+            var request = new JunkRequest(fileName, "default.xml", null);
+            using (var scope = new AutofacJunkBootstrapper(request)) {
+                var importer = scope.Resolve<JunkImporter>();
+                response = importer.Import();
+            }
+
+            var companies = new List<Company>();
+
+            using (var cn = new SqlConnection(ConnectionString)) {
+                companies.AddRange(cn.Query<Company>("SELECT [A],[B],Created FROM " + response.TableName + ";"));
+            }
+
+            Assert.AreEqual(4, companies.Count);
+
+        }
+
         [Test]
         public void ExcelXls() {
 
             const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xls";
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -185,7 +244,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xlsx";
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -220,7 +279,7 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -255,7 +314,7 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 response = scope.Resolve<JunkImporter>().Import();
             }
@@ -289,7 +348,7 @@ Microsofthttp://www.microsoft.com4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml");
+            var request = new JunkRequest(fileName, "default.xml", null);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 response = scope.Resolve<JunkImporter>().Import();
             }
