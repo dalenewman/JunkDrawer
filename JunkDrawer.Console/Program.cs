@@ -15,6 +15,7 @@
 // limitations under the License.
 #endregion
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JunkDrawer.Autofac;
 using Environment = System.Environment;
@@ -28,52 +29,63 @@ namespace JunkDrawer {
         static void Main(string[] args) {
 
             var options = new Options();
-            if (CommandLine.Parser.Default.ParseArguments(args, options))
-            {
-
-                // check if request has valid file
-                var request = new JunkRequest(options.File, options.Configuration, options.Types);
-                if (!request.IsValid)
-                {
-                    Console.Error.WriteLine(request.Message);
-                    Environment.Exit(Error);
+            var modifed = new List<string>();
+            if (args != null) {
+                if (args.Length == 1 && !args[0].StartsWith("-f")) {
+                    modifed.Add("-f");
+                    modifed.Add(args[0]);
+                } else {
+                    modifed.AddRange(args);
                 }
-
-                try
-                {
-
-                    using (var bootstrapper = new AutofacJunkBootstrapper(request))
-                    {
-
-                        var cfg = bootstrapper.Resolve<JunkCfg>();
-
-                        if (cfg.Errors().Any())
-                        {
-                            foreach (var error in cfg.Errors())
-                            {
-                                Console.Error.WriteLine(error);
-                                Environment.ExitCode = Error;
-                            }
-                        }
-                        else
-                        {
-                            var response = bootstrapper.Resolve<JunkImporter>().Import();
-                            if (response.Records != 0)
-                                return;
-                            Console.Error.WriteLine("Did not import any records!");
-                            Environment.ExitCode = Error;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine(ex.Message);
-                    Environment.ExitCode = Error;
-                }
-
-                Environment.ExitCode = 0;
             }
 
+            if (!CommandLine.Parser.Default.ParseArguments(modifed.ToArray(), options)) {
+                Environment.ExitCode = Error;
+                return;
+            }
+
+            var request = new JunkRequest(options.File) {
+                Configuration = options.Configuration ?? "default.xml",
+                Types = options.Types,
+                View = options.Table,
+                Provider = options.Provider,
+                Server = options.Server,
+                Database = options.Database,
+                User = options.User,
+                Password = options.Password,
+                Port = options.Port
+            };
+
+            if (!request.IsValid()) {
+                Console.Error.WriteLine(request.Message);
+                Environment.Exit(Error);
+            }
+
+            try {
+
+                using (var bootstrapper = new AutofacJunkBootstrapper(request)) {
+
+                    var cfg = bootstrapper.Resolve<JunkCfg>();
+
+                    if (cfg.Errors().Any()) {
+                        foreach (var error in cfg.Errors()) {
+                            Console.Error.WriteLine(error);
+                            Environment.ExitCode = Error;
+                        }
+                    } else {
+                        var response = bootstrapper.Resolve<JunkImporter>().Import();
+                        if (response.Records != 0)
+                            return;
+                        Console.Error.WriteLine("Did not import any records!");
+                        Environment.ExitCode = Error;
+                    }
+                }
+            } catch (Exception ex) {
+                Console.Error.WriteLine(ex.Message);
+                Environment.ExitCode = Error;
+            }
+
+            Environment.ExitCode = 0;
         }
 
     }

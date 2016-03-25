@@ -16,7 +16,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac;
@@ -35,10 +34,10 @@ using Pipeline.Provider.File;
 
 namespace JunkDrawer.Autofac {
     public class JunkModule : Module {
-        private readonly JunkRequest _junkRequest;
+        private readonly JunkRequest _jr;
 
-        public JunkModule(JunkRequest junkRequest) {
-            _junkRequest = junkRequest;
+        public JunkModule(JunkRequest jr) {
+            _jr = jr;
         }
 
         public static string ProcessName = "JunkDrawer";
@@ -57,7 +56,7 @@ namespace JunkDrawer.Autofac {
 
             builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
 
-            var entityName = Pipeline.Utility.Identifier(_junkRequest.FileInfo.Name);
+            var entityName = Pipeline.Utility.Identifier(_jr.FileInfo.Name);
             builder.Register(ctx => new PipelineContext(
                 ctx.Resolve<IPipelineLogger>(),
                 new Process { Name = ProcessName, Key = ProcessName }.WithDefaults(),
@@ -66,26 +65,40 @@ namespace JunkDrawer.Autofac {
 
             builder.Register(ctx => {
                 var cfg = new JunkCfg(
-                    _junkRequest.Configuration,
+                    _jr.Configuration,
                     ctx.Resolve<IReader>()
                 );
+
                 // modify the input provider based on the file name requested
-                var input = cfg.Connections.First();
-                input.File = _junkRequest.FileInfo.FullName;
-                if (_junkRequest.Extension.StartsWith(".xls", StringComparison.OrdinalIgnoreCase)) {
+                var input = cfg.Input();
+                input.File = _jr.FileInfo.FullName;
+                if (_jr.Extension.StartsWith(".xls", StringComparison.OrdinalIgnoreCase)) {
                     input.Provider = "excel";
                 }
 
+                // modify the output connection
+                var output = cfg.Output();
+                if (!string.IsNullOrEmpty(_jr.Provider) && Constants.ProviderSet().Contains(_jr.Provider)) {
+                    output.Provider = _jr.Provider;
+                }
+
+                SetOption(() => _jr.Server, option => { output.Server = option; });
+                SetOption(() => _jr.Database, option => { output.Database = option; });
+                SetOption(() => _jr.User, option => { output.User = option; });
+                SetOption(() => _jr.Password, option => { output.Password = option; });
+                SetOption(() => _jr.Port, option => { output.Port = option; });
+                SetOption(() => _jr.View, option => { output.Table = option; });
+
                 // modify the types if provided from command line
-                if (_junkRequest.Types == null || !_junkRequest.Types.Any(t => Constants.TypeSet().Contains(t)))
+                if (_jr.Types == null || !_jr.Types.Any(t => Constants.TypeSet().Contains(t)))
                     return cfg;
 
                 var context = ctx.Resolve<IContext>();
-                context.Warn("Manually over-riding types from command line");
+                context.Debug(() => "Manually over-riding types from command line");
                 cfg.Input().Types.Clear();
-                foreach (var type in _junkRequest.Types.Where(type => Constants.TypeSet().Contains(type))) {
+                foreach (var type in _jr.Types.Where(type => Constants.TypeSet().Contains(type))) {
                     cfg.Input().Types.Add(new TflType(type).WithDefaults());
-                    context.Warn($"Check for {type}.");
+                    context.Debug(() => $"Inspecting for type: {type}.");
                 }
 
                 return cfg;
@@ -104,15 +117,15 @@ namespace JunkDrawer.Autofac {
                 var fileInfo = new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
                 var context = new ConnectionContext(ctx.Resolve<IContext>(), connection);
                 var cfg = connection.Provider == "file" ?
-                    new FileInspection(context, fileInfo, 100).Create() :
-                    new ExcelInspection(context, fileInfo, 100).Create();
+                    new FileInspection(context, fileInfo).Create() :
+                    new ExcelInspection(context, fileInfo).Create();
                 var process = ctx.Resolve<Process>(new NamedParameter("cfg", cfg));
                 process.Pipeline = "linq";
                 return new SchemaReader(context, new RunTimeRunner(context), process);
             }).As<ISchemaReader>();
 
             // Write Configuration based on schema results and JunkRequest
-            builder.Register<ICreateConfiguration>(c => new JunkConfigurationCreator(c.Resolve<JunkCfg>(), _junkRequest, c.Resolve<ISchemaReader>())).As<ICreateConfiguration>();
+            builder.Register<ICreateConfiguration>(c => new JunkConfigurationCreator(c.Resolve<JunkCfg>(), c.Resolve<ISchemaReader>())).As<ICreateConfiguration>();
             builder.Register(c => c.Resolve<ICreateConfiguration>().Create()).Named<string>("cfg");
             builder.Register<IRunTimeExecute>(c => new RunTimeExecutor(c.Resolve<IContext>())).As<IRunTimeExecute>();
 
@@ -121,6 +134,13 @@ namespace JunkDrawer.Autofac {
                 var process = c.Resolve<Process>(new NamedParameter("cfg", c.ResolveNamed<string>("cfg")));
                 return new JunkImporter(process, c.Resolve<IRunTimeExecute>());
             }).As<JunkImporter>();
+        }
+
+        private static void SetOption<T>(Func<T> getter, Action<T> setter) {
+            var value = getter();
+            if (value != null && (default(T) == null ? string.Empty : default(T).ToString()) != value.ToString()) {
+                setter(value);
+            }
         }
     }
 }

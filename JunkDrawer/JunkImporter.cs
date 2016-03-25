@@ -41,7 +41,7 @@ namespace JunkDrawer {
 
                 return new JunkResponse {
                     Records = entity.Inserts,
-                    TableName = entity.Alias
+                    View = entity.Alias
                 };
 
             } catch (Exception) {

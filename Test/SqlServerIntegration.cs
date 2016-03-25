@@ -35,12 +35,12 @@ namespace Test {
         public void Demo() {
 
             JunkResponse response;
-            var request = new JunkRequest(@"C:\Code\JunkDrawer\Test\sample.txt", "default.xml", null);
+            var request = new JunkRequest(@"C:\Code\JunkDrawer\Test\sample.txt");
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 response = scope.Resolve<JunkImporter>().Import();
             }
 
-            Assert.AreEqual("sample", response.TableName);
+            Assert.AreEqual("sample", response.View);
             Assert.AreEqual(4, response.Records);
 
         }
@@ -57,7 +57,7 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -66,7 +66,7 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -91,7 +91,7 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -100,7 +100,7 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             var companies = new List<Abc>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Abc>("SELECT A,B,C FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Abc>("SELECT A,B,C FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -127,7 +127,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -136,7 +136,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -164,7 +164,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -173,7 +173,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -193,7 +193,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -202,7 +202,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT [A],[B],Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT [A],[B],Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -215,7 +215,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xls";
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -224,7 +224,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<CompanyForOldExcel>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<CompanyForOldExcel>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<CompanyForOldExcel>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -244,7 +244,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xlsx";
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -253,7 +253,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -279,7 +279,7 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 var importer = scope.Resolve<JunkImporter>();
                 response = importer.Import();
@@ -288,7 +288,7 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -314,7 +314,7 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 response = scope.Resolve<JunkImporter>().Import();
             }
@@ -322,7 +322,7 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.TableName + ";"));
+                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -348,7 +348,7 @@ Microsofthttp://www.microsoft.com4/4/1975";
             File.WriteAllText(fileName, content);
 
             JunkResponse response;
-            var request = new JunkRequest(fileName, "default.xml", null);
+            var request = new JunkRequest(fileName);
             using (var scope = new AutofacJunkBootstrapper(request)) {
                 response = scope.Resolve<JunkImporter>().Import();
             }
@@ -356,7 +356,7 @@ Microsofthttp://www.microsoft.com4/4/1975";
             var lines = new List<string>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                lines.AddRange(cn.Query<string>("SELECT [Name     WebSite                 Created] FROM " + response.TableName + ";"));
+                lines.AddRange(cn.Query<string>("SELECT [Name     WebSite                 Created] FROM " + response.View + ";"));
             }
 
             Assert.AreEqual(3, lines.Count);

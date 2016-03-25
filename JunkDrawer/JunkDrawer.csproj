@@ -60,9 +60,9 @@
       <HintPath>..\packages\Cfg-NET.0.6.5\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Pipeline.Portable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

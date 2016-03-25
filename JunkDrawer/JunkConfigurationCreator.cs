@@ -14,21 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-using System.Collections.Generic;
 using System.Linq;
 using Cfg.Net.Ext;
+using Pipeline;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
 
 namespace JunkDrawer {
     public class JunkConfigurationCreator : ICreateConfiguration {
+
         private readonly JunkCfg _cfg;
-        private readonly JunkRequest _request;
         private readonly ISchemaReader _schemaReader;
 
-        public JunkConfigurationCreator(JunkCfg cfg, JunkRequest request, ISchemaReader schemaReader) {
+        public JunkConfigurationCreator(JunkCfg cfg, ISchemaReader schemaReader) {
             _cfg = cfg;
-            _request = request;
             _schemaReader = schemaReader;
         }
 
@@ -43,8 +42,8 @@ namespace JunkDrawer {
             foreach (var entity in process.Entities) {
                 entity.PrependProcessNameToOutputName = false;
             }
-            if (!string.IsNullOrEmpty(_request.TableName)) {
-                process.Entities.First().Alias = _request.TableName;
+            if (!string.IsNullOrEmpty(_cfg.Output().Table) && _cfg.Output().Table != Constants.DefaultSetting) {
+                process.Entities.First().Alias = _cfg.Output().Table;
             }
             process.Mode = "init";
 

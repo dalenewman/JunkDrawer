@@ -86,15 +86,19 @@
     </Reference>
     <Reference Include="Pipeline.Desktop, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Desktop.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Desktop.dll</HintPath>
     </Reference>
-    <Reference Include="Pipeline.Portable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="Pipeline.Provider.Excel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Pipeline.Net\Pipeline.Provider.Excel.dll</HintPath>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Pipeline.Provider.File, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Provider.File.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -16,7 +16,7 @@
 #endregion
 namespace JunkDrawer {
     public class JunkResponse {
-        public string TableName { get; set; } = string.Empty;
+        public string View { get; set; } = string.Empty;
         public long Records { get; set; } = 0;
     }
 }

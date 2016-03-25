@@ -19,75 +19,99 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Pipeline;
 
 namespace JunkDrawer {
 
     public class JunkRequest {
-
-        public bool IsValid { get; private set; }
-        public FileInfo FileInfo { get;}
-        public string Message { get; private set; }
-        public string TableName { get; set; }
-        public string Configuration { get; set; }
-        public string Extension { get; set; }
-
-        public IList<string> Types { get; set; }
+        public FileInfo FileInfo { get; }
+        public string Message { get; private set; } = string.Empty;
+        public string View { get; set; }
+        public string Configuration { get; set; } = "default.xml";
+        public string Extension { get; private set; }
+        public int Retries { get; set; } = 3;
+        public int Sleep { get; set; } = 1000;
+        public IList<string> Types { get; set; } = new List<string>();
+        public string Provider { get; set; }
+        public string Server { get; set; }
+        public string Database { get; set; }
+        public string User { get; set; }
+        public string Password { get; set; }
+        public int Port { get; set; }
+        public string FileName { get; set; }
 
         public JunkRequest(
-            string fileName, 
-            string configuration, 
-            IList<string> types,
-            int retries = 3, 
-            int sleep = 1000
+            string fileName
         ) {
-            Types = types;
+            FileName = fileName;
+            try {
+                FileInfo = new FileInfo(FileName);
+                Extension = FileInfo.Extension.ToLower();
+            } catch (Exception ex) {
+                Message = ex.Message;
+            }
 
-            FileInfo = new FileInfo(fileName);
-            Extension = FileInfo.Extension.ToLower();
-            Configuration = configuration;
-            Message = string.Empty;
+            // for backwards compatibility 
+            // originally, -c was for configuration. 
+            // now -a is for configuration (aka arrangement) because -c is for connection type
+            // connection type couldn't be provider because -p is used for password
+            if (Configuration == "default.xml" && !string.IsNullOrEmpty(Provider) && !Constants.ProviderDomain.Contains(Provider)) {
+                try {
+                    var fileInfo = new FileInfo(Provider);
+                    Configuration = fileInfo.FullName;
+                } catch (Exception) {
+                    // ignored
+                }
+            }
+
+
+        }
+
+        public bool IsValid() {
+
+            if (FileInfo == null) {
+                return false;
+            }
+
 
             var attempts = 0;
 
             if (!FileInfo.Exists) {
                 attempts++;
 
-                if (retries == 0) {
+                if (Retries == 0) {
                     Message = $"File {FileInfo.Name} does not exist!";
-                    IsValid = false;
-                    return;
+                    return false;
                 }
 
-                while (attempts < retries && !FileInfo.Exists) {
+                while (attempts < Retries && !FileInfo.Exists) {
                     attempts++;
-                    Thread.Sleep(sleep);
+                    Thread.Sleep(Sleep);
                 }
 
                 if (!FileInfo.Exists) {
-                    Message = $"File '{FileInfo.FullName}' just doesn't exist!  I looked for it {retries} times.";
-                    IsValid = false;
-                    return;
+                    Message = $"File '{FileInfo.FullName}' doesn't exist! Tried {Retries} times.";
+                    return false;
                 }
             }
 
             // If we made it this far, the file exists
-
             if (FileInUse(FileInfo)) {
-                if (attempts < retries) {
-                    while (attempts < retries && FileInUse(FileInfo)) {
+                if (attempts < Retries) {
+                    while (attempts < Retries && FileInUse(FileInfo)) {
                         Console.Beep();
                         attempts++;
-                        Thread.Sleep(sleep);
+                        Thread.Sleep(Sleep);
                     }
                     if (FileInUse(FileInfo)) {
-                        Message = $"Can not open file {FileInfo.Name}. I tried opening it {retries} times.";
-                        IsValid = false;
-                        return;
+                        Message = $"Can not open file {FileInfo.Name}. Tried {Retries} times.";
+                        return false;
                     }
                 }
             }
 
-            IsValid = true;
+            return true;
+
         }
 
         private static bool FileInUse(FileSystemInfo fileInfo) {

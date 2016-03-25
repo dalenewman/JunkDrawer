@@ -19,10 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using JunkDrawer.Autofac.Modules;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
-using Pipeline.Logging.NLog;
+using Pipeline.Ioc.Autofac.Modules;
 
 namespace JunkDrawer.Autofac {
 
@@ -49,12 +48,12 @@ namespace JunkDrawer.Autofac {
 
             var builder = new ContainerBuilder();
             builder.RegisterInstance(_context.Logger).As<IPipelineLogger>();
-            builder.RegisterModule(new RootModule());
             builder.RegisterModule(new ContextModule(process));
             builder.RegisterModule(new AdoModule(process));
-            builder.RegisterModule(new EntityControlModule(process));
-            builder.RegisterModule(new EntityInputModule(process));
-            builder.RegisterModule(new EntityOutputModule(process));
+            builder.RegisterModule(new ExcelModule(process));
+            builder.RegisterModule(new FileModule(process));
+            builder.RegisterModule(new InternalModule(process));
+
             builder.RegisterModule(new EntityPipelineModule(process));
             builder.RegisterModule(new ProcessControlModule(process));
 
@@ -68,17 +67,7 @@ namespace JunkDrawer.Autofac {
         }
 
         public void Execute(string cfg, string shorthand, Dictionary<string, string> parameters) {
-            var builder = new ContainerBuilder();
-            builder.RegisterModule(new RootModule());
-            using (var scope = builder.Build().BeginLifetimeScope()) {
-                var process = scope.Resolve<Process>(
-                    new NamedParameter("cfg", cfg),
-                    new NamedParameter("shorthand", shorthand),
-                    new NamedParameter("parameters", parameters)
-                );
-                Execute(process);
-            }
+            throw new NotImplementedException();
         }
-
     }
 }

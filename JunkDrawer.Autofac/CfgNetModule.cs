@@ -16,46 +16,37 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Linq;
 using Autofac;
 using Cfg.Net.Contracts;
 using Cfg.Net.Reader;
+using Cfg.Net.Serializers;
 using Pipeline.Configuration;
+using Pipeline.Contracts;
 using Pipeline.Nulls;
 
-// ReSharper disable PossibleMultipleEnumeration
-
-namespace JunkDrawer.Autofac.Modules {
-    public class RootModule : Module {
+namespace JunkDrawer.Autofac {
+    public class CfgNetModule : Module {
 
         protected override void Load(ContainerBuilder builder) {
 
             builder.RegisterType<FileReader>().Named<IReader>("file");
             builder.RegisterType<WebReader>().Named<IReader>("web");
+            builder.RegisterType<XmlSerializer>().As<ISerializer>();
 
             builder.Register<IReader>(ctx => new DefaultReader(
                 ctx.ResolveNamed<IReader>("file"),
-                new ReTryingReader(ctx.ResolveNamed<IReader>("web"), 3))
+                new ReTryingReader(ctx.ResolveNamed<IReader>("web"), attempts: 3))
             );
 
-            builder.Register((ctx, p) => {
-                var process = new Process(new NullValidator("js"), new NullValidator("sh"), ctx.Resolve<IReader>());
-                switch (p.Count()) {
-                    case 2:
-                        process.Load(
-                            p.Named<string>("cfg"),
-                            p.Named<Dictionary<string, string>>("parameters")
-                        );
-                        break;
-                    case 1:
-                        process.Load(p.Named<string>("cfg"));
-                        break;
-                    default:
-                        process.Load(p.Named<string>("cfg"));
-                        break;
-                }
-                return process;
-            }).As<Process>();
+            builder.RegisterType<NullParser>().Named<Pipeline.Contracts.IParser>("js");
+            builder.RegisterType<NullRowCondition>().As<IRowCondition>();
+
+            builder.Register((ctx, p) => new Process(
+                new NullValidator("js"),
+                new NullValidator("sh"),
+                ctx.Resolve<IReader>(),
+                ctx.Resolve<ISerializer>()
+            )).As<Process>();
 
         }
     }

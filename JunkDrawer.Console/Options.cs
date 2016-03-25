@@ -26,11 +26,33 @@ namespace JunkDrawer {
         [Option('f', "file", Required = true, HelpText = "The file to import.")]
         public string File { get; set; }
 
-        [Option('c', "config", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file.")]
+        [Option('a', "arrangement", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file.")]
         public string Configuration { get; set; }
 
-        [OptionList('t', "types", Separator = ',', HelpText = "Specify types to check for, separated by commas. Note: this is usually set by the configuration file, but you can override it here.")]
+        [OptionList('t',"types", Separator = ',', HelpText = "Override the configuration's inspection types, comma separated (e.g. bool, byte, short, int, long, single, double, datetime).")]
         public IList<string> Types { get; set; }
+
+        [Option('c',"connection", Required = false, HelpText = "Override the configuration's connection type (e.g. sqlserver, mysql, postgresql, sqlite).")]
+        public string Provider { get; set; }
+
+        [Option('s',"server", Required = false,HelpText = "Override the configuration's output server.")]
+        public string Server { get; set; }
+
+        [Option('n', "port", Required = false, HelpText = "Override the configuration's output port.")]
+        public int Port { get; set; }
+
+        [Option('d', "database", Required = false, HelpText = "Override the configuration's output database.")]
+        public string Database { get; set; }
+
+        [Option('v', "view", Required = false, HelpText = "Override the configuration's output view.")]
+        public string Table { get; set; }
+
+
+        [Option('u', "user", Required = false, HelpText = "Override the configuration's output user.")]
+        public string User { get; set; }
+
+        [Option('p', "password", Required = false, HelpText = "Override the configuration's output password.")]
+        public string Password { get; set; }
 
         [HelpOption]
         public string GetUsage() {

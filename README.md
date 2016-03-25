@@ -164,7 +164,8 @@ CREATE TABLE colors(
 ```
 
 **Note**: The actual table has auto-generated column names. However, a 
-view is also created with friendly column names (if available).
+view is created with friendly column names (if available).  Also, when a 
+single file name argument is passed into `jd.exe`, the `-f` is not required.  
 
 ### How Does it Work?
 
@@ -281,7 +282,7 @@ JunkDrawer may be used in code like this:
 
 ```csharp
 JunkResponse response;
-var request = new JunkRequest(@"c:\temp\colors.csv", "default.xml");
+var request = new JunkRequest(@"c:\temp\colors.csv");
 using (var scope = new AutofacJunkBootstrapper(request)) {
     response = scope.Resolve<JunkImporter>().Import();
 }
@@ -296,11 +297,11 @@ included in the solution to demonstrate how `JunkImporter` is composed.
 
 ### Options
 
-#### Table Name
+#### View Name
 By default, Junk Drawer creates a view named after your 
 file (without the extension).  For example, `colors.csv` is 
 named `colors`. If you want to name your view something else, 
-set the `TableName` property in `JunkRequest`.
+set the `View` property in `JunkRequest`.
 
 #### Configuration
 
@@ -324,7 +325,7 @@ a configuration like this:
 
 Save it as *sqlite.xml*.  Now import *colors.csv* into SQLite:
 
-`jd.exe -f c:\temp\colors.csv -c sqlite.xml`
+`jd.exe -f c:\temp\colors.csv -a sqlite.xml`
 
 MySql and PostgreSql are also supported.
 
@@ -370,3 +371,47 @@ Junk Drawer is not possible without:
 * [System.Data.SQLite](https://system.data.sqlite.org)
 * [Npgsql](http://www.npgsql.org/)
 * [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
+
+### Update: 2016-03-25
+
+#### New Command Line Parameters
+I've added a whole bunch of optional command line parameters:
+
+```bash
+Junk Drawer 0.0.4.0
+Copyright - Dale Newman 2013 - Apache 2
+
+  -f, --file           Required. The file to import.
+
+  -a, --arrangement    (Default: default.xml) The configuration file.
+
+  -t, --types          Override the configuration inspection types, comma
+                       separated (e.g. bool, byte, short, int, long, single,
+                       double, datetime).
+
+  -c, --connection     Override the configuration connection type (e.g.
+                       sqlserver, mysql, postgresql, sqlite).
+
+  -s, --server         Override the configuration output server.
+
+  -n, --port           Override the configuration output port.
+
+  -d, --database       Override the configuration output database.
+
+  -v, --view           Override the configuration output view.
+
+  -u, --user           Override the configuration output user.
+
+  -p, --password       Override the configuration output password.
+
+  --help               Display this help screen.
+```
+
+#### Backward Compatibility for Command Line Parameters
+
+If you use a single file name argument, you may omit `-f`.  This way, you 
+can use Junk Drawer with Window's *open with* context menu option.
+
+The `-c` argument was previously used for the configuration file. This should still work. 
+However, going forward, use `-a` (arrangement) for configuration, and use `-c` to over-ride the connection 
+provider.

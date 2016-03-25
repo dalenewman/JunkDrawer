@@ -18,9 +18,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using JunkDrawer.Autofac.Modules;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
+using Pipeline.Ioc.Autofac.Modules;
 using Pipeline.Nulls;
 
 namespace JunkDrawer.Autofac {
@@ -47,17 +47,16 @@ namespace JunkDrawer.Autofac {
 
             var container = new ContainerBuilder();
             container.RegisterInstance(_context.Logger).As<IPipelineLogger>().SingleInstance();
-            container.RegisterModule(new RootModule());
             container.RegisterModule(new ContextModule(process));
             container.RegisterModule(new AdoModule(process));
-            container.RegisterModule(new EntityControlModule(process));
+            container.RegisterModule(new InternalModule(process));
+            container.RegisterModule(new FileModule(process));
+            container.RegisterModule(new ExcelModule(process));
 
             var entity = process.Entities.First();
             container.RegisterType<NullUpdater>().Named<IUpdate>(entity.Key);
             container.RegisterType<NullDeleteHandler>().Named<IEntityDeleteHandler>(entity.Key);
 
-            container.RegisterModule(new EntityInputModule(process));
-            container.RegisterModule(new EntityOutputModule(process));
             container.RegisterModule(new EntityPipelineModule(process));
             container.RegisterModule(new ProcessControlModule(process));
 
