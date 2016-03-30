@@ -16,6 +16,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac;
@@ -24,6 +25,7 @@ using Cfg.Net.Ext;
 using Cfg.Net.Reader;
 using Pipeline;
 using Pipeline.Configuration;
+using Pipeline.Context;
 using Pipeline.Contracts;
 using Pipeline.Desktop;
 using Pipeline.Logging.NLog;
@@ -38,6 +40,10 @@ namespace JunkDrawer.Autofac {
 
         public JunkModule(JunkRequest jr) {
             _jr = jr;
+        }
+
+        public JunkModule() {
+            // sometimes you just don't have the junk request yet...
         }
 
         public static string ProcessName = "JunkDrawer";
@@ -55,48 +61,50 @@ namespace JunkDrawer.Autofac {
             );
 
             builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
+            builder.Register((ctx, p) => _jr ?? p.TypedAs<JunkRequest>()).As<JunkRequest>();
 
-            var entityName = Pipeline.Utility.Identifier(_jr.FileInfo.Name);
-            builder.Register(ctx => new PipelineContext(
-                ctx.Resolve<IPipelineLogger>(),
-                new Process { Name = ProcessName, Key = ProcessName }.WithDefaults(),
-                new Entity { Name = entityName, Alias = entityName, Key = entityName }.WithDefaults()
-            )).As<IContext>();
+            builder.Register((ctx, p) => {
+                var entityName = ctx.Resolve<JunkRequest>(p).FileInfo.Name;
+                return new PipelineContext(
+                    ctx.Resolve<IPipelineLogger>(),
+                    new Process { Name = ProcessName, Key = ProcessName }.WithDefaults(),
+                    new Entity { Name = entityName, Alias = entityName, Key = entityName }
+                        .WithDefaults()
+                    );
+            }).As<IContext>();
 
-            builder.Register(ctx => {
-                var cfg = new JunkCfg(
-                    _jr.Configuration,
-                    ctx.Resolve<IReader>()
-                );
+            builder.Register((ctx, p) => {
+                var request = ctx.Resolve<JunkRequest>(p);
+                var cfg = new JunkCfg(request.Configuration, ctx.Resolve<IReader>());
 
                 // modify the input provider based on the file name requested
                 var input = cfg.Input();
-                input.File = _jr.FileInfo.FullName;
-                if (_jr.Extension.StartsWith(".xls", StringComparison.OrdinalIgnoreCase)) {
+                input.File = request.FileInfo.FullName;
+                if (request.Extension.StartsWith(".xls", StringComparison.OrdinalIgnoreCase)) {
                     input.Provider = "excel";
                 }
 
                 // modify the output connection
                 var output = cfg.Output();
-                if (!string.IsNullOrEmpty(_jr.Provider) && Constants.ProviderSet().Contains(_jr.Provider)) {
-                    output.Provider = _jr.Provider;
+                if (!string.IsNullOrEmpty(request.Provider) && Constants.ProviderSet().Contains(request.Provider)) {
+                    output.Provider = request.Provider;
                 }
 
-                SetOption(() => _jr.Server, option => { output.Server = option; });
-                SetOption(() => _jr.Database, option => { output.Database = option; });
-                SetOption(() => _jr.User, option => { output.User = option; });
-                SetOption(() => _jr.Password, option => { output.Password = option; });
-                SetOption(() => _jr.Port, option => { output.Port = option; });
-                SetOption(() => _jr.View, option => { output.Table = option; });
+                SetOption(() => request.Server, option => { output.Server = option; });
+                SetOption(() => request.Database, option => { output.Database = option; });
+                SetOption(() => request.User, option => { output.User = option; });
+                SetOption(() => request.Password, option => { output.Password = option; });
+                SetOption(() => request.Port, option => { output.Port = option; });
+                SetOption(() => request.View, option => { output.Table = option; });
 
                 // modify the types if provided from command line
-                if (_jr.Types == null || !_jr.Types.Any(t => Constants.TypeSet().Contains(t)))
+                if (request.Types == null || !request.Types.Any(t => Constants.TypeSet().Contains(t)))
                     return cfg;
 
                 var context = ctx.Resolve<IContext>();
                 context.Debug(() => "Manually over-riding types from command line");
                 cfg.Input().Types.Clear();
-                foreach (var type in _jr.Types.Where(type => Constants.TypeSet().Contains(type))) {
+                foreach (var type in request.Types.Where(type => Constants.TypeSet().Contains(type))) {
                     cfg.Input().Types.Add(new TflType(type).WithDefaults());
                     context.Debug(() => $"Inspecting for type: {type}.");
                 }
@@ -112,27 +120,29 @@ namespace JunkDrawer.Autofac {
 
             // Junk Drawer Setup
 
-            builder.Register<ISchemaReader>(ctx => {
-                var connection = ctx.Resolve<JunkCfg>().Input();
+            builder.Register<ISchemaReader>((ctx, p) => {
+                var connection = ctx.Resolve<JunkCfg>(p).Input();
                 var fileInfo = new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
-                var context = new ConnectionContext(ctx.Resolve<IContext>(), connection);
+                var context = new ConnectionContext(ctx.Resolve<IContext>(p), connection);
                 var cfg = connection.Provider == "file" ?
                     new FileInspection(context, fileInfo).Create() :
                     new ExcelInspection(context, fileInfo).Create();
-                var process = ctx.Resolve<Process>(new NamedParameter("cfg", cfg));
+                var process = ctx.Resolve<Process>(p.Concat(new[] { new NamedParameter("cfg", cfg) }));
                 process.Pipeline = "linq";
                 return new SchemaReader(context, new RunTimeRunner(context), process);
             }).As<ISchemaReader>();
 
             // Write Configuration based on schema results and JunkRequest
-            builder.Register<ICreateConfiguration>(c => new JunkConfigurationCreator(c.Resolve<JunkCfg>(), c.Resolve<ISchemaReader>())).As<ICreateConfiguration>();
-            builder.Register(c => c.Resolve<ICreateConfiguration>().Create()).Named<string>("cfg");
-            builder.Register<IRunTimeExecute>(c => new RunTimeExecutor(c.Resolve<IContext>())).As<IRunTimeExecute>();
+            builder.Register<ICreateConfiguration>((c, p) => new JunkConfigurationCreator(c.Resolve<JunkCfg>(p), c.Resolve<ISchemaReader>(p))).As<ICreateConfiguration>();
+            builder.Register<IRunTimeExecute>((c,p) => new RunTimeExecutor(c.Resolve<IContext>(p))).As<IRunTimeExecute>();
 
             // Final product is a JunkImporter that executes the action above
-            builder.Register(c => {
-                var process = c.Resolve<Process>(new NamedParameter("cfg", c.ResolveNamed<string>("cfg")));
-                return new JunkImporter(process, c.Resolve<IRunTimeExecute>());
+            builder.Register((c, p) => {
+                var parameters = new List<global::Autofac.Core.Parameter>();
+                parameters.AddRange(p);
+                parameters.Add(new NamedParameter("cfg", c.Resolve<ICreateConfiguration>(parameters).Create()));
+                var process = c.Resolve<Process>(parameters);
+                return new JunkImporter(process, c.Resolve<IRunTimeExecute>(parameters));
             }).As<JunkImporter>();
         }
 

@@ -1,0 +1,37 @@
+﻿<jd retries="3">
+
+  <connections>
+
+    <add name="input"
+         provider="file"
+         file="*.*"
+         min-length="1"
+         max-length="4000">
+      <delimiters>
+        <add name="comma" character=","/>
+        <add name="pipe" character="|"/>
+        <add name="tab" character="&#009;"/>
+        <add name="semicolon" character=";"/>
+      </delimiters>
+      <!--<types>
+        <add type="bool"/>
+        <add type="byte"/>
+        <add type="short"/>
+        <add type="int"/>
+        <add type="long"/>
+        <add type="single"/>
+        <add type="double"/>
+        <add type="decimal"/>
+        <add type="datetime"/>
+      </types>-->
+    </add>
+
+    <add name="output"
+         provider="sqlserver"
+         server="localhost"
+         database="Junk"
+         drop-control="false"/>
+
+  </connections>
+
+</jd>

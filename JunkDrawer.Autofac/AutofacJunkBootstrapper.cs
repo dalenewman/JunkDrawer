@@ -25,12 +25,22 @@ namespace JunkDrawer.Autofac {
             _scope = builder.Build().BeginLifetimeScope();
         }
 
+        public AutofacJunkBootstrapper() {
+            var builder = new ContainerBuilder();
+            builder.RegisterModule(new JunkModule());
+            _scope = builder.Build().BeginLifetimeScope();
+        }
+
         public void Dispose() {
             _scope.Dispose();
         }
 
-        public T Resolve<T>() where T: IResolvable {
+        public T Resolve<T>() where T : IResolvable {
             return _scope.Resolve<T>();
+        }
+
+        public T Resolve<T>(JunkRequest request) where T : IResolvable {
+            return _scope.Resolve<T>(new TypedParameter(typeof(JunkRequest), request));
         }
 
     }
