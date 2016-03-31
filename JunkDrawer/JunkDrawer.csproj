@@ -56,8 +56,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CfgNet, Version=0.6.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.6.5\lib\CfgNet.dll</HintPath>
+    <Reference Include="CfgNet, Version=0.6.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.6.6\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -70,10 +70,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IJunkBootstrapper.cs" />
+    <Compile Include="IJunkBootstrapperFactory.cs" />
+    <Compile Include="IPager.cs" />
     <Compile Include="IResolvable.cs" />
     <Compile Include="JunkCfg.cs" />
     <Compile Include="JunkConfigurationCreator.cs" />
     <Compile Include="JunkImporter.cs" />
+    <Compile Include="JunkPager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="JunkRequest.cs" />
     <Compile Include="JunkResponse.cs" />

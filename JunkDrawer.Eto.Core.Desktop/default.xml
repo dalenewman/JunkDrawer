@@ -13,7 +13,7 @@
         <add name="tab" character="&#009;"/>
         <add name="semicolon" character=";"/>
       </delimiters>
-      <!--<types>
+      <types>
         <add type="bool"/>
         <add type="byte"/>
         <add type="short"/>
@@ -23,7 +23,7 @@
         <add type="double"/>
         <add type="decimal"/>
         <add type="datetime"/>
-      </types>-->
+      </types>
     </add>
 
     <add name="output"

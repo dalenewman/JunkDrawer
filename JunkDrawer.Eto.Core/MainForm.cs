@@ -1,15 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region license
+// JunkDrawer.Eto.Core
+// Copyright 2013 Dale Newman
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//   
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+using System;
 using System.Linq;
 using Eto.Forms;
 using Eto.Drawing;
 
 namespace JunkDrawer.Eto.Core {
     public class MainForm : Form {
-        private readonly IJunkBootstrapper _bs;
+        private readonly IJunkBootstrapperFactory _factory;
 
-        public MainForm(IJunkBootstrapper bs) {
-            _bs = bs;
+        public MainForm(IJunkBootstrapperFactory factory) {
+            _factory = factory;
             Title = "Junk Drawer";
             ClientSize = new Size(800, 600);
             CreateMenu();
@@ -27,37 +42,35 @@ namespace JunkDrawer.Eto.Core {
 
                 Title = $"Junk Drawer ({openDialogue.FileName})";
 
-                using (var scope = _bs) {
-                    var request = new JunkRequest(openDialogue.FileName);
-                    try {
-                        var result = scope.Resolve<JunkImporter>(request).Import();
-                        MessageBox.Show($"Imported {result.Records} records into {result.View}.", "Import Complete", MessageBoxButtons.OK);
+                var grid = new GridView {GridLines = GridLines.Both};
 
-                        var collection = new List<Dictionary<string, object>>{
-                            new Dictionary<string, object> {{"p1", 1}, {"p2", 2}},
-                            new Dictionary<string, object> {{"p1", 3}, {"p2", 4}}
-                        };
+                var request = new JunkRequest(openDialogue.FileName);
+                try {
+                    using (var scope = _factory.Produce(request)) {
+                        var response = scope.Resolve<JunkImporter>(request).Import();
+                        if (response.Records > 0) {
+                            var pager = scope.Resolve<JunkPager>(request, response);
+                            var collection = pager.Read(1, 20);
+                            grid.DataStore = collection;
 
-                        var expandos = collection.Select(kv => new {p1 = kv["p1"], p2 = kv["p2"]});
+                            foreach (var field in pager.Fields().Where(f => f.Name != "TflKey")) {
+                                grid.Columns.Add(new GridColumn {
+                                    DataCell = field.ToCell(),
+                                    HeaderText = field.Label,
+                                    AutoSize = true,
+                                    Editable = false
+                                });
+                            }
+                        }
 
-                        var grid = new GridView { DataStore = expandos};
-
-                        grid.Columns.Add(new GridColumn {
-                            DataCell = new TextBoxCell("p1"),
-                            HeaderText = "P1"
-                        });
-
-                        grid.Columns.Add(new GridColumn {
-                            DataCell = new TextBoxCell("p2"),
-                            HeaderText = "P2"
-                        });
-
-                        Content = grid;
-
-                    } catch (Exception ex) {
-                        MessageBox.Show(ex.Message, MessageBoxType.Error);
                     }
+                    // MessageBox.Show($"Imported {response.Records} records into {response.View}.", "Import Complete", MessageBoxButtons.OK);
+                } catch (Exception ex) {
+                    MessageBox.Show(ex.Message, MessageBoxType.Error);
                 }
+
+                Content = grid;
+
             };
 
             // QUIT

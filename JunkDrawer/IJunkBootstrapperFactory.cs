@@ -15,8 +15,8 @@
 // limitations under the License.
 #endregion
 namespace JunkDrawer {
-    public class JunkResponse {
-        public string View { get; set; } = string.Empty;
-        public long Records { get; set; } = 0;
+    public interface IJunkBootstrapperFactory {
+        IJunkBootstrapper Produce(JunkRequest request);
+        IJunkBootstrapper Produce();
     }
 }

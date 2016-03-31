@@ -1,5 +1,5 @@
 ﻿#region license
-// JunkDrawer
+// JunkDrawer.Autofac
 // Copyright 2013 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-namespace JunkDrawer {
-    public class JunkResponse {
-        public string View { get; set; } = string.Empty;
-        public long Records { get; set; } = 0;
+namespace JunkDrawer.Autofac {
+    public class AutofacJunkBootstrapperFactory : IJunkBootstrapperFactory {
+        public IJunkBootstrapper Produce(JunkRequest request) {
+            return new AutofacJunkBootstrapper(request);
+        }
+
+        public IJunkBootstrapper Produce() {
+            return new AutofacJunkBootstrapper();
+        }
     }
 }

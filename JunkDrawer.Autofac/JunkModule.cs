@@ -1,21 +1,21 @@
 ﻿#region license
-// JunkDrawer
+// JunkDrawer.Autofac
 // Copyright 2013 Dale Newman
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//  
-//      http://www.apache.org/licenses/LICENSE-2.0
-//  
+//   
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,6 +28,7 @@ using Pipeline.Configuration;
 using Pipeline.Context;
 using Pipeline.Contracts;
 using Pipeline.Desktop;
+using Pipeline.Ioc.Autofac;
 using Pipeline.Logging.NLog;
 using Pipeline.Nulls;
 using Pipeline.Provider.Excel;
@@ -71,7 +72,7 @@ namespace JunkDrawer.Autofac {
                     new Entity { Name = entityName, Alias = entityName, Key = entityName }
                         .WithDefaults()
                     );
-            }).As<IContext>();
+            }).As<IContext>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
                 var request = ctx.Resolve<JunkRequest>(p);
@@ -130,20 +131,44 @@ namespace JunkDrawer.Autofac {
                 var process = ctx.Resolve<Process>(p.Concat(new[] { new NamedParameter("cfg", cfg) }));
                 process.Pipeline = "linq";
                 return new SchemaReader(context, new RunTimeRunner(context), process);
-            }).As<ISchemaReader>();
+            }).As<ISchemaReader>().InstancePerLifetimeScope();
 
             // Write Configuration based on schema results and JunkRequest
-            builder.Register<ICreateConfiguration>((c, p) => new JunkConfigurationCreator(c.Resolve<JunkCfg>(p), c.Resolve<ISchemaReader>(p))).As<ICreateConfiguration>();
-            builder.Register<IRunTimeExecute>((c,p) => new RunTimeExecutor(c.Resolve<IContext>(p))).As<IRunTimeExecute>();
+            builder.Register<IRunTimeExecute>((c, p) => new RunTimeExecutor(c.Resolve<IContext>(p))).As<IRunTimeExecute>();
+            builder.Register<IRunTimeRun>((c, p) => new RunTimeRunner(c.Resolve<IContext>(p))).As<IRunTimeRun>();
 
-            // Final product is a JunkImporter that executes the action above
+            // when you resolve a process, you need to add a cfg parameter
             builder.Register((c, p) => {
                 var parameters = new List<global::Autofac.Core.Parameter>();
                 parameters.AddRange(p);
-                parameters.Add(new NamedParameter("cfg", c.Resolve<ICreateConfiguration>(parameters).Create()));
-                var process = c.Resolve<Process>(parameters);
-                return new JunkImporter(process, c.Resolve<IRunTimeExecute>(parameters));
+
+                var cfg = new JunkConfigurationCreator(c.Resolve<JunkCfg>(p), c.Resolve<ISchemaReader>(p)).Create();
+                parameters.Add(new NamedParameter("cfg", cfg));
+                return c.Resolve<Process>(parameters);
+            }).Named<Process>("import").InstancePerLifetimeScope();
+
+            // when you resolve a process, you need to add a cfg parameter
+            builder.Register((c, p) => {
+                var parameters = new List<global::Autofac.Core.Parameter>();
+                parameters.AddRange(p);
+
+                var cfg = new ReverseConfiguration(p.TypedAs<JunkResponse>(), c.ResolveNamed<Process>("import", p)).Create();
+                parameters.Add(new NamedParameter("cfg", cfg));
+                return c.Resolve<Process>(parameters);
+            }).Named<Process>("read");
+
+            // Final products are JunkImporter and JunkPager
+            builder.Register((c, p) => {
+                var process = c.ResolveNamed<Process>("import", p);
+                return new JunkImporter(process, c.Resolve<IRunTimeExecute>(p));
             }).As<JunkImporter>();
+
+            builder.Register((c, p) => {
+                var process = c.ResolveNamed<Process>("read", p);
+                return new JunkPager(process, new RunTimeRunner(c.Resolve<IContext>(p)));
+            }).As<JunkPager>();
+
+
         }
 
         private static void SetOption<T>(Func<T> getter, Action<T> setter) {

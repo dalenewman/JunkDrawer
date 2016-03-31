@@ -14,40 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
 
 namespace JunkDrawer {
-    public class JunkImporter : IResolvable {
+    public class JunkPager : IPager {
         private readonly Process _process;
-        private readonly IRunTimeExecute _executor;
+        private readonly Entity _entity;
+        private readonly Field[] _fields;
+        private readonly IRunTimeRun _reader;
 
-        public JunkImporter(
-            Process process,
-           IRunTimeExecute executor
-        ) {
+        public JunkPager(Process process, IRunTimeRun reader) {
             _process = process;
-            _executor = executor;
+            _entity = _process.Entities.First();
+            _reader = reader;
+            _fields = _entity.Fields.Where(f => !f.System).ToArray();
         }
 
-        public JunkResponse Import() {
-
-            try {
-                _executor.Execute(_process);
-                var entity = _process.Entities.First();
-
-                return new JunkResponse {
-                    Records = entity.Inserts,
-                    View = entity.Alias
-                };
-
-            } catch (Exception) {
-                return new JunkResponse();
-            }
-
+        public IEnumerable<IRow> Read(int page, int pageSize) {
+            _entity.Page = page;
+            _entity.PageSize = pageSize;
+            return _reader.Run(_process);
         }
 
+        public Field[] Fields() {
+            return _fields;
+        }
     }
 }

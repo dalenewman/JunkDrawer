@@ -74,6 +74,14 @@
       <HintPath>..\packages\Eto.Platform.Mac.2.2.0\lib\net45\MonoMac.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Pipeline.Ioc.Autofac, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Ioc.Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Portable\bin\Debug\Pipeline.Portable.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -100,6 +108,9 @@
     <None Include="Mac\MyApp.app\Contents\Info.plist" />
     <None Include="Mac\MyApp.app\Contents\MacOS\Launcher.exec" />
     <None Include="Mac\MyApp.app\Contents\Resources\Icon.icns" />
+    <None Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

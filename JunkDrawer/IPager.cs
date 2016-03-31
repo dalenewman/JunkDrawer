@@ -1,4 +1,4 @@
-﻿#region license
+#region license
 // JunkDrawer
 // Copyright 2013 Dale Newman
 //  
@@ -14,9 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+using System.Collections.Generic;
+using Pipeline.Configuration;
+using Pipeline.Contracts;
+
 namespace JunkDrawer {
-    public class JunkResponse {
-        public string View { get; set; } = string.Empty;
-        public long Records { get; set; } = 0;
+    public interface IPager : IResolvable {
+        IEnumerable<IRow> Read(int page, int pageSize);
+        Field[] Fields();
     }
 }
