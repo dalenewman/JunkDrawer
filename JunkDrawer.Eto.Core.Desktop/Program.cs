@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 using Autofac;
+using Cfg.Net.Contracts;
+using Cfg.Net.Reader;
 using Eto;
 using Eto.Forms;
 using JunkDrawer.Autofac;
@@ -47,9 +49,18 @@ namespace JunkDrawer.Eto.Core.Desktop {
 
             var builder = new ContainerBuilder();
             builder.RegisterType<AutofacJunkBootstrapperFactory>().As<IJunkBootstrapperFactory>();
+            builder.RegisterType<FileReader>().As<IReader>();
+            builder.Register((c, p) => new JunkCfg(options.Configuration, c.Resolve<IReader>())).As<JunkCfg>();
+
             using (var scope = builder.Build().BeginLifetimeScope()) {
                 var app = new Application(Platform.Detect);
-                app.Run(new MainForm(scope.Resolve<IJunkBootstrapperFactory>()));
+                app.Run(new MainForm(
+                    scope.Resolve<IJunkBootstrapperFactory>(), 
+                    scope.Resolve<JunkCfg>(), 
+                    options.File,
+                    options.Configuration
+                    )
+                );
             }
 
         }

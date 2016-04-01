@@ -23,12 +23,10 @@ namespace JunkDrawer.Eto.Core.Desktop {
 
         [Option('f', "file", Required = false, HelpText = "The file to import.")]
         public string File { get; set; }
-
-
+        
         [Option('a', "arrangement", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file.")]
         public string Configuration { get; set; }
-
-
+        
         [HelpOption]
         public string GetUsage() {
             return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));

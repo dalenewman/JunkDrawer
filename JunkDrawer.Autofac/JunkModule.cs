@@ -51,16 +51,7 @@ namespace JunkDrawer.Autofac {
         protected override void Load(ContainerBuilder builder) {
 
             // Cfg-Net Setup for JunkCfg
-            builder.RegisterType<FileReader>();
-            builder.RegisterType<WebReader>();
-
-            builder.Register<IReader>(ctx =>
-                new DefaultReader(
-                    ctx.Resolve<FileReader>(),
-                    new ReTryingReader(ctx.Resolve<WebReader>(), 3)
-                )
-            );
-
+            builder.RegisterType<FileReader>().As<IReader>();
             builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
             builder.Register((ctx, p) => _jr ?? p.TypedAs<JunkRequest>()).As<JunkRequest>();
 

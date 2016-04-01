@@ -15,14 +15,15 @@
       </delimiters>
       <types>
         <add type="bool"/>
-        <add type="byte"/>
-        <add type="short"/>
+        <!--<add type="byte"/>-->
+        <!--<add type="short"/>-->
         <add type="int"/>
         <add type="long"/>
-        <add type="single"/>
-        <add type="double"/>
+        <!--<add type="single"/>-->
+        <!--<add type="double"/>-->
         <add type="decimal"/>
         <add type="datetime"/>
+        <!--<add type="guid" />-->
       </types>
     </add>
 
