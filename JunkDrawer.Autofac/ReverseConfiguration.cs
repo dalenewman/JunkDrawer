@@ -22,11 +22,9 @@ using Pipeline.Contracts;
 namespace JunkDrawer.Autofac {
     public class ReverseConfiguration : ICreateConfiguration {
         private readonly JunkResponse _response;
-        private readonly Process _process;
 
-        public ReverseConfiguration(JunkResponse response, Process process) {
+        public ReverseConfiguration(JunkResponse response) {
             _response = response;
-            _process = process;
         }
 
         public string Create() {
@@ -36,14 +34,12 @@ namespace JunkDrawer.Autofac {
             process.Connections.Clear();
             process.Entities.Clear();
 
-            process.Connections.Add(_process.Output().Clone());
+            process.Connections.Add(_response.Connection.Clone());
             process.Connections.First().Name = "input";
 
             var entity = new Entity { Name = _response.View, Connection = "input" }.WithDefaults();
-            entity.Fields.Add(new Field { Name = Pipeline.Constants.TflKey, Alias="Key", Type="int", PrimaryKey = true}.WithDefaults());
-            var starFields = _process.GetStarFields().ToArray();
-            entity.Fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
-            entity.Fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
+            entity.Fields.Add(new Field { Name = Pipeline.Constants.TflKey, Alias = "Key", Type = "int", PrimaryKey = true }.WithDefaults());
+            entity.Fields.AddRange(_response.Fields);
             process.Entities.Add(entity);
 
             return process.Serialize();

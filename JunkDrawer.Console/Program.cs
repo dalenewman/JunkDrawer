@@ -31,7 +31,7 @@ namespace JunkDrawer {
             var options = new Options();
             var modifed = new List<string>();
             if (args != null) {
-                if (args.Length == 1 && !args[0].StartsWith("-f")) {
+                if (args.Length == 1 && !args[0].StartsWith("-")) {
                     modifed.Add("-f");
                     modifed.Add(args[0]);
                 } else {
@@ -51,6 +51,7 @@ namespace JunkDrawer {
                 Provider = options.Provider,
                 Server = options.Server,
                 Database = options.Database,
+                Schema = options.Schema,
                 User = options.User,
                 Password = options.Password,
                 Port = options.Port

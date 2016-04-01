@@ -14,15 +14,15 @@
         <add name="semicolon" character=";"/>
       </delimiters>
       <types>
-        <add type="bool"/>
+        <!--<add type="bool"/>-->
         <!--<add type="byte"/>-->
         <!--<add type="short"/>-->
-        <add type="int"/>
-        <add type="long"/>
+        <!--<add type="int"/>-->
+        <!--<add type="long"/>-->
         <!--<add type="single"/>-->
         <!--<add type="double"/>-->
-        <add type="decimal"/>
-        <add type="datetime"/>
+        <!--<add type="decimal"/>-->
+        <!--<add type="datetime"/>-->
         <!--<add type="guid" />-->
       </types>
     </add>
@@ -32,6 +32,12 @@
          server="localhost"
          database="Junk"
          drop-control="false"/>
+    
+    <!-- other connections for Junk Drawer GUI -->
+    <add name="SQL Junk" provider="sqlserver" server="localhost" database="Junk" />
+    <add name="SQLite Junk" provider="sqlite" file="c:\temp\junk.sqlite3" />
+    <add name="MySQL Junk" provider="mysql" server="localhost" database="Junk" />
+    <add name="PostgreSQL Junk" provider="postgresql" server="localhost" database="Junk" />
 
   </connections>
 

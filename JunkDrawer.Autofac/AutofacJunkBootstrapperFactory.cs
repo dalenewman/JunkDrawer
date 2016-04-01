@@ -14,14 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
+using Pipeline.Contracts;
+
 namespace JunkDrawer.Autofac {
     public class AutofacJunkBootstrapperFactory : IJunkBootstrapperFactory {
+        private readonly IPipelineLogger _logger;
+
+        public AutofacJunkBootstrapperFactory(IPipelineLogger logger = null) {
+            _logger = logger;
+        }
+
         public IJunkBootstrapper Produce(JunkRequest request) {
-            return new AutofacJunkBootstrapper(request);
+            return new AutofacJunkBootstrapper(request, _logger);
         }
 
         public IJunkBootstrapper Produce() {
-            return new AutofacJunkBootstrapper();
+            return new AutofacJunkBootstrapper(_logger);
         }
     }
 }

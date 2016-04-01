@@ -18,10 +18,16 @@ using System;
 using System.Collections.Generic;
 using Autofac;
 using Cfg.Net.Contracts;
+using Cfg.Net.Ext;
 using Cfg.Net.Reader;
 using Eto;
 using Eto.Forms;
 using JunkDrawer.Autofac;
+using Pipeline.Configuration;
+using Pipeline.Context;
+using Pipeline.Contracts;
+using Pipeline.Logging.NLog;
+using Environment = System.Environment;
 
 namespace JunkDrawer.Eto.Core.Desktop {
     public class Program {
@@ -33,7 +39,7 @@ namespace JunkDrawer.Eto.Core.Desktop {
             var options = new Options();
             var modifed = new List<string>();
             if (args != null) {
-                if (args.Length == 1 && !args[0].StartsWith("-f")) {
+                if (args.Length == 1 && !args[0].StartsWith("-")) {
                     modifed.Add("-f");
                     modifed.Add(args[0]);
                 } else {
@@ -48,15 +54,18 @@ namespace JunkDrawer.Eto.Core.Desktop {
 
 
             var builder = new ContainerBuilder();
-            builder.RegisterType<AutofacJunkBootstrapperFactory>().As<IJunkBootstrapperFactory>();
             builder.RegisterType<FileReader>().As<IReader>();
             builder.Register((c, p) => new JunkCfg(options.Configuration, c.Resolve<IReader>())).As<JunkCfg>();
+            builder.Register<IPipelineLogger>(c => new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger("JunkDrawer", options.LogLevel))).As<IPipelineLogger>().SingleInstance();
+            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = "JunkDrawer", Key = "JunkDrawer" }.WithDefaults()));
+            builder.Register(c => new AutofacJunkBootstrapperFactory(c.Resolve<IPipelineLogger>())).As<IJunkBootstrapperFactory>();
 
             using (var scope = builder.Build().BeginLifetimeScope()) {
                 var app = new Application(Platform.Detect);
                 app.Run(new MainForm(
-                    scope.Resolve<IJunkBootstrapperFactory>(), 
-                    scope.Resolve<JunkCfg>(), 
+                    scope.Resolve<IJunkBootstrapperFactory>(),
+                    scope.Resolve<JunkCfg>(),
+                    scope.Resolve<IContext>(),
                     options.File,
                     options.Configuration
                     )

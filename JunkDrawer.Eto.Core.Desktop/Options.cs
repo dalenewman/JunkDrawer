@@ -16,6 +16,7 @@
 #endregion
 using CommandLine;
 using CommandLine.Text;
+using Pipeline.Contracts;
 
 namespace JunkDrawer.Eto.Core.Desktop {
 
@@ -26,7 +27,10 @@ namespace JunkDrawer.Eto.Core.Desktop {
         
         [Option('a', "arrangement", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file.")]
         public string Configuration { get; set; }
-        
+
+        [Option('l', "loglevel", Required = false, DefaultValue = LogLevel.Info, HelpText = "The log level (i.e. none, info, debug, warn, error).")]
+        public LogLevel LogLevel { get; set; }
+
         [HelpOption]
         public string GetUsage() {
             return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));

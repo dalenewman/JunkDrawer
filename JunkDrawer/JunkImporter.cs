@@ -15,7 +15,9 @@
 // limitations under the License.
 #endregion
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Cfg.Net.Ext;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
 
@@ -38,8 +40,15 @@ namespace JunkDrawer {
                 _executor.Execute(_process);
                 var entity = _process.Entities.First();
 
+                var starFields = _process.GetStarFields().ToArray();
+                var fields = new List<Field>();
+                fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
+                fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
+
                 return new JunkResponse {
                     Records = entity.Inserts,
+                    Connection = _process.Output(),
+                    Fields = fields.ToArray(),
                     View = entity.Alias
                 };
 

@@ -14,9 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
+using Cfg.Net.Ext;
+using Pipeline.Configuration;
+
 namespace JunkDrawer {
     public class JunkResponse {
         public string View { get; set; } = string.Empty;
         public long Records { get; set; } = 0;
+        public Connection Connection { get; set; } = new Connection().WithDefaults();
+        public Field[] Fields { get; set; } = new Field[0];
     }
 }

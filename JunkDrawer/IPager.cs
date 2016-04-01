@@ -14,13 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-using System.Collections.Generic;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
 
 namespace JunkDrawer {
     public interface IPager : IResolvable {
-        IEnumerable<IRow> Read(int page, int pageSize);
-        Field[] Fields();
+        PageResult GetPage(int page, int pageSize);
     }
 }

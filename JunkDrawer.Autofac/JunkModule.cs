@@ -38,12 +38,15 @@ using Pipeline.Provider.File;
 namespace JunkDrawer.Autofac {
     public class JunkModule : Module {
         private readonly JunkRequest _jr;
+        private readonly IPipelineLogger _logger;
 
-        public JunkModule(JunkRequest jr) {
+        public JunkModule(JunkRequest jr, IPipelineLogger logger = null) {
             _jr = jr;
+            _logger = logger;
         }
 
-        public JunkModule() {
+        public JunkModule(IPipelineLogger logger = null) {
+            _logger = logger;
             // sometimes you just don't have the junk request yet...
         }
 
@@ -52,7 +55,7 @@ namespace JunkDrawer.Autofac {
 
             // Cfg-Net Setup for JunkCfg
             builder.RegisterType<FileReader>().As<IReader>();
-            builder.Register(ctx => new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
+            builder.Register(ctx => _logger ?? new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
             builder.Register((ctx, p) => _jr ?? p.TypedAs<JunkRequest>()).As<JunkRequest>();
 
             builder.Register((ctx, p) => {
@@ -84,17 +87,19 @@ namespace JunkDrawer.Autofac {
 
                 SetOption(() => request.Server, option => { output.Server = option; });
                 SetOption(() => request.Database, option => { output.Database = option; });
+                SetOption(() => request.DatabaseFile, option => { output.File = option; });
+                SetOption(() => request.View, option => { output.Table = option; });
+                SetOption(() => request.Schema, option => { output.Schema = option; });
                 SetOption(() => request.User, option => { output.User = option; });
                 SetOption(() => request.Password, option => { output.Password = option; });
                 SetOption(() => request.Port, option => { output.Port = option; });
-                SetOption(() => request.View, option => { output.Table = option; });
 
                 // modify the types if provided from command line
                 if (request.Types == null || !request.Types.Any(t => Constants.TypeSet().Contains(t)))
                     return cfg;
 
                 var context = ctx.Resolve<IContext>();
-                context.Debug(() => "Manually over-riding types from command line");
+                context.Debug(() => "Manually over-riding types.");
                 cfg.Input().Types.Clear();
                 foreach (var type in request.Types.Where(type => Constants.TypeSet().Contains(type))) {
                     cfg.Input().Types.Add(new TflType(type).WithDefaults());
@@ -142,8 +147,7 @@ namespace JunkDrawer.Autofac {
             builder.Register((c, p) => {
                 var parameters = new List<global::Autofac.Core.Parameter>();
                 parameters.AddRange(p);
-
-                var cfg = new ReverseConfiguration(p.TypedAs<JunkResponse>(), c.ResolveNamed<Process>("import", p)).Create();
+                var cfg = new ReverseConfiguration(p.TypedAs<JunkResponse>()).Create();
                 parameters.Add(new NamedParameter("cfg", cfg));
                 return c.Resolve<Process>(parameters);
             }).Named<Process>("read");

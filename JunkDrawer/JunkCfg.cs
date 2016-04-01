@@ -22,7 +22,7 @@ using Pipeline.Configuration;
 
 namespace JunkDrawer {
 
-    public class JunkCfg :CfgNode, IResolvable {
+    public class JunkCfg : CfgNode, IResolvable {
 
         public JunkCfg(string cfg, params IDependency[] dependencies) : base(dependencies) {
             Load(cfg);
@@ -33,16 +33,22 @@ namespace JunkDrawer {
 
         protected override void Validate() {
             if (Connections.Count < 2) {
-                Error("You need two connections defined; the first an input, the last an output.");
+                Error("You need at least two connections defined; one named 'input', and one named 'output.'");
+            }
+            if (Connections.All(c => c.Name != "input")) {
+                Error("Please define an input named 'input.'");
+            }
+            if (Connections.All(c => c.Name != "output")) {
+                Error("Please define an input named 'output.'");
             }
         }
 
         public Connection Input() {
-            return Connections.First();
+            return Connections.First(c => c.Name == "input");
         }
 
         public Connection Output() {
-            return Connections.Last();
+            return Connections.First(c => c.Name == "output");
         }
     }
 

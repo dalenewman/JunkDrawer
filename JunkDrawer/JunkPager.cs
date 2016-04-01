@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-using System.Collections.Generic;
+
 using System.Dynamic;
 using System.Linq;
 using Pipeline.Configuration;
@@ -34,14 +34,15 @@ namespace JunkDrawer {
             _fields = _entity.Fields.Where(f => !f.System).ToArray();
         }
 
-        public IEnumerable<IRow> Read(int page, int pageSize) {
+        public PageResult GetPage(int page, int pageSize) {
+            var result = new PageResult();
             _entity.Page = page;
             _entity.PageSize = pageSize;
-            return _reader.Run(_process);
+            result.Rows = _reader.Run(_process).ToArray(); // enumerate so i can get hits count back
+            result.Fields = _fields;
+            result.Hits = _entity.Hits;
+            return result;
         }
 
-        public Field[] Fields() {
-            return _fields;
-        }
     }
 }

@@ -17,6 +17,7 @@
 using System.Collections.Generic;
 using CommandLine;
 using CommandLine.Text;
+using Pipeline.Contracts;
 
 namespace JunkDrawer {
 
@@ -43,6 +44,9 @@ namespace JunkDrawer {
         [Option('d', "database", Required = false, HelpText = "Override the configuration's output database.")]
         public string Database { get; set; }
 
+        [Option('o', "owner", Required = false, HelpText = "Override the configuration's owner (schema) database.")]
+        public string Schema { get; set; }
+
         [Option('v', "view", Required = false, HelpText = "Override the configuration's output view.")]
         public string Table { get; set; }
 
@@ -52,6 +56,10 @@ namespace JunkDrawer {
 
         [Option('p', "password", Required = false, HelpText = "Override the configuration's output password.")]
         public string Password { get; set; }
+
+        [Option('l', "loglevel", Required = false, DefaultValue = LogLevel.Info, HelpText = "The log level (i.e. none, info, debug, warn, error).")]
+        public LogLevel LogLevel { get; set; }
+
 
         [HelpOption]
         public string GetUsage() {

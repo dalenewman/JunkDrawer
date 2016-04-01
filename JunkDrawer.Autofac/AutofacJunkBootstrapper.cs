@@ -15,19 +15,20 @@
 // limitations under the License.
 #endregion
 using Autofac;
+using Pipeline.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class AutofacJunkBootstrapper : IJunkBootstrapper {
         private readonly ILifetimeScope _scope;
-        public AutofacJunkBootstrapper(JunkRequest request) {
+        public AutofacJunkBootstrapper(JunkRequest request, IPipelineLogger logger = null) {
             var builder = new ContainerBuilder();
-            builder.RegisterModule(new JunkModule(request));
+            builder.RegisterModule(new JunkModule(request, logger));
             _scope = builder.Build().BeginLifetimeScope();
         }
 
-        public AutofacJunkBootstrapper() {
+        public AutofacJunkBootstrapper(IPipelineLogger logger = null) {
             var builder = new ContainerBuilder();
-            builder.RegisterModule(new JunkModule());
+            builder.RegisterModule(new JunkModule(logger));
             _scope = builder.Build().BeginLifetimeScope();
         }
 
