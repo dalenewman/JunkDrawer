@@ -31,6 +31,9 @@ namespace JunkDrawer {
         [Cfg(required = true)]
         public List<Connection> Connections { get; set; }
 
+        [Cfg(value=false)]
+        public bool CalculateHashCode { get; set; }
+
         protected override void Validate() {
             if (Connections.Count < 2) {
                 Error("You need at least two connections defined; one named 'input', and one named 'output.'");

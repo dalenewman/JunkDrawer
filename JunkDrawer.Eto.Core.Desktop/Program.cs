@@ -56,7 +56,12 @@ namespace JunkDrawer.Eto.Core.Desktop {
             var builder = new ContainerBuilder();
             builder.RegisterType<FileReader>().As<IReader>();
             builder.Register((c, p) => new JunkCfg(options.Configuration, c.Resolve<IReader>())).As<JunkCfg>();
-            builder.Register<IPipelineLogger>(c => new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger("JunkDrawer", options.LogLevel))).As<IPipelineLogger>().SingleInstance();
+            builder.Register<IPipelineLogger>(c => {
+                if (options.LogLevel == LogLevel.None)
+                    return new NLogPipelineLogger("JunkDraswer", options.LogLevel);
+                return new CompositeLogger(new TextAreaLogger(options.LogLevel),
+                    new NLogPipelineLogger("JunkDrawer", options.LogLevel));
+            }).As<IPipelineLogger>().SingleInstance();
             builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = "JunkDrawer", Key = "JunkDrawer" }.WithDefaults()));
             builder.Register(c => new AutofacJunkBootstrapperFactory(c.Resolve<IPipelineLogger>())).As<IJunkBootstrapperFactory>();
 
@@ -66,6 +71,7 @@ namespace JunkDrawer.Eto.Core.Desktop {
                     scope.Resolve<IJunkBootstrapperFactory>(),
                     scope.Resolve<JunkCfg>(),
                     scope.Resolve<IContext>(),
+                    options.LogLevel,
                     options.File,
                     options.Configuration
                     )

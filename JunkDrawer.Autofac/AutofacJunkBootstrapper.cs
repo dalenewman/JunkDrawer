@@ -23,12 +23,16 @@ namespace JunkDrawer.Autofac {
         public AutofacJunkBootstrapper(JunkRequest request, IPipelineLogger logger = null) {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new JunkModule(request, logger));
+            builder.RegisterModule(new JunkImportModule());
+            builder.RegisterModule(new JunkPageModule());
             _scope = builder.Build().BeginLifetimeScope();
         }
 
         public AutofacJunkBootstrapper(IPipelineLogger logger = null) {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new JunkModule(logger));
+            builder.RegisterModule(new JunkImportModule());
+            builder.RegisterModule(new JunkPageModule());
             _scope = builder.Build().BeginLifetimeScope();
         }
 

@@ -15,6 +15,7 @@
 // limitations under the License.
 #endregion
 using System;
+using System.ComponentModel;
 using System.Linq;
 using Eto.Forms;
 using Eto.Drawing;
@@ -28,6 +29,8 @@ namespace JunkDrawer.Eto.Core {
         private readonly IJunkBootstrapperFactory _factory;
         private readonly JunkCfg _junkCfg;
         private readonly IContext _context;
+        private readonly LogLevel _logLevel;
+        private readonly BackgroundWorker _worker = new BackgroundWorker();
 
         public TextArea LogArea { get; } = new TextArea { Wrap = false, };
         public int Hits { get; set; }
@@ -39,18 +42,25 @@ namespace JunkDrawer.Eto.Core {
             IJunkBootstrapperFactory factory,
             JunkCfg junkCfg,
             IContext context,
+            LogLevel logLevel,
             string file,
             string configuration
         ) {
             _factory = factory;
             _junkCfg = junkCfg;
             _context = context;
+            _logLevel = logLevel;
             _configuration = configuration;
 
             Title = "Junk Drawer";
             ClientSize = new Size(800, 600);
             CreateMenu();
-            Import(file);
+
+            _worker.DoWork += (sender, args) => { Import(file); };
+            if (!string.IsNullOrEmpty(file)) {
+                _worker.RunWorkerAsync();
+            }
+
         }
 
         private void CreateMenu() {
@@ -69,8 +79,11 @@ namespace JunkDrawer.Eto.Core {
 
                 Title = $"Junk Drawer ({openDialogue.FileName})";
 
-                Import(openDialogue.FileName);
-
+                if (_worker.IsBusy) {
+                    MessageBox.Show("You must cancel your last request before starting another.");
+                } else {
+                    Import(openDialogue.FileName);
+                }
             };
 
             // QUIT
@@ -118,7 +131,7 @@ namespace JunkDrawer.Eto.Core {
 
             Content = new Splitter {
                 Panel1 = GetSpinner(),
-                Panel2 = LogArea,
+                Panel2 = _logLevel == LogLevel.None ? null : LogArea,
                 Orientation = Orientation.Vertical
             };
 
@@ -152,7 +165,7 @@ namespace JunkDrawer.Eto.Core {
                     _context.Error(ex, ex.Message);
                     Content = new Splitter {
                         Panel1 = null,
-                        Panel2 = LogArea,
+                        Panel2 = _logLevel == LogLevel.None ? null : LogArea,
                         Orientation = Orientation.Vertical
                     };
 
@@ -233,7 +246,13 @@ namespace JunkDrawer.Eto.Core {
 
         private GridView GetGrid() {
 
-            var grid = new GridView { GridLines = GridLines.Both };
+            var grid = new GridView { GridLines = GridLines.None };
+
+            grid.CellFormatting += (sender, e) => {
+                e.BackgroundColor = e.Row % 2 == 0 ? Colors.White : Colors.WhiteSmoke;
+                e.ForegroundColor = Colors.Black;
+            };
+
             _context.Info("Requesting page " + Page);
 
             using (var scope = _factory.Produce(Request)) {

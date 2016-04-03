@@ -41,6 +41,7 @@ namespace JunkDrawer {
             process.Entities = schema.Entities;
             foreach (var entity in process.Entities) {
                 entity.PrependProcessNameToOutputName = false;
+                entity.CalculateHashCode = _cfg.CalculateHashCode;
             }
             if (!string.IsNullOrEmpty(_cfg.Output().Table) && _cfg.Output().Table != Constants.DefaultSetting) {
                 process.Entities.First().Alias = _cfg.Output().Table;

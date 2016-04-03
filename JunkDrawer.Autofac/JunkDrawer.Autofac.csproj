@@ -108,6 +108,8 @@
     <Compile Include="AutofacJunkBootstrapper.cs" />
     <Compile Include="AutofacJunkBootstrapperFactory.cs" />
     <Compile Include="JunkModule.cs" />
+    <Compile Include="JunkPageModule.cs" />
+    <Compile Include="JunkImportModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReverseConfiguration.cs" />
     <Compile Include="RunTimeExecutor.cs" />

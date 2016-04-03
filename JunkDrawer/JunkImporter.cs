@@ -42,8 +42,8 @@ namespace JunkDrawer {
 
                 var starFields = _process.GetStarFields().ToArray();
                 var fields = new List<Field>();
-                fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
-                fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
+                fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
+                fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
 
                 return new JunkResponse {
                     Records = entity.Inserts,
