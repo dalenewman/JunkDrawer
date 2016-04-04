@@ -125,5 +125,29 @@ namespace JunkDrawer {
             }
         }
 
+        public int GetCacheKey(JunkCfg cfg) {
+            unchecked {
+                var hash = 17;
+                var input = cfg.Input();
+                var output = cfg.Output();
+
+                hash = hash * 23 + input.MinLength.GetHashCode();
+                hash = hash * 23 + input.MaxLength.GetHashCode();
+
+                hash = hash * 23 + Provider?.GetHashCode() ?? output.Provider.GetHashCode();
+                hash = hash * 23 + Server?.GetHashCode() ?? output.Server.GetHashCode();
+                hash = hash * 23 + Database?.GetHashCode() ?? output.Database.GetHashCode();
+                hash = hash * 23 + Schema?.GetHashCode() ?? output.Schema.GetHashCode();
+                hash = hash * 23 + View?.GetHashCode() ?? output.Table.GetHashCode();
+                hash = hash * 23 + Math.Max(Port, output.Port).GetHashCode();
+                hash = hash * 23 + DatabaseFile?.GetHashCode() ?? output.File.GetHashCode();
+
+                hash = hash * 23 + FileInfo.FullName.GetHashCode();
+                hash = hash + 23 + FileInfo.LastWriteTimeUtc.GetHashCode();
+
+                return hash;
+            }
+        }
+
     }
 }

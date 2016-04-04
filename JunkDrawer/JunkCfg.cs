@@ -15,6 +15,7 @@
 // limitations under the License.
 #endregion
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Cfg.Net;
 using Cfg.Net.Contracts;
@@ -53,6 +54,7 @@ namespace JunkDrawer {
         public Connection Output() {
             return Connections.First(c => c.Name == "output");
         }
+
     }
 
 }

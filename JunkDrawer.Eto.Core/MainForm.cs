@@ -32,7 +32,7 @@ namespace JunkDrawer.Eto.Core {
         private readonly LogLevel _logLevel;
         private readonly BackgroundWorker _worker = new BackgroundWorker();
 
-        public TextArea LogArea { get; } = new TextArea { Wrap = false, };
+        public TextArea LogArea { get; } = new TextArea { Wrap = false };
         public int Hits { get; set; }
         public int PageSize { get; set; }
         public int Page { get; set; }
@@ -129,6 +129,7 @@ namespace JunkDrawer.Eto.Core {
 
         private void Import(string fileName) {
 
+            LogArea.Text = string.Empty;
             Content = new Splitter {
                 Panel1 = GetSpinner(),
                 Panel2 = _logLevel == LogLevel.None ? null : LogArea,
@@ -192,7 +193,7 @@ namespace JunkDrawer.Eto.Core {
                 grid = GetGrid();
 
                 var pages = Convert.ToInt32(Math.Ceiling((decimal)Hits / PageSize));
-                var imageSize = new Size(16, 16);
+                var imageSize = new Size(22, 20);
 
                 var first = new Button { Image = Icons.First, Size = imageSize, Enabled = Page > 1 };
                 first.Click += (sender, args) => {
@@ -220,6 +221,20 @@ namespace JunkDrawer.Eto.Core {
                     ShowPage();
                 };
 
+                var pageSize = new NumericUpDown {
+                    MinValue = 10,
+                    MaxValue = 50,
+                    Increment = 5,
+                    DecimalPlaces = 0,
+                    Value = PageSize,
+                    Width = 50
+                };
+                pageSize.ValueChanged += (sender, args) => {
+                    Page = 1;
+                    PageSize = Convert.ToInt32(pageSize.Value);
+                    ShowPage();
+                };
+
                 controls = new TableLayout {
                     Spacing = Extensions.Spacing,
                     Rows = { new TableRow(
@@ -229,7 +244,8 @@ namespace JunkDrawer.Eto.Core {
                     new TableCell(description),
                     new TableCell(next),
                     new TableCell(last),
-                    null
+                    null,
+                    new TableCell(pageSize)
                 )}
                 };
             }

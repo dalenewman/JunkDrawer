@@ -30,22 +30,38 @@ using Pipeline.Provider.File;
 namespace JunkDrawer.Autofac {
     public class JunkImportModule : Module {
 
+        private static readonly IDictionary<int, Process> Cache = new Dictionary<int, Process>();
+
         protected override void Load(ContainerBuilder builder) {
 
-            builder.Register<ISchemaReader>((ctx, p) => {
-                var connection = ctx.Resolve<JunkCfg>(p).Input();
-                var fileInfo = new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
-                var context = new ConnectionContext(ctx.Resolve<IContext>(p), connection);
-                var cfg = connection.Provider == "file" ?
-                    new FileInspection(context, fileInfo).Create() :
-                    new ExcelInspection(context, fileInfo).Create();
-                var process = ctx.Resolve<Process>(p.Concat(new[] { new NamedParameter("cfg", cfg) }));
-                process.Pipeline = "linq";
-                return new SchemaReader(context, new RunTimeRunner(context), process);
-            }).As<ISchemaReader>().InstancePerLifetimeScope();
+            // an input connection
+            builder.Register((c, p) => c.Resolve<JunkCfg>(p).Input()).As<Connection>();
 
-            // Write Configuration based on schema results and JunkRequest
-            builder.Register<IRunTimeExecute>((c, p) => new RunTimeExecutor(c.Resolve<IContext>(p))).As<IRunTimeExecute>();
+            // a cleaned up file info
+            builder.Register((c, p) => {
+                var connection = c.Resolve<Connection>();
+                return new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
+            }).As<FileInfo>();
+
+            // an input connection context
+            builder.Register<IConnectionContext>((c, p) => new ConnectionContext(c.Resolve<IContext>(p), c.Resolve<Connection>())).As<IConnectionContext>();
+
+            // a schema reader for file or excel
+            builder.Register<ISchemaReader>((c, p) => {
+
+                var context = c.Resolve<IConnectionContext>();
+
+                var cfg = context.Connection.Provider == "file" ?
+                    new FileInspection(context, c.Resolve<FileInfo>()).Create() :
+                    new ExcelInspection(context, c.Resolve<FileInfo>()).Create();
+                var process = c.Resolve<Process>(p.Concat(new[] { new NamedParameter("cfg", cfg) }));
+                process.Pipeline = "parallel.linq";
+
+                return new SchemaReader(context, new RunTimeRunner(context), process);
+            }).As<ISchemaReader>();
+
+
+            builder.Register<IRunTimeExecute>((c, p) => new RunTimeExecutor(c.Resolve<IConnectionContext>())).As<IRunTimeExecute>();
 
             // when you resolve a process, you need to add a cfg parameter
             builder.Register((c, p) => {
@@ -54,11 +70,21 @@ namespace JunkDrawer.Autofac {
                 var cfg = new JunkConfigurationCreator(c.Resolve<JunkCfg>(p), c.Resolve<ISchemaReader>(p)).Create();
                 parameters.Add(new NamedParameter("cfg", cfg));
                 return c.Resolve<Process>(parameters);
-            }).Named<Process>("import").InstancePerLifetimeScope();
+            }).Named<Process>("import");
 
-            // Final products are JunkImporter and JunkPager
+            // Final product is JunkImporter
             builder.Register((c, p) => {
-                var process = c.ResolveNamed<Process>("import", p);
+                var context = c.Resolve<IConnectionContext>();
+                var key = p.TypedAs<JunkRequest>().GetCacheKey(c.Resolve<JunkCfg>());
+                Process process;
+                if (Cache.ContainsKey(key)) {
+                    process = Cache[key];
+                    context.Info("Using cached delimiter, header, type, and string-length inspection.");
+                } else {
+                    process = c.ResolveNamed<Process>("import", p);
+                    Cache[key] = process;
+                    context.Info("Cached delimiter, header, type, and string-length inspection.");
+                }
                 return new JunkImporter(process, c.Resolve<IRunTimeExecute>(p));
             }).As<JunkImporter>();
 
