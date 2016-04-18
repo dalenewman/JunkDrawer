@@ -21,9 +21,9 @@ using Pipeline.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class ReverseConfiguration : ICreateConfiguration {
-        private readonly JunkResponse _response;
+        private readonly Response _response;
 
-        public ReverseConfiguration(JunkResponse response) {
+        public ReverseConfiguration(Response response) {
             _response = response;
         }
 

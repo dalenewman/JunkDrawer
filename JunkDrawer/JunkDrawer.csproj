@@ -62,25 +62,26 @@
     </Reference>
     <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Command\bin\Debug\Pipeline.Portable.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IFolder.cs" />
     <Compile Include="IJunkBootstrapper.cs" />
     <Compile Include="IJunkBootstrapperFactory.cs" />
     <Compile Include="IPager.cs" />
     <Compile Include="IResolvable.cs" />
-    <Compile Include="JunkCfg.cs" />
-    <Compile Include="JunkConfigurationCreator.cs" />
-    <Compile Include="JunkImporter.cs" />
-    <Compile Include="JunkPager.cs" />
+    <Compile Include="Cfg.cs" />
+    <Compile Include="ConfigurationCreator.cs" />
+    <Compile Include="Importer.cs" />
+    <Compile Include="Pager.cs" />
     <Compile Include="PageResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="JunkRequest.cs" />
-    <Compile Include="JunkResponse.cs" />
+    <Compile Include="Request.cs" />
+    <Compile Include="Response.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

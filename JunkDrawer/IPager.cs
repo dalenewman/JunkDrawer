@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 namespace JunkDrawer {
     public interface IPager : IResolvable {
         PageResult GetPage(int page, int pageSize);

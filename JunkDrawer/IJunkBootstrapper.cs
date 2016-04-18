@@ -19,7 +19,7 @@ using System;
 namespace JunkDrawer {
     public interface IJunkBootstrapper : IDisposable {
         T Resolve<T>() where T : IResolvable;
-        T Resolve<T>(JunkRequest request) where T : IResolvable;
-        T Resolve<T>(JunkRequest request, JunkResponse response) where T : IResolvable;
+        T Resolve<T>(Request request) where T : IResolvable;
+        T Resolve<T>(Request request, Response response) where T : IResolvable;
     }
 }

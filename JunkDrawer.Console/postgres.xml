@@ -5,6 +5,6 @@
          provider="postgresql"
          database="Junk"
          user="postgres"
-         password="********"/>
+         password="password"/>
   </connections>
 </jd>

@@ -44,7 +44,7 @@ namespace JunkDrawer {
                 return;
             }
 
-            var request = new JunkRequest(options.File) {
+            var request = new Request(options.File) {
                 Configuration = options.Configuration ?? "default.xml",
                 Types = options.Types,
                 View = options.Table,
@@ -64,9 +64,9 @@ namespace JunkDrawer {
 
             try {
 
-                using (var bootstrapper = new AutofacJunkBootstrapper(request)) {
+                using (var bootstrapper = new Bootstrapper(request)) {
 
-                    var cfg = bootstrapper.Resolve<JunkCfg>();
+                    var cfg = bootstrapper.Resolve<Cfg>();
 
                     if (cfg.Errors().Any()) {
                         foreach (var error in cfg.Errors()) {
@@ -74,7 +74,7 @@ namespace JunkDrawer {
                             Environment.ExitCode = Error;
                         }
                     } else {
-                        var response = bootstrapper.Resolve<JunkImporter>().Import();
+                        var response = bootstrapper.Resolve<Importer>().Import();
                         if (response.Records != 0)
                             return;
                         Console.Error.WriteLine("Did not import any records!");

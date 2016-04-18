@@ -33,22 +33,30 @@
       <HintPath>..\packages\Cfg-NET.0.6.6\lib\CfgNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Eto, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Eto.Forms.2.2.0\lib\net45\Eto.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Pipeline.Portable, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\dnewman\Code\pipeline.net\Pipeline.Portable\bin\Debug\Pipeline.Portable.dll</HintPath>
+      <HintPath>..\packages\Pipeline.Net\Pipeline.Portable.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompositeLogger.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Icons.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="PageGridView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MainForm.cs" />
+    <Compile Include="TextAreaLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

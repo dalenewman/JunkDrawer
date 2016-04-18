@@ -34,10 +34,10 @@ namespace Test {
         [Test]
         public void Demo() {
 
-            JunkResponse response;
-            var request = new JunkRequest(@"C:\Code\JunkDrawer\Test\sample.txt");
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                response = scope.Resolve<JunkImporter>().Import();
+            Response response;
+            var request = new Request(@"C:\Code\JunkDrawer\Test\sample.txt");
+            using (var scope = new Bootstrapper(request)) {
+                response = scope.Resolve<Importer>().Import();
             }
 
             Assert.AreEqual("sample", response.View);
@@ -56,10 +56,10 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -90,10 +90,10 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -126,10 +126,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -163,10 +163,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -192,10 +192,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var fileName = Path.GetTempFileName().Replace(".tmp", ".csv");
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -214,10 +214,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xls";
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -243,10 +243,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xlsx";
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -278,10 +278,10 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                var importer = scope.Resolve<JunkImporter>();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
@@ -313,10 +313,10 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                response = scope.Resolve<JunkImporter>().Import();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                response = scope.Resolve<Importer>().Import();
             }
 
             var companies = new List<Company>();
@@ -347,10 +347,10 @@ Microsofthttp://www.microsoft.com4/4/1975";
             var fileName = Path.GetTempFileName();
             File.WriteAllText(fileName, content);
 
-            JunkResponse response;
-            var request = new JunkRequest(fileName);
-            using (var scope = new AutofacJunkBootstrapper(request)) {
-                response = scope.Resolve<JunkImporter>().Import();
+            Response response;
+            var request = new Request(fileName);
+            using (var scope = new Bootstrapper(request)) {
+                response = scope.Resolve<Importer>().Import();
             }
 
             var lines = new List<string>();

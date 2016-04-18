@@ -16,7 +16,7 @@
 #endregion
 namespace JunkDrawer {
     public interface IJunkBootstrapperFactory {
-        IJunkBootstrapper Produce(JunkRequest request);
+        IJunkBootstrapper Produce(Request request);
         IJunkBootstrapper Produce();
     }
 }

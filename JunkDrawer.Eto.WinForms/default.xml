@@ -1,0 +1,44 @@
+﻿<jd retries="3">
+
+  <connections>
+
+    <add name="input"
+         provider="file"
+         file="*.*"
+         min-length="1"
+         max-length="4000">
+      <delimiters>
+        <add name="comma" character=","/>
+        <add name="pipe" character="|"/>
+        <add name="tab" character="&#009;"/>
+        <add name="semicolon" character=";"/>
+      </delimiters>
+      <types>
+        <!--<add type="bool"/>-->
+        <!--<add type="byte"/>-->
+        <!--<add type="short"/>-->
+        <!--<add type="int"/>-->
+        <!--<add type="long"/>-->
+        <!--<add type="single"/>-->
+        <!--<add type="double"/>-->
+        <!--<add type="decimal"/>-->
+        <!--<add type="datetime"/>-->
+        <!--<add type="guid" />-->
+      </types>
+    </add>
+
+    <add name="output"
+         provider="sqlserver"
+         server="localhost"
+         database="Junk"
+         drop-control="false"/>
+    
+    <!-- other connections for Junk Drawer GUI -->
+    <add name="SQL Junk" provider="sqlserver" server="localhost" database="Junk" open-with="C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\Ssms.exe" />
+    <add name="SQLite Junk" provider="sqlite" file="c:\temp\junk.sqlite3" open-with="C:\Program Files\SqliteBrowser3\bin\sqlitebrowser.exe" />
+    <add name="MySQL Junk" provider="mysql" server="localhost" database="Junk" user="root" password="password" open-with="C:\Program Files\MySQL\MySQL Workbench 6.3 CE\MySQLWorkbench.exe -script" />
+    <add name="PostgreSQL Junk" provider="postgresql" server="localhost" database="Junk" user="postgres" password="password" open-with="C:\Program Files\PostgreSQL\9.4\bin\pgAdmin3.exe /q /f" />
+
+  </connections>
+
+</jd>

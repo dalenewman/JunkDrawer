@@ -15,7 +15,6 @@
 // limitations under the License.
 #endregion
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Autofac;
 using Pipeline.Configuration;
@@ -24,7 +23,6 @@ using Pipeline.Ioc.Autofac.Modules;
 using Pipeline.Nulls;
 
 namespace JunkDrawer.Autofac {
-
     public class RunTimeRunner : IRunTimeRun {
         private readonly IContext _host;
 

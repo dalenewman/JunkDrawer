@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using Pipeline.Contracts;
 
 namespace JunkDrawer.Autofac {
@@ -25,12 +24,12 @@ namespace JunkDrawer.Autofac {
             _logger = logger;
         }
 
-        public IJunkBootstrapper Produce(JunkRequest request) {
-            return new AutofacJunkBootstrapper(request, _logger);
+        public IJunkBootstrapper Produce(Request request) {
+            return new Bootstrapper(request, _logger);
         }
 
         public IJunkBootstrapper Produce() {
-            return new AutofacJunkBootstrapper(_logger);
+            return new Bootstrapper(_logger);
         }
     }
 }

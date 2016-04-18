@@ -30,10 +30,10 @@ using Pipeline.Nulls;
 namespace JunkDrawer.Autofac {
 
     public class JunkModule : Module {
-        private readonly JunkRequest _jr;
+        private readonly Request _jr;
         private readonly IPipelineLogger _logger;
 
-        public JunkModule(JunkRequest jr, IPipelineLogger logger = null) {
+        public JunkModule(Request jr, IPipelineLogger logger = null) {
             _jr = jr;
             _logger = logger;
         }
@@ -46,13 +46,13 @@ namespace JunkDrawer.Autofac {
         public static string ProcessName = "Junk Drawer";
         protected override void Load(ContainerBuilder builder) {
 
-            // Cfg-Net Setup for JunkCfg
+            // Cfg-Net Setup for Cfg
             builder.RegisterType<FileReader>().As<IReader>();
             builder.Register(ctx => _logger ?? new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
-            builder.Register((ctx, p) => _jr ?? p.TypedAs<JunkRequest>()).As<JunkRequest>();
+            builder.Register((ctx, p) => _jr ?? p.TypedAs<Request>()).As<Request>();
 
             builder.Register((ctx, p) => {
-                var entityName = ctx.Resolve<JunkRequest>(p).FileInfo.Name;
+                var entityName = ctx.Resolve<Request>(p).FileInfo.Name;
                 return new PipelineContext(
                     ctx.Resolve<IPipelineLogger>(),
                     new Process { Name = ProcessName, Key = ProcessName }.WithDefaults(),
@@ -62,8 +62,8 @@ namespace JunkDrawer.Autofac {
             }).As<IContext>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
-                var request = ctx.Resolve<JunkRequest>(p);
-                var cfg = new JunkCfg(request.Configuration, ctx.Resolve<IReader>());
+                var request = ctx.Resolve<Request>(p);
+                var cfg = new Cfg(request.Configuration, ctx.Resolve<IReader>());
 
                 // modify the input provider based on the file name requested
                 var input = cfg.Input();
@@ -100,11 +100,12 @@ namespace JunkDrawer.Autofac {
                 }
 
                 return cfg;
-            }).As<JunkCfg>().InstancePerLifetimeScope();
+            }).As<Cfg>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
                 var process = new Process(new NullValidator("js"), new NullValidator("sh"));
-                process.Load(p.Named<string>("cfg"));
+                if(p.Any())
+                    process.Load(p.Named<string>("cfg"));
                 return process;
             }).As<Process>();
         }

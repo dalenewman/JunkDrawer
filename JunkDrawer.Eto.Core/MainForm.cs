@@ -27,64 +27,62 @@ namespace JunkDrawer.Eto.Core {
 
         private readonly string _configuration;
         private readonly IJunkBootstrapperFactory _factory;
-        private readonly JunkCfg _junkCfg;
+        private readonly Cfg _cfg;
         private readonly IContext _context;
         private readonly LogLevel _logLevel;
         private readonly BackgroundWorker _worker = new BackgroundWorker();
 
-        public TextArea LogArea { get; } = new TextArea { Wrap = false };
-        public int Hits { get; set; }
+        public Response Response { get; set; }
+        public TextArea LogArea { get; } = new TextArea {
+            Wrap = false,
+            Font = new Font("Courier,Terminal", 9),
+            TextColor = Colors.LightGreen,
+            BackgroundColor = Colors.Black
+        };
         public int PageSize { get; set; }
         public int Page { get; set; }
-        public JunkRequest Request { get; set; }
 
         public MainForm(
             IJunkBootstrapperFactory factory,
-            JunkCfg junkCfg,
+            Cfg cfg,
             IContext context,
             LogLevel logLevel,
             string file,
             string configuration
         ) {
             _factory = factory;
-            _junkCfg = junkCfg;
+            _cfg = cfg;
             _context = context;
             _logLevel = logLevel;
             _configuration = configuration;
 
-            Title = "Junk Drawer";
+            Title = "Junk Drawer GUI";
             ClientSize = new Size(800, 600);
             CreateMenu();
 
-            _worker.DoWork += (sender, args) => { Import(file); };
-            if (!string.IsNullOrEmpty(file)) {
-                _worker.RunWorkerAsync();
-            }
+            _worker.DoWork += (sender, args) => {
+                args.Result = Import(args.Argument as Request);
+            };
 
+            _worker.RunWorkerCompleted += (sender, args) => {
+                Application.Instance.AsyncInvoke(() => {
+                    Content = ((Func<Control>)args.Result)();
+                });
+            };
+
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            Content = GetWorkingLayout();
+            _worker.RunWorkerAsync(CreateRequest(file));
         }
 
         private void CreateMenu() {
             // OPEN
             _context.Debug(() => "Creating Menu.");
+
             var open = new Command { MenuText = "&Open", ToolBarText = "Open", Shortcut = Application.Instance.CommonModifier | Keys.O };
-
-            open.Executed += (sender, e) => {
-                _context.Debug(() => "Opening file.");
-                var openDialogue = new OpenFileDialog();
-                if (openDialogue.ShowDialog(this) != DialogResult.Ok) {
-                    _context.Debug(() => "Opening file cancelled.");
-                    return;
-                }
-                _context.Debug(() => $"Selected {openDialogue.FileName}.");
-
-                Title = $"Junk Drawer ({openDialogue.FileName})";
-
-                if (_worker.IsBusy) {
-                    MessageBox.Show("You must cancel your last request before starting another.");
-                } else {
-                    Import(openDialogue.FileName);
-                }
-            };
+            open.Executed += OpenOnExecuted;
 
             // QUIT
             var quit = new Command { MenuText = "&Quit", Shortcut = Application.Instance.CommonModifier | Keys.Q };
@@ -99,7 +97,7 @@ namespace JunkDrawer.Eto.Core {
                 if (Platform.Supports<CheckMenuItem>()) {
                     var types = new[] { "bool", "byte", "short", "int", "long", "single", "double", "decimal", "datetime", "guid" };
                     foreach (var type in types) {
-                        typeMenu.Items.Add(new CheckMenuItem { Text = type, Checked = _junkCfg.Input().Types.Any(t => t.Type.StartsWith(type)) });
+                        typeMenu.Items.Add(new CheckMenuItem { Text = type, Checked = _cfg.Input().Types.Any(t => t.Type.StartsWith(type)) });
                     }
                     typeMenu.Items.Add(new CheckMenuItem { Text = "string", Checked = true, Enabled = false });
                 }
@@ -108,7 +106,7 @@ namespace JunkDrawer.Eto.Core {
                     var controller = new RadioMenuItem { Text = "output", Checked = true };
                     connectionMenu.Items.Add(new RadioMenuItem(controller) { Text = "output", Checked = true });
                     connectionMenu.Items.AddSeparator();
-                    foreach (var c in _junkCfg.Connections.Where(c => !c.Name.In("input", "output"))) {
+                    foreach (var c in _cfg.Connections.Where(c => !c.Name.In("input", "output"))) {
                         connectionMenu.Items.Add(new RadioMenuItem(controller) { Text = c.Name, Checked = false });
                     }
                 }
@@ -120,124 +118,148 @@ namespace JunkDrawer.Eto.Core {
             }
         }
 
-        private static Control GetSpinner() {
-            var spinner = new Spinner { Size = new Size(100, 100), Visible = true, Enabled = true };
-            var spinLayout = new DynamicLayout { DefaultSpacing = Extensions.Spacing };
-            spinLayout.AddCentered(spinner);
-            return spinLayout;
+        private void OpenOnExecuted(object sender, EventArgs eventArgs) {
+            _context.Debug(() => "Opening a file.");
+            var openDialogue = new OpenFileDialog();
+            if (openDialogue.ShowDialog(this) != DialogResult.Ok) {
+                _context.Debug(() => "Open file cancelled.");
+                return;
+            }
+            _context.Debug(() => $"Selected {openDialogue.FileName}.");
+
+            Title = $"Junk Drawer GUI ({openDialogue.FileName})";
+
+            if (_worker.IsBusy) {
+                MessageBox.Show("You must cancel your last request before starting another.");
+            } else {
+                _context.Logger.Clear();
+                Content = GetWorkingLayout();
+                _worker.RunWorkerAsync(CreateRequest(openDialogue.FileName));
+            }
         }
 
-        private void Import(string fileName) {
+        private static Control GetSpinner() {
+            var control = new DynamicLayout { DefaultSpacing = Extensions.Spacing };
+            control.AddCentered(new Spinner {
+                Size = new Size(100, 100),
+                Visible = true,
+                Enabled = true
+            });
+            return control;
+        }
 
-            LogArea.Text = string.Empty;
-            Content = new Splitter {
-                Panel1 = GetSpinner(),
-                Panel2 = _logLevel == LogLevel.None ? null : LogArea,
-                Orientation = Orientation.Vertical
-            };
+        private Func<Control> Import(Request request) {
 
-            if (!string.IsNullOrEmpty(fileName)) {
-
-                var selected = Menu.Items.GetSubmenu("Connections").Items.Where(i => !string.IsNullOrEmpty(i.Text)).Cast<RadioMenuItem>().First(mu => mu.Checked).Text;
-                var connection = _junkCfg.Connections.Where(c => !c.Name.In("input", "output")).FirstOrDefault(c => selected == c.Name);
-
-                Request = new JunkRequest(fileName) {
-                    Configuration = _configuration,
-                    Provider = connection?.Provider,
-                    Server = connection?.Server,
-                    Database = connection?.Database,
-                    DatabaseFile = connection?.File, //sqlite
-                    Schema = connection?.Schema,
-                    View = connection?.Table,
-                    User = connection?.User,
-                    Password = connection?.Password,
-                    Port = connection?.Port ?? 0,
-                    Types = Menu.Items.GetSubmenu("Types").Items.Cast<CheckMenuItem>().Where(mi => mi.Checked && mi.Enabled).Select(mi => mi.Text).ToList()
-                };
-                try {
-                    Page = 1;
-                    PageSize = 20;
-                    using (var scope = _factory.Produce(Request)) {
-                        Response = scope.Resolve<JunkImporter>(Request).Import();
-                        _context.Info($"Imported {Response.Records} records into {Response.View}.");
-                        ShowPage();
-                    }
-                } catch (Exception ex) {
-                    _context.Error(ex, ex.Message);
-                    Content = new Splitter {
-                        Panel1 = null,
-                        Panel2 = _logLevel == LogLevel.None ? null : LogArea,
-                        Orientation = Orientation.Vertical
-                    };
-
+            var success = true;
+            try {
+                Page = 1;
+                PageSize = 20;
+                using (var scope = _factory.Produce(request)) {
+                    Response = scope.Resolve<Importer>(request).Import();
+                    _context.Info($"Imported {Response.Records} records into {Response.View}.");
                 }
+            } catch (Exception ex) {
+                _context.Error(ex, ex.Message);
+                success = false;
             }
 
+            return success ? GetSuccessLayout(request) : GetFailLayout(request);
         }
 
-        private void ShowPage() {
-            Content = new Splitter {
-                Panel1 = GetPage(),
-                Panel2 = LogArea,
-                Orientation = Orientation.Vertical
+        private Func<Control> GetSuccessLayout(Request request) {
+            if (_logLevel == LogLevel.None)
+                return () => GetPage(request);
+
+            return () => new Splitter {
+                Panel1 = new Panel { Content = GetPage(request), Height = -1 },
+                Panel2 = new Panel { Content = LogArea, Height = 150 },
+                Orientation = Orientation.Vertical,
+                FixedPanel = SplitterFixedPanel.Panel2
+            };
+
+        }
+
+        private Func<Control> GetFailLayout(Request request) {
+            if (_logLevel == LogLevel.None)
+                return () => new TextArea { Text = $"Could not import {request.FileInfo.Name}! Turn on logging to find out more." };
+
+            return () => new Splitter {
+                Panel1 = new Panel { Content = null, Height = 0 },
+                Panel2 = new Panel { Content = LogArea, Height = 200 },
+                Orientation = Orientation.Vertical,
+                FixedPanel = SplitterFixedPanel.Panel2
             };
         }
 
-        public JunkResponse Response { get; set; }
+        private Control GetWorkingLayout() {
+            if (_logLevel == LogLevel.None)
+                return GetSpinner();
 
-        private Control GetPage() {
-            GridView grid = null;
-            TableLayout controls = null;
+            return new Splitter {
+                Panel1 = new Panel { Content = GetSpinner(), Height = -1 },
+                Panel2 = new Panel { Content = LogArea, Height = 150 },
+                Orientation = Orientation.Vertical,
+                FixedPanel = SplitterFixedPanel.Panel2,
+            };
+        }
 
-            if (Response.Records > 0) {
-                grid = GetGrid();
+        private Control GetPage(Request request) {
 
-                var pages = Convert.ToInt32(Math.Ceiling((decimal)Hits / PageSize));
-                var imageSize = new Size(22, 20);
+            if (Response.Records <= 0)
+                return new TextArea { Text = $"Nothing found in {request.FileInfo.Name}." };
 
-                var first = new Button { Image = Icons.First, Size = imageSize, Enabled = Page > 1 };
-                first.Click += (sender, args) => {
-                    Page = 1;
-                    ShowPage();
-                };
+            PageResult result;
+            using (var scope = _factory.Produce(request)) {
+                result = scope.Resolve<Pager>(request, Response).GetPage(Page, PageSize);
+            }
 
-                var previous = new Button { Image = Icons.Previous, Size = imageSize, Enabled = Page > 1 };
-                previous.Click += (sender, args) => {
-                    Page = Page - 1;
-                    ShowPage();
-                };
+            var pages = Convert.ToInt32(Math.Ceiling((decimal)result.Hits / PageSize));
+            var imageSize = new Size(22, 20);
 
-                var description = new Label { Text = $"Page {Page} of {pages} ({Hits} items)" };
+            var first = new Button { Image = Icons.First, Size = imageSize, Enabled = Page > 1 };
+            first.Click += (sender, args) => {
+                Page = 1;
+                Content = GetSuccessLayout(request)();
+            };
 
-                var next = new Button { Image = Icons.Next, Size = imageSize, Enabled = Page < pages };
-                next.Click += (sender, args) => {
-                    Page = Page + 1;
-                    ShowPage();
-                };
+            var previous = new Button { Image = Icons.Previous, Size = imageSize, Enabled = Page > 1 };
+            previous.Click += (sender, args) => {
+                Page = Page - 1;
+                Content = GetSuccessLayout(request)();
+            };
 
-                var last = new Button { Image = Icons.Last, Size = imageSize, Enabled = Page < pages };
-                last.Click += (sender, args) => {
-                    Page = pages;
-                    ShowPage();
-                };
+            var description = new Label { Text = $"Page {Page} of {pages} ({result.Hits} items)" };
 
-                var pageSize = new NumericUpDown {
-                    MinValue = 10,
-                    MaxValue = 50,
-                    Increment = 5,
-                    DecimalPlaces = 0,
-                    Value = PageSize,
-                    Width = 50
-                };
-                pageSize.ValueChanged += (sender, args) => {
-                    Page = 1;
-                    PageSize = Convert.ToInt32(pageSize.Value);
-                    ShowPage();
-                };
+            var next = new Button { Image = Icons.Next, Size = imageSize, Enabled = Page < pages };
+            next.Click += (sender, args) => {
+                Page = Page + 1;
+                Content = GetSuccessLayout(request)();
+            };
 
-                controls = new TableLayout {
-                    Spacing = Extensions.Spacing,
-                    Rows = { new TableRow(
+            var last = new Button { Image = Icons.Last, Size = imageSize, Enabled = Page < pages };
+            last.Click += (sender, args) => {
+                Page = pages;
+                Content = GetSuccessLayout(request)();
+            };
+
+            var pageSize = new NumericUpDown {
+                MinValue = 10,
+                MaxValue = 50,
+                Increment = 5,
+                DecimalPlaces = 0,
+                Value = PageSize,
+                Width = 50
+            };
+
+            pageSize.ValueChanged += (sender, args) => {
+                Page = 1;
+                PageSize = Convert.ToInt32(pageSize.Value);
+                Content = GetSuccessLayout(request)();
+            };
+
+            var controls = new TableLayout {
+                Spacing = Extensions.Spacing,
+                Rows = { new TableRow(
                     null,
                     new TableCell(first),
                     new TableCell(previous),
@@ -246,48 +268,35 @@ namespace JunkDrawer.Eto.Core {
                     new TableCell(last),
                     null,
                     new TableCell(pageSize)
-                )}
-                };
-            }
+                    )}
+            };
 
-            var table = new TableLayout {
+            return new TableLayout {
                 Rows = {
                     new TableRow(new TableCell(controls)),
-                    new TableRow(new TableCell(grid))
+                    new TableRow(new TableCell(new PageGridView(_context, result)))
                 }
             };
-
-            return table;
         }
 
-        private GridView GetGrid() {
+        public Request CreateRequest(string fileName) {
 
-            var grid = new GridView { GridLines = GridLines.None };
+            var selected = Menu.Items.GetSubmenu("Connections").Items.Where(i => !string.IsNullOrEmpty(i.Text)).Cast<RadioMenuItem>().First(mu => mu.Checked).Text;
+            var connection = _cfg.Connections.Where(c => !c.Name.In("input", "output")).FirstOrDefault(c => selected == c.Name);
 
-            grid.CellFormatting += (sender, e) => {
-                e.BackgroundColor = e.Row % 2 == 0 ? Colors.White : Colors.WhiteSmoke;
-                e.ForegroundColor = Colors.Black;
+            return new Request(fileName) {
+                Configuration = _configuration,
+                Provider = connection?.Provider,
+                Server = connection?.Server,
+                Database = connection?.Database,
+                DatabaseFile = connection?.File, //sqlite
+                Schema = connection?.Schema,
+                View = connection?.Table,
+                User = connection?.User,
+                Password = connection?.Password,
+                Port = connection?.Port ?? 0,
+                Types = Menu.Items.GetSubmenu("Types").Items.Cast<CheckMenuItem>().Where(mi => mi.Checked && mi.Enabled).Select(mi => mi.Text).ToList()
             };
-
-            _context.Info("Requesting page " + Page);
-
-            using (var scope = _factory.Produce(Request)) {
-                var pager = scope.Resolve<JunkPager>(Request, Response);
-                var page = pager.GetPage(Page, PageSize);
-                grid.DataStore = page.Rows;
-                Hits = page.Hits;
-
-                foreach (var field in page.Fields.Where(f => f.Name != "TflKey")) {
-                    grid.Columns.Add(new GridColumn {
-                        DataCell = field.ToCell(),
-                        HeaderText = field.Label,
-                        AutoSize = true,
-                        Editable = false
-                    });
-                }
-            }
-
-            return grid;
         }
 
     }

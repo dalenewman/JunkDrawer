@@ -5,6 +5,6 @@
          provider="mysql"
          database="junk"
          user="root"
-         password="********"/>
+         password="password"/>
   </connections>
 </jd>
