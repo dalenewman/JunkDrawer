@@ -20,18 +20,22 @@ using System.Linq;
 using Cfg.Net.Ext;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
+using Pipeline.Provider.Ado;
 
 namespace JunkDrawer {
     public class Importer : IResolvable {
         private readonly Process _process;
         private readonly IRunTimeExecute _executor;
+        private readonly IConnectionFactory _cf;
 
         public Importer(
             Process process,
-           IRunTimeExecute executor
+            IRunTimeExecute executor,
+            IConnectionFactory cf
         ) {
             _process = process;
             _executor = executor;
+            _cf = cf;
         }
 
         public Response Import() {
@@ -45,11 +49,18 @@ namespace JunkDrawer {
                 fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
                 fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
 
+                var arr = fields.ToArray();
+
                 return new Response {
                     Records = entity.Inserts,
                     Connection = _process.Output(),
-                    Fields = fields.ToArray(),
-                    View = entity.Alias
+                    Fields = arr,
+                    View = entity.Alias,
+                    Sql = $@"USE {_cf.Enclose(_process.Output().Database)};
+
+SELECT
+{(string.Join("," + System.Environment.NewLine, arr.Select(f => "    " + _cf.Enclose(f.Alias))))}
+FROM {_cf.Enclose(entity.Alias)};"
                 };
 
             } catch (Exception) {

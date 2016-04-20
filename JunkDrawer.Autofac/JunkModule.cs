@@ -30,6 +30,7 @@ using Pipeline.Nulls;
 namespace JunkDrawer.Autofac {
 
     public class JunkModule : Module {
+
         private readonly Request _jr;
         private readonly IPipelineLogger _logger;
 

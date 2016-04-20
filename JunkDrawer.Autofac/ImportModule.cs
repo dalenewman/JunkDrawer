@@ -23,8 +23,13 @@ using Pipeline.Configuration;
 using Pipeline.Context;
 using Pipeline.Contracts;
 using Pipeline.Desktop;
+using Pipeline.Provider.Ado;
 using Pipeline.Provider.Excel;
 using Pipeline.Provider.File;
+using Pipeline.Provider.MySql;
+using Pipeline.Provider.PostgreSql;
+using Pipeline.Provider.SqlServer;
+using Pipeline.Provider.SQLite;
 
 
 namespace JunkDrawer.Autofac {
@@ -72,6 +77,24 @@ namespace JunkDrawer.Autofac {
                 return c.Resolve<Process>(parameters);
             }).Named<Process>("import");
 
+            // Connection Factory
+            builder.Register<IConnectionFactory>(c => {
+                var output = c.Resolve<Cfg>().Output();
+                switch (output.Provider) {
+                    case "sqlserver":
+                        return new SqlServerConnectionFactory(output);
+                    case "mysql":
+                        return new MySqlConnectionFactory(output);
+                    case "postgresql":
+                        return new PostgreSqlConnectionFactory(output);
+                    case "sqlite":
+                        return new SqLiteConnectionFactory(output);
+                    default:
+                        return new NullConnectionFactory();
+                }
+            }).As<IConnectionFactory>().InstancePerLifetimeScope();
+
+
             // Final product is Importer
             builder.Register((c, p) => {
                 var context = c.Resolve<IConnectionContext>();
@@ -85,7 +108,7 @@ namespace JunkDrawer.Autofac {
                     Cache[key] = process.Serialize();
                     context.Info("Cached delimiter, header, type, and string-length inspection.");
                 }
-                return new Importer(process, c.Resolve<IRunTimeExecute>(p));
+                return new Importer(process, c.Resolve<IRunTimeExecute>(p), c.Resolve<IConnectionFactory>());
             }).As<Importer>();
 
         }

@@ -18,9 +18,11 @@ using System.IO;
 
 namespace JunkDrawer.Autofac {
     public class AppDataFolder : IFolder {
+
         public const string Folder = "JunkDrawer";
         public const string Ext = ".sql";
         private readonly string _path;
+
         public AppDataFolder() {
             var appDataPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             _path = Path.Combine(appDataPath, Folder);
@@ -28,6 +30,7 @@ namespace JunkDrawer.Autofac {
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
         }
+
         public string Read(int key) {
             return File.ReadAllText(FileName(key));
         }
@@ -37,7 +40,7 @@ namespace JunkDrawer.Autofac {
         }
 
         public string FileName(int key) {
-            return Path.Combine(_path, key.ToString(), Ext);
+            return Path.Combine(_path, "Jd" + key + Ext);
         }
     }
 }

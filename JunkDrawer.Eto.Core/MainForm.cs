@@ -16,6 +16,7 @@
 #endregion
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using Eto.Forms;
 using Eto.Drawing;
@@ -29,6 +30,7 @@ namespace JunkDrawer.Eto.Core {
         private readonly IJunkBootstrapperFactory _factory;
         private readonly Cfg _cfg;
         private readonly IContext _context;
+        private readonly IFolder _folder;
         private readonly LogLevel _logLevel;
         private readonly BackgroundWorker _worker = new BackgroundWorker();
 
@@ -46,6 +48,7 @@ namespace JunkDrawer.Eto.Core {
             IJunkBootstrapperFactory factory,
             Cfg cfg,
             IContext context,
+            IFolder folder,
             LogLevel logLevel,
             string file,
             string configuration
@@ -53,6 +56,7 @@ namespace JunkDrawer.Eto.Core {
             _factory = factory;
             _cfg = cfg;
             _context = context;
+            _folder = folder;
             _logLevel = logLevel;
             _configuration = configuration;
 
@@ -130,7 +134,7 @@ namespace JunkDrawer.Eto.Core {
             Title = $"Junk Drawer GUI ({openDialogue.FileName})";
 
             if (_worker.IsBusy) {
-                MessageBox.Show("You must cancel your last request before starting another.");
+                MessageBox.Show(this, "You must cancel your last request before starting another.", "Busy", MessageBoxButtons.OK);
             } else {
                 _context.Logger.Clear();
                 Content = GetWorkingLayout();
@@ -156,6 +160,7 @@ namespace JunkDrawer.Eto.Core {
                 PageSize = 20;
                 using (var scope = _factory.Produce(request)) {
                     Response = scope.Resolve<Importer>(request).Import();
+                    _folder.Write(request.ToKey(_cfg), Response.Sql);
                     _context.Info($"Imported {Response.Records} records into {Response.View}.");
                 }
             } catch (Exception ex) {
@@ -214,15 +219,14 @@ namespace JunkDrawer.Eto.Core {
             }
 
             var pages = Convert.ToInt32(Math.Ceiling((decimal)result.Hits / PageSize));
-            var imageSize = new Size(22, 20);
 
-            var first = new Button { Image = Icons.First, Size = imageSize, Enabled = Page > 1 };
+            var first = new Button { Image = Icons.First, Enabled = Page > 1, Size = new Size(-1, -1) };
             first.Click += (sender, args) => {
                 Page = 1;
                 Content = GetSuccessLayout(request)();
             };
 
-            var previous = new Button { Image = Icons.Previous, Size = imageSize, Enabled = Page > 1 };
+            var previous = new Button { Image = Icons.Previous, Enabled = Page > 1, Size = new Size(-1, -1) };
             previous.Click += (sender, args) => {
                 Page = Page - 1;
                 Content = GetSuccessLayout(request)();
@@ -230,16 +234,34 @@ namespace JunkDrawer.Eto.Core {
 
             var description = new Label { Text = $"Page {Page} of {pages} ({result.Hits} items)" };
 
-            var next = new Button { Image = Icons.Next, Size = imageSize, Enabled = Page < pages };
+            var next = new Button { Image = Icons.Next, Enabled = Page < pages, Size = new Size(-1, -1) };
             next.Click += (sender, args) => {
                 Page = Page + 1;
                 Content = GetSuccessLayout(request)();
             };
 
-            var last = new Button { Image = Icons.Last, Size = imageSize, Enabled = Page < pages };
+            var last = new Button { Image = Icons.Last, Enabled = Page < pages, Size = new Size(-1,-1)};
             last.Click += (sender, args) => {
                 Page = pages;
                 Content = GetSuccessLayout(request)();
+            };
+
+            var sql = new Button { Image = Icons.Sql, Size = new Size(-1, -1) };
+            sql.Click += (sender, args) => {
+                var selected = Menu.Items.GetSubmenu("Connections").Items.Where(i => !string.IsNullOrEmpty(i.Text)).Cast<RadioMenuItem>().First(mu => mu.Checked).Text;
+                var connection = _cfg.Connections.Where(c => c.Name != "input").FirstOrDefault(c => selected == c.Name);
+
+                if (string.IsNullOrEmpty(connection?.OpenWith)) {
+                    MessageBox.Show(this, "You must add the open-with attribute in your output connection.  Set it to the application you want to use.", "Setup", MessageBoxButtons.OK);
+                } else {
+                    var arguments = string.IsNullOrEmpty(connection.File)
+                        ? $" \"{(_folder.FileName(request.ToKey(_cfg)))}\""
+                        : $"\"{connection.File}\"";  //sqlite
+
+                    _context.Info($"Starting {connection.OpenWith} {arguments}");
+                    var startInfo = new ProcessStartInfo { FileName = connection.OpenWith, Arguments = arguments };
+                    Process.Start(startInfo);
+                }
             };
 
             var pageSize = new NumericUpDown {
@@ -247,8 +269,7 @@ namespace JunkDrawer.Eto.Core {
                 MaxValue = 50,
                 Increment = 5,
                 DecimalPlaces = 0,
-                Value = PageSize,
-                Width = 50
+                Value = PageSize
             };
 
             pageSize.ValueChanged += (sender, args) => {
@@ -267,6 +288,7 @@ namespace JunkDrawer.Eto.Core {
                     new TableCell(next),
                     new TableCell(last),
                     null,
+                    new TableCell(sql),
                     new TableCell(pageSize)
                     )}
             };

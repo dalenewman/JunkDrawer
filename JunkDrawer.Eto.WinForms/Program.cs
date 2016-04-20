@@ -31,7 +31,10 @@ using Pipeline.Logging.NLog;
 using Environment = System.Environment;
 
 namespace JunkDrawer.Eto.WinForms {
+
     public class Program {
+
+        private const string ProcessName = "JunkDrawer";
         private const int Error = 1;
 
         [STAThread]
@@ -58,13 +61,14 @@ namespace JunkDrawer.Eto.WinForms {
             builder.Register((c, p) => new Cfg(options.Configuration, c.Resolve<IReader>())).As<Cfg>();
             builder.Register<IPipelineLogger>(c => {
                 if (options.LogLevel == LogLevel.None)
-                    return new NLogPipelineLogger("JunkDrawer", options.LogLevel);
+                    return new NLogPipelineLogger(ProcessName, options.LogLevel);
 
-                return new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger("JunkDrawer", options.LogLevel));
+                return new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger(ProcessName, options.LogLevel));
             }).As<IPipelineLogger>().SingleInstance();
 
-            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = "JunkDrawer", Key = "JunkDrawer" }.WithDefaults()));
+            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = ProcessName, Key = ProcessName }.WithDefaults()));
             builder.Register(c => new AutofacJunkBootstrapperFactory(c.Resolve<IPipelineLogger>())).As<IJunkBootstrapperFactory>();
+            builder.RegisterType<AppDataFolder>().As<IFolder>();
 
             using (var scope = builder.Build().BeginLifetimeScope()) {
                 var app = new Application(Platform.Detect);
@@ -72,6 +76,7 @@ namespace JunkDrawer.Eto.WinForms {
                     scope.Resolve<IJunkBootstrapperFactory>(),
                     scope.Resolve<Cfg>(),
                     scope.Resolve<IContext>(),
+                    scope.Resolve<IFolder>(),
                     options.LogLevel,
                     options.File,
                     options.Configuration
