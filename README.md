@@ -1,74 +1,64 @@
 JunkDrawer
 ==============
-JunkDrawer imports an excel or delimited file into 
+JunkDrawer imports excel or delimited files into 
 a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under
 Apache 2.
 
 ### Introduction
 
-**analyst**: "*Is there something that just
-automatically imports files into a database?*"
+**analyst**: *"Is there something that automatically imports files into a database?"*
 
-**programmer**: "*No. You have to use the data import wizard.*"
+**programmer**: *"Use the import wizard."*
 
-The data analyst sighed as he recalled the wizard.
+The data analyst sighed as he recalled the wizard...
 
 <img src="http://www.codeproject.com/KB/database/716239/SqlServerImportExportWizard.png" class="img-responsive img-thumbnail" alt="SQL Server Import Wizard" />
+<br/>
 
-Using the wizard to import a text file into SQL Server 
-goes something like this:
+Wizarding data into SQL Server goes something like this:
 
 *   Install SQL Server Management Studio.
 *   Find Tasks and choose Import Data.
-*   Select &quot;Flat File Source.&quot;
+*   Select "Flat File Source."
 *   Browse for the file.
 *   Preview the data.
 *   Specify the delimiter.
 *   Specify if the first row is column names.
 *   Preview the data (again).
-*   Go to each column and choose the correct data type or use &quot;Suggest Types&quot; feature.
+*   Go to each column and choose the correct data type or use "Suggest Types."
 *   Choose if you want to save the SSIS package for later.
 *   Execute it
 
-**programmer**: &quot;*The wizard helps you import any kind of file.*&quot;
+**analyst**: *"Is there something that imports the data without asking questions?"*
 
-**analyst**: &quot;*That's great.
-But, it would be better if a program just figured it out
-for me.*&quot;
+**programmer**: *"No.  Use the wizard.  If you get an error 
+message, fix the problem and try again."*
 
-**programmer**: &quot;*Sorry. You have to use the wizard.
-If you get an error message, fix the problem
-and try again.*&quot;
+**analyst**: *"I get a lot of different files.
+Using the wizard is repetitive. This wastes my time."*
 
-**analyst**: &quot;*I get a lot of different files.
-Using the wizard is repetitive.
-This wastes my time.*&quot;
+At this, the programmer shouted assembly language...
 
-At this, the programmer shouted assembly language
-and put the data analyst in a head lock.
-Balling his fist, he pressed his knuckles hard against
-the analyst's head and rubbed *back* and *forth*.
-
-**programmer**: &quot;*You come to my cube, without a ticket,
-complaining about YOUR time being wasted?*&quot;
+**programmer**: *"You come to my cube, without a ticket,
+saying YOUR time is being wasted?"*
 
 ---
 
 Sadly, this scenario happens a lot in IT offices. Recently, 
-while forcing a staff member to learn `SQL`,
-he said:
+while helping a co-worker learn `SQL`, he said:
 
-**staff**: &quot;*SQL is great, but how do I get these files
-into the database?*&quot;
+**staff**: *"SQL is amazing, but how do I get these files
+into the database?"*
 
 I thought of the import wizard, but it didn't feel right. 
-If he found out that he'd have to run the wizard every time 
+If he found out he'd have to run the wizard every time, 
 and most likely deal with error messages, it would be a 
-stumbling block for him. Also, I knew the conversation would most likely
-end in a head-lock (as depicted above).
+stumbling block for him.
 
-So, instead of giving him the beat down, I decided to create a program that 
-makes it easier to import an Excel or text file into a database.
+This gave me the idea to create Junk Drawer; a program that 
+tries to import an Excel or text file into a database 
+without asking questions.
+
 
 ### Getting Started
 
@@ -76,7 +66,7 @@ Junk Drawer refers to files as junk, and the
 database as a drawer.  The file is an input, and 
 the database is an output.  Both are connections. 
 
-To configure the connections, open Junk Drawer's default 
+To configure your connections, open Junk Drawer's default 
 configuration file *default.xml*.
 
 ```xml
@@ -105,8 +95,8 @@ instead.
 The file must be Excel (e.g. `.xls`, `.xlsx`), or a delimited 
 text file (e.g. `.csv`, `.txt`).
 
-I searched Google for `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv). You 
-can find some pretty neat stuff on Google with the `filetype` term. 
+I searched Google for `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv).
+
 Here's a sample of *colors.csv*:
 
 ```bash
@@ -119,14 +109,20 @@ alice_blue,"Alice Blue",#f0f8ff,240,248,255
 alizarin_crimson,"Alizarin Crimson",#e32636,227,38,54
 alloy_orange,"Alloy Orange",#c46210,196,98,16
 almond,"Almond",#efdecd,239,222,205
+...
 ```
 
-Junk Drawer (*jd.exe*) imports it from the command line 
-like this:
+### Command Line
+
+To import the file, execute Junk Drawer with the `-f` (file) flag:
 
 `jd.exe -f c:\temp\colors.csv`
 
-Now it can be queried:
+If a file is the only argument, `-f` is optional. It's only required 
+when combined with other options exposed to the command line interface.
+
+When `jd.exe` is done, the data is in your local SQL Server 
+and it may be queried:
 
 ```sql
 USE Junk;
@@ -150,22 +146,16 @@ amaranth              Amaranth               #e52b50 229 43    80
 amber                 Amber                  #ffbf00 255 191   0
 ```
 
-The resulting data structure is similar to this:
+The `colors` object is a view.  The data columns are defined like so:
 
 ```sql
-CREATE TABLE colors(
-    Code NVARCHAR(40),
-    Name NVARCHAR(42),
-    Hex NVARCHAR(8),
-    Red TINYINT,
-    Green TINYINT,
-    Blue TINYINT
-);
+Code NVARCHAR(40),
+Name NVARCHAR(42),
+Hex NVARCHAR(8),
+Red TINYINT,
+Green TINYINT,
+Blue TINYINT
 ```
-
-**Note**: The actual table has auto-generated column names. However, a 
-view is created with friendly column names (if available).  Also, when a 
-single file name argument is passed into `jd.exe`, the `-f` is not required.  
 
 ### How Does it Work?
 
@@ -223,8 +213,8 @@ and tested for:
 * dates
 
 If there are any of the above, the first line is not suitable 
-for column names. Excel-like column names are generated (i.e. A, B, C) 
-if necessary.  In *colors.csv*, the first line doesn't have any 
+for column names and Excel-like names are generated (i.e. A, B, C). 
+In *colors.csv*, the first line doesn't have any 
 duplicates, empties, white space values, numbers, or dates, 
 so it is used as column names.
 
@@ -253,14 +243,14 @@ the data, add types into the input connection like this:
 
 Currently, types are checked in the order they appear. So, to select the 
 most efficient type, add more restrictive types first. For example, if 
-you test for a `short` (-32,768-32,767), before a `byte` (0-255), 
+you test for a `short` (-32,768 to 32,767), before a `byte` (0 to 255), 
 any *would-be* `bytes` end up as `shorts`.
 
 Every value in a field is checked against a type's restrictions. 
 The first compatible type is used. If no type allows all the values, 
 a `string` is used.
 
-A `string` is tested for length. A field assumes the length 
+A string's length is measured. A field assumes the length 
 of the longest value in the file (+1). If you want control 
 over string length, add `min-length` and/or `max-length` to 
 the connection:
@@ -274,7 +264,7 @@ the connection:
 ```
 
 Once the values are type and/or length checked, Junk Drawer
-tries to import the file
+imports the file
 
 ### In Code
 
@@ -288,12 +278,9 @@ using (var scope = new AutofacJunkBootstrapper(request)) {
 }
 
 ```
-Just like the *jd.exe* executable, `JunkRequest` requires the 
-file name you want to import, and a configuration.
-
-In the case above, I'm using [Autofac](http://autofac.org/) to wire up the 
-`JunkImporter` dependencies.  A `JunkDrawer.Autofac` project is 
-included in the solution to demonstrate how `JunkImporter` is composed.
+The above snippet uses [Autofac](http://autofac.org/) to wire up 
+the `JunkImporter` dependencies.  A `JunkDrawer.Autofac` project 
+is included in the solution.
 
 ### Options
 
@@ -301,13 +288,14 @@ included in the solution to demonstrate how `JunkImporter` is composed.
 By default, Junk Drawer creates a view named after your 
 file (without the extension).  For example, `colors.csv` is 
 named `colors`. If you want to name your view something else, 
-set the `View` property in `JunkRequest`.
+set the `View` property in the `JunkRequest` or use the `-v` 
+flag from the command line.
 
 #### Configuration
 
 If you do not provide a configuration, *default.xml* is used.
 
-The configuration is file based.  You may make as 
+The configuration is file based. You may make as 
 many configurations as you want.  For example, 
 to import into SQLite instead of SQL Server, create 
 a configuration like this:
@@ -323,11 +311,45 @@ a configuration like this:
 </jd>
 ```
 
-Save it as *sqlite.xml*.  Now import *colors.csv* into SQLite:
+Save it as *sqlite.xml*.  Now import *colors.csv* into 
+a SQLite database:
 
 `jd.exe -f c:\temp\colors.csv -a sqlite.xml`
 
-MySql and PostgreSql are also supported.
+The `-a` flag stands for *arrangement*. You can control 
+everything from the arrangment (aka configuration). In addition, 
+you over-ride some options from the command line.  Here is the 
+complete list:
+
+```bash
+-f, --file           Required. The file to import.
+-a, --arrangement    The configuration file (default.xml).
+-t, --types          Override the configuration inspection types, comma
+                     separated (e.g. bool, byte, short, int, long, single,
+                     double, datetime).
+-c, --connection     Override the configuration connection type (e.g.
+                     sqlserver, mysql, postgresql, sqlite).
+-s, --server         Override the configuration output server.
+-n, --port           Override the configuration output port.
+-d, --database       Override the configuration output database.
+-v, --view           Override the configuration output view.
+-u, --user           Override the configuration output user.
+-p, --password       Override the configuration output password.
+--help               Display this help screen.
+```
+
+### GUI
+
+If you'd rather use a GUI (a graphical user-interface), you may 
+use `jdgui.exe`.  It looks like this:
+
+![Junk Drawer GUI](Content/jdgui.png "Junk Drawer GUI")
+
+In addition to importing files into databases, you can page through 
+the data a bit.  Any connections you define in addition to `input` are 
+listed in the connections menu.  This allows you to 
+conveniently switch between connections you use often (just 
+in case you have Junk databases all over the place).
 
 ### Precautions
 
@@ -352,8 +374,7 @@ and run ad-hoc queries until their heart's content.
 
 Of course, there are files out there that are so 
 jacked up that Junk Drawer won't be able handle them. 
-In that case, you'll have to resort to shouting, head-locks,
-and noogies (or an import wizard).
+In that case, you'll have to resort to the import wizard.
 
 ### Credits
 
@@ -371,47 +392,4 @@ Junk Drawer is not possible without:
 * [System.Data.SQLite](https://system.data.sqlite.org)
 * [Npgsql](http://www.npgsql.org/)
 * [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
-
-### Update: 2016-03-25
-
-#### New Command Line Parameters
-I've added a whole bunch of optional command line parameters:
-
-```bash
-Junk Drawer 0.0.4.0
-Copyright - Dale Newman 2013 - Apache 2
-
-  -f, --file           Required. The file to import.
-
-  -a, --arrangement    (Default: default.xml) The configuration file.
-
-  -t, --types          Override the configuration inspection types, comma
-                       separated (e.g. bool, byte, short, int, long, single,
-                       double, datetime).
-
-  -c, --connection     Override the configuration connection type (e.g.
-                       sqlserver, mysql, postgresql, sqlite).
-
-  -s, --server         Override the configuration output server.
-
-  -n, --port           Override the configuration output port.
-
-  -d, --database       Override the configuration output database.
-
-  -v, --view           Override the configuration output view.
-
-  -u, --user           Override the configuration output user.
-
-  -p, --password       Override the configuration output password.
-
-  --help               Display this help screen.
-```
-
-#### Backward Compatibility for Command Line Parameters
-
-If you use a single file name argument, you may omit `-f`.  This way, you 
-can use Junk Drawer with Window's *open with* context menu option.
-
-The `-c` argument was previously used for the configuration file. This should still work. 
-However, going forward, use `-a` (arrangement) for configuration, and use `-c` to over-ride the connection 
-provider.
+* [ETO.Forms](https://github.com/picoe/Eto) - Custom
