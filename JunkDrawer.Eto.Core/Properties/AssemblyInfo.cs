@@ -1,4 +1,5 @@
-﻿#region license
+﻿using System.Runtime.InteropServices;
+#region license
 // JunkDrawer.Eto.Core
 // Copyright 2013 Dale Newman
 //  
@@ -14,6 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -33,7 +35,9 @@ using System.Runtime.CompilerServices;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("0.0.1.0")]
+[assembly: AssemblyFileVersion("0.0.1.0")]
+[assembly: Guid("38C18AC2-4F88-4F99-85F1-CC6D6D561636")]
 
 // The following attributes are used to specify the signing key for the assembly,
 // if desired. See the Mono documentation for more information about signing.

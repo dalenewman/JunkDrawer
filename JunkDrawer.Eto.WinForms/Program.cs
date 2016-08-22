@@ -61,12 +61,12 @@ namespace JunkDrawer.Eto.WinForms {
             builder.Register((c, p) => new Cfg(options.Configuration, c.Resolve<IReader>())).As<Cfg>();
             builder.Register<IPipelineLogger>(c => {
                 if (options.LogLevel == LogLevel.None)
-                    return new NLogPipelineLogger(ProcessName, options.LogLevel);
+                    return new NLogPipelineLogger(ProcessName);
 
-                return new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger(ProcessName, options.LogLevel));
+                return new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger(ProcessName));
             }).As<IPipelineLogger>().SingleInstance();
 
-            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = ProcessName, Key = ProcessName }.WithDefaults()));
+            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = ProcessName }.WithDefaults()));
             builder.Register(c => new AutofacJunkBootstrapperFactory(c.Resolve<IPipelineLogger>())).As<IJunkBootstrapperFactory>();
             builder.RegisterType<AppDataFolder>().As<IFolder>();
 

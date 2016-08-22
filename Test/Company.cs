@@ -28,6 +28,6 @@ namespace Test {
     {
         public string Name { get; set; }
         public string WebSite { get; set; }
-        public Int32 Created { get; set; }
+        public int Created { get; set; }
     }
 }

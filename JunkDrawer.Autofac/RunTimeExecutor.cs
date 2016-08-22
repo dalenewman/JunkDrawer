@@ -18,9 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using JunkDrawer.Autofac.Modules;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
-using Pipeline.Ioc.Autofac.Modules;
 
 namespace JunkDrawer.Autofac {
 
@@ -58,7 +58,7 @@ namespace JunkDrawer.Autofac {
 
             using (var scope = builder.Build().BeginLifetimeScope()) {
                 try {
-                    scope.ResolveNamed<IProcessController>(process.Key).Execute();
+                    scope.Resolve<IProcessController>().Execute();
                 } catch (Exception ex) {
                     _context.Error(ex.Message);
                 }

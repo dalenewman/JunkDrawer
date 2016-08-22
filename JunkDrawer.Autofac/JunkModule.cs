@@ -49,14 +49,14 @@ namespace JunkDrawer.Autofac {
 
             // Cfg-Net Setup for Cfg
             builder.RegisterType<FileReader>().As<IReader>();
-            builder.Register(ctx => _logger ?? new NLogPipelineLogger(ProcessName, LogLevel.Info)).As<IPipelineLogger>().SingleInstance();
+            builder.Register(ctx => _logger ?? new NLogPipelineLogger(ProcessName)).As<IPipelineLogger>().SingleInstance();
             builder.Register((ctx, p) => _jr ?? p.TypedAs<Request>()).As<Request>();
 
             builder.Register((ctx, p) => {
                 var entityName = ctx.Resolve<Request>(p).FileInfo.Name;
                 return new PipelineContext(
                     ctx.Resolve<IPipelineLogger>(),
-                    new Process { Name = ProcessName, Key = ProcessName }.WithDefaults(),
+                    new Process { Name = ProcessName }.WithDefaults(),
                     new Entity { Name = entityName, Alias = entityName, Key = entityName }
                         .WithDefaults()
                     );

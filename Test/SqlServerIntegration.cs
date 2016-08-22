@@ -224,7 +224,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<CompanyForOldExcel>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<CompanyForOldExcel>("SELECT Name,Website,Created FROM " + response.View + ";"));
+                var sql = "SELECT Name,Website,Created FROM " + response.View + ";";
+                companies.AddRange(cn.Query<CompanyForOldExcel>(sql));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -253,7 +254,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var companies = new List<Company>();
 
             using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
+                var sql = "SELECT Name,Website,Created FROM " + response.View + ";";
+                companies.AddRange(cn.Query<Company>(sql));
             }
 
             Assert.AreEqual(4, companies.Count);

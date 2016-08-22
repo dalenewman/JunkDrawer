@@ -17,9 +17,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using JunkDrawer.Autofac.Modules;
 using Pipeline.Configuration;
 using Pipeline.Contracts;
-using Pipeline.Ioc.Autofac.Modules;
 using Pipeline.Nulls;
 
 namespace JunkDrawer.Autofac {
@@ -62,7 +62,7 @@ namespace JunkDrawer.Autofac {
             container.RegisterModule(new ProcessControlModule(process));
 
             using (var scope = container.Build().BeginLifetimeScope()) {
-                return scope.ResolveNamed<IProcessController>(process.Key).Read();
+                return scope.Resolve<IProcessController>().Read();
             }
         }
     }
