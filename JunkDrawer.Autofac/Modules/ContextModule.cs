@@ -17,11 +17,12 @@
 #endregion
 
 using Autofac;
-using Pipeline;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop.Writers;
+using Transformalize;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop.Writers;
+using Transformalize.Impl;
 
 namespace JunkDrawer.Autofac.Modules {
 

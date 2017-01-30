@@ -18,9 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cfg.Net.Ext;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
-using Pipeline.Provider.Ado;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
+using Transformalize.Provider.Ado;
 
 namespace JunkDrawer {
     public class Importer : IResolvable {

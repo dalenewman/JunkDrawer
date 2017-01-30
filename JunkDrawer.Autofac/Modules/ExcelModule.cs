@@ -20,12 +20,12 @@ using System;
 using System.IO;
 using System.Linq;
 using Autofac;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop;
-using Pipeline.Nulls;
-using Pipeline.Provider.Excel;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop;
+using Transformalize.Nulls;
+using Transformalize.Provider.Excel;
 
 namespace JunkDrawer.Autofac.Modules {
     public class ExcelModule : Module {

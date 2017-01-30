@@ -21,36 +21,18 @@ using System.Linq;
 using Autofac;
 using Cfg.Net.Contracts;
 using Cfg.Net.Environment;
-using Cfg.Net.Ext;
 using Cfg.Net.Reader;
-using Cfg.Net.Shorthand;
-using Pipeline;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop.Loggers;
-using Pipeline.Nulls;
-using IParser = Pipeline.Contracts.IParser;
+using Transformalize;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 // ReSharper disable PossibleMultipleEnumeration
 
 namespace JunkDrawer.Autofac.Modules {
 
     public class RootModule : Module {
-        private readonly string _shorthand;
-
-        public RootModule() { }
-
-        public RootModule(string shorthand) {
-            _shorthand = shorthand;
-        }
 
         protected override void Load(ContainerBuilder builder) {
-
-            builder.Register(ctx => new EnvironmentModifier(
-                new PlaceHolderModifier(),
-                new ParameterModifier())
-            ).As<IRootModifier>();
 
             // This reader is used to load the initial configuration and nested resources for tfl actions, etc.
             builder.RegisterType<FileReader>().Named<IReader>("file");
@@ -61,36 +43,10 @@ namespace JunkDrawer.Autofac.Modules {
             );
 
             builder.Register((ctx, p) => {
-
-                var dependencies = new List<IDependency> {
+                var process = new Process(new List<IDependency> {
                     ctx.Resolve<IReader>(),
-                    new PlaceHolderModifier(),
-                    ctx.Resolve<IRootModifier>(),
-                    ctx.ResolveNamed<IValidator>("js"),
-                    new IllegalCharacterValidator("ipc"),
-                    new PlaceHolderValidator()
-                };
-
-                if (!string.IsNullOrEmpty(_shorthand)) {
-                    var shr = new ShorthandRoot(_shorthand, ctx.ResolveNamed<IReader>("file"));
-                    if (shr.Errors().Any()) {
-                        var context = ctx.IsRegistered<IContext>() ? ctx.Resolve<IContext>() : new PipelineContext(ctx.IsRegistered<IPipelineLogger>() ? ctx.Resolve<IPipelineLogger>() : new TraceLogger(), new Process { Name = "Error" }.WithDefaults());
-                        foreach (var error in shr.Errors()) {
-                            context.Error(error);
-                        }
-                        context.Error("Please fix you shorthand configuration.  No short-hand is being processed.");
-                        dependencies.Add(new NullValidator("sh"));
-                        dependencies.Add(new NullNodeModifier("sh"));
-                    } else {
-                        dependencies.Add(new ShorthandValidator(shr, "sh"));
-                        dependencies.Add(new ShorthandModifier(shr, "sh"));
-                    }
-                } else {
-                    dependencies.Add(new NullValidator("sh"));
-                    dependencies.Add(new NullNodeModifier("sh"));
-                }
-
-                var process = new Process(dependencies.ToArray());
+                    new EnvironmentModifier()
+                }.ToArray());
 
                 switch (p.Count()) {
                     case 2:

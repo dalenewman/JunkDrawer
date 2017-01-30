@@ -17,8 +17,8 @@
 #endregion
 
 using Newtonsoft.Json;
-using Pipeline.Context;
-using Pipeline.Contracts;
+using Transformalize.Context;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class JsonNetSerializer : ISerialize {

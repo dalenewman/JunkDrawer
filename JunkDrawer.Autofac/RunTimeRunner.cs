@@ -18,9 +18,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using JunkDrawer.Autofac.Modules;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
-using Pipeline.Nulls;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
+using Transformalize.Nulls;
 
 namespace JunkDrawer.Autofac {
     public class RunTimeRunner : IRunTimeRun {

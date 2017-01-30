@@ -16,8 +16,8 @@
 #endregion
 using System;
 using Eto.Forms;
-using Pipeline.Context;
-using Pipeline.Contracts;
+using Transformalize.Context;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Eto.Core {
     public class TextAreaLogger : IPipelineLogger {

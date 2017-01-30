@@ -16,7 +16,7 @@
 #endregion
 using CommandLine;
 using CommandLine.Text;
-using Pipeline.Contracts;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Eto.Core {
 

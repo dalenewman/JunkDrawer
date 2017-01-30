@@ -19,11 +19,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Pipeline;
-using Pipeline.Actions;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Process = Pipeline.Configuration.Process;
+using Transformalize;
+using Transformalize.Actions;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac.Modules {
     public class ProcessControlModule : Module {

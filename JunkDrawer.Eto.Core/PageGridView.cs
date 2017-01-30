@@ -17,7 +17,7 @@
 using System.Linq;
 using Eto.Drawing;
 using Eto.Forms;
-using Pipeline.Contracts;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Eto.Core {
     public class PageGridView : GridView {

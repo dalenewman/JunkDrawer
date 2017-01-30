@@ -55,47 +55,46 @@ If he found out he'd have to run the wizard every time,
 and most likely deal with error messages, it would be a 
 stumbling block for him.
 
-This gave me the idea to create Junk Drawer; a program that 
-tries to import an Excel or text file into a database 
+This gave me the idea to create a program that 
+imports an Excel or text file into a database 
 without asking questions.
 
 
 ### Getting Started
 
-Junk Drawer refers to files as junk, and the 
-database as a drawer.  The file is an input, and 
+Junk Drawer refers to files as *junk*, and the 
+database as a *drawer*.  The file is an input, and 
 the database is an output.  Both are connections. 
 
-To configure your connections, open Junk Drawer's default 
-configuration file *default.xml*.
+To configure connections, open the default configuration file *default.xml*.
 
 ```xml
 <jd>
   <connections>
+
     <add name="input" 
          provider="file" 
          file="*.*" />
+
     <add name="output" 
          provider="sqlserver" 
          server="localhost" 
          database="Junk" />
+
   </connections>
 </jd>
 ```
 
-The input is set to a file.  The file `*.*` is changed to your 
+The configuration (above) defines two connections: an input, and an output.
+The input is set to a file named `*.*`, which is changed to your 
 file at run-time. The output is set to a local SQL Server database named Junk. 
-For SQL Server, the default database connection uses trusted security. 
-If you're using a native account, you may add a `user` and 
-`password` attribute.  You may also use a `connection-string` attribute 
-instead.
 
-### Get a File
+### The File Input
 
-The file must be Excel (e.g. `.xls`, `.xlsx`), or a delimited 
+The file must be an Excel (e.g. `.xls`, `.xlsx`), or delimited 
 text file (e.g. `.csv`, `.txt`).
 
-I searched Google for `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv).
+I Googled `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv) for this demo.
 
 Here's a sample of *colors.csv*:
 
@@ -116,7 +115,9 @@ almond,"Almond",#efdecd,239,222,205
 
 To import the file, execute Junk Drawer with the `-f` (file) flag:
 
-`jd.exe -f c:\temp\colors.csv`
+```bash
+jd.exe -f c:\temp\colors.csv
+```
 
 If a file is the only argument, `-f` is optional. It's only required 
 when combined with other options exposed to the command line interface.
@@ -192,12 +193,12 @@ the input connection like this:
 
 ```xml
 <add name="input" provider="file" file="*.*">
-    <delimiters>
-        <add name="comma" character=","/>
-        <add name="pipe" character="|"/>
-        <add name="tab" character="&#009;"/>
-        <add name="semicolon" character=";"/>
-    </delimiters>
+  <delimiters>
+     <add name="comma" character=","/>
+     <add name="pipe" character="|"/>
+     <add name="tab" character="&#009;"/>
+     <add name="semicolon" character=";"/>
+  </delimiters>
 </add>
 ```
 
@@ -241,9 +242,9 @@ the data, add types into the input connection like this:
 </add>
 ```
 
-Currently, types are checked in the order they appear. So, to select the 
-most efficient type, add more restrictive types first. For example, if 
-you test for a `short` (-32,768 to 32,767), before a `byte` (0 to 255), 
+Types are checked in the order they appear. So, to select the 
+most efficient type, place more restrictive types ahead of less restrictive types. 
+For example, if you test for a `short` (-32,768 to 32,767), before a `byte` (0 to 255), 
 any *would-be* `bytes` end up as `shorts`.
 
 Every value in a field is checked against a type's restrictions. 
@@ -302,12 +303,12 @@ a configuration like this:
 
 ```xml
 <jd>
-    <connections>
-        <add name="input" provider="file" file="*.*" />
-        <add name="output"
-             provider="sqlite"
-             file="c:\temp\junk.sqlite3" />
-    </connections>
+  <connections>
+    <add name="input" provider="file" file="*.*" />
+    <add name="output"
+         provider="sqlite"
+         file="c:\temp\junk.sqlite3" />
+  </connections>
 </jd>
 ```
 
@@ -349,26 +350,25 @@ In addition to importing files into databases, you can page through
 the data a bit.  Any connections you define in addition to `input` are 
 listed in the connections menu.  This allows you to 
 conveniently switch between connections you use often (just 
-in case you have Junk databases all over the place).
+in case you have junk everywhere).
 
 ### Precautions
 
 #### Junk Overwrite
 
 If you import the same file into Junk Drawer twice, it overwrites 
-the previous table.  Don't worry though; it's only 
-your junk.
+the previous table.  Don't worry though; it's only junk ;-)
 
 #### Junk Overflow
 
 I called it Junk Drawer because allowing folks to 
 import files directly into a database can create a mess. 
 You may want to keep an eye on it, or put your Junk database 
-on an isolated test server where it can't hurt anybody.
+on an isolated test server where it can't hurt anything.
 
 ### Conclusion
 
-Once in place, Junk Drawer can empower your trusted
+Once in place, Junk Drawer empowers your trusted
 friends to import their data into a Junk database
 and run ad-hoc queries until their heart's content.
 
@@ -393,3 +393,4 @@ Junk Drawer is not possible without:
 * [Npgsql](http://www.npgsql.org/)
 * [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
 * [ETO.Forms](https://github.com/picoe/Eto) - Custom
+* [Transformalize](https://github.com/dalenewman/transformalize) - Apache 2 

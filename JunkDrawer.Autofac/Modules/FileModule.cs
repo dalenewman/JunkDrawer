@@ -20,12 +20,12 @@ using System;
 using System.IO;
 using System.Linq;
 using Autofac;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop;
-using Pipeline.Nulls;
-using Pipeline.Provider.File;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop;
+using Transformalize.Nulls;
+using Transformalize.Provider.File;
 
 namespace JunkDrawer.Autofac.Modules {
     public class FileModule : Module {
@@ -88,16 +88,7 @@ namespace JunkDrawer.Autofac.Modules {
                                 return new FileReader(input, rowFactory);
                             }
 
-                            IRowCondition condition = new NullRowCondition();
-                            if (input.Entity.Filter.Any()) {
-                                var expression = input.Entity.Filter.First().Expression;
-                                if (ctx.IsRegisteredWithName<IParser>("js") && ctx.ResolveNamed<IParser>("js").Parse(expression, input.Error)) {
-                                    condition = ctx.Resolve<IRowCondition>(new TypedParameter(typeof(InputContext), input), new TypedParameter(typeof(string), input.Entity.Filter.First().Expression));
-                                } else {
-                                    input.Error($"Your {input.Entity.Alias} script is not parsing or registered. It is not filtering.");
-                                }
-                            }
-                            return new DelimitedFileReader(input, rowFactory, condition);
+                            return new DelimitedFileReader(input, rowFactory);
                         default:
                             return new NullReader(input, false);
                     }

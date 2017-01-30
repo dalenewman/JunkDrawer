@@ -19,14 +19,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop.Transforms;
-using Pipeline.Extensions;
-using Pipeline.Transforms;
-using Pipeline.Transforms.System;
-using Pipeline.Validators;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop.Transforms;
+using Transformalize.Nulls;
+using Transformalize.Transforms;
+using Transformalize.Transforms.System;
+using Transformalize.Validators;
 
 namespace JunkDrawer.Autofac {
     public static class TransformFactory {
@@ -61,8 +61,6 @@ namespace JunkDrawer.Autofac {
                 case "connection": return new ConnectionTransform(context);
                 case "convert": return new ConvertTransform(context);
                 case "copy": return new CopyTransform(context);
-                case "cs": case "csharp": return context.Process.Mode.In("init","check") ? new CsharpLocalTransform(context) : new CsharpRemoteTransform(context) as CSharpBaseTransform;
-                case "datediff": return new DateDiffTransform(context);
                 case "datepart": return new DatePartTransform(context);
                 case "decompress": return new DecompressTransform(context);
                 case "fileext": return new FileExtTransform(context);
@@ -80,14 +78,14 @@ namespace JunkDrawer.Autofac {
                 case "left": return new LeftTransform(context);
                 case "lower": case "tolower": return new ToLowerTransform(context);
                 case "map": return new MapTransform(context);
-                case "match": return new CompiledRegexMatchTransform(context);
+                case "match": return new RegexMatchTransform(context);
                 case "multiply": return new MultiplyTransform(context);
                 case "next": return new NextTransform(context);
                 case "now": return new UtcNowTransform(context);
                 case "padleft": return new PadLeftTransform(context);
                 case "padright": return new PadRightTransform(context);
                 case "razor": return ctx.ResolveNamed<ITransform>("razor", new TypedParameter(typeof(PipelineContext), context));
-                case "regexreplace": return new CompiledRegexReplaceTransform(context);
+                case "regexreplace": return new RegexReplaceTransform(context);
                 case "remove": return new RemoveTransform(context);
                 case "replace": return new ReplaceTransform(context);
                 case "right": return new RightTransform(context);
@@ -96,7 +94,6 @@ namespace JunkDrawer.Autofac {
                 case "tag": return new TagTransform(context);
                 case "timeago": return new RelativeTimeTransform(context, true);
                 case "timeahead": return new RelativeTimeTransform(context, false);
-                case "timezone": return new TimeZoneTransform(context);
                 case "tostring": return new ToStringTransform(context);
                 case "totime": return new ToTimeTransform(context);
                 case "toyesno": return new ToYesNoTransform(context);
@@ -110,7 +107,6 @@ namespace JunkDrawer.Autofac {
                 case "include": return new FilterTransform(context, FilterType.Include);
                 case "exclude": return new FilterTransform(context, FilterType.Exclude);
 
-                case "fromxml": return context.Transform.XmlMode == "all" ? new Pipeline.Desktop.Transforms.FromXmlTransform(context, ctx.ResolveNamed<IRowFactory>(context.Entity.Key, new NamedParameter("capacity", context.GetAllEntityFields().Count()))) : new Pipeline.Transforms.FromXmlTransform(context) as ITransform;
                 case "fromsplit": return new FromSplitTransform(context);
                 case "fromlengths": return new FromLengthsTranform(context);
 
@@ -128,7 +124,7 @@ namespace JunkDrawer.Autofac {
 
                 default:
                     context.Warn("The {0} method is undefined.", context.Transform.Method);
-                    return new NullTransformer(context);
+                    return new NullTransform(context);
             }
         }
     }

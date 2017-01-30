@@ -18,7 +18,7 @@
 
 using System.Collections.Generic;
 using Autofac;
-using Pipeline.Configuration;
+using Transformalize.Configuration;
 
 namespace JunkDrawer.Autofac.Modules {
     public abstract class ConnectionModule : Module {

@@ -24,10 +24,10 @@ using Eto;
 using Eto.Forms;
 using JunkDrawer.Autofac;
 using JunkDrawer.Eto.Core;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Logging.NLog;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Logging.NLog;
 using Environment = System.Environment;
 
 namespace JunkDrawer.Eto.WinForms {

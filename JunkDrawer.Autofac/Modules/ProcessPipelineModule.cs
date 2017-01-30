@@ -19,13 +19,13 @@
 using System;
 using System.Linq;
 using Autofac;
-using Pipeline;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop;
-using Pipeline.Nulls;
-using Pipeline.Transforms.System;
+using Transformalize;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop;
+using Transformalize.Nulls;
+using Transformalize.Transforms.System;
 
 namespace JunkDrawer.Autofac.Modules {
 

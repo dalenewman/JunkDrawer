@@ -15,7 +15,7 @@
 // limitations under the License.
 #endregion
 using Cfg.Net.Ext;
-using Pipeline.Configuration;
+using Transformalize.Configuration;
 
 namespace JunkDrawer {
     public class Response {

@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cfg.Net;
 using Cfg.Net.Contracts;
-using Pipeline.Configuration;
+using Transformalize.Configuration;
 
 namespace JunkDrawer {
 

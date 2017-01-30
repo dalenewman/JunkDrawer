@@ -16,9 +16,9 @@
 #endregion
 using System.Linq;
 using Cfg.Net.Ext;
-using Pipeline;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
+using Transformalize;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 namespace JunkDrawer {
     public class ConfigurationCreator : ICreateConfiguration {

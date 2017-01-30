@@ -16,8 +16,8 @@
 #endregion
 using System.Linq;
 using Cfg.Net.Ext;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class ReverseConfiguration : ICreateConfiguration {
@@ -38,7 +38,7 @@ namespace JunkDrawer.Autofac {
             process.Connections.First().Name = "input";
 
             var entity = new Entity { Name = _response.View, Connection = "input" }.WithDefaults();
-            entity.Fields.Add(new Field { Name = Pipeline.Constants.TflKey, Alias = "Key", Type = "int", PrimaryKey = true }.WithDefaults());
+            entity.Fields.Add(new Field { Name = Transformalize.Constants.TflKey, Alias = "Key", Type = "int", PrimaryKey = true }.WithDefaults());
             entity.Fields.AddRange(_response.Fields);
             process.Entities.Add(entity);
 

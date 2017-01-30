@@ -15,7 +15,7 @@
 // limitations under the License.
 #endregion
 using Autofac;
-using Pipeline.Contracts;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class Bootstrapper : IJunkBootstrapper {

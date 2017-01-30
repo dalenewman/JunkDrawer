@@ -16,8 +16,8 @@
 #endregion
 using System.Collections.Generic;
 using Autofac;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class PageModule : Module {

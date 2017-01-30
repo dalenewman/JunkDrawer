@@ -19,17 +19,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop;
-using Pipeline.Provider.Ado;
-using Pipeline.Provider.Excel;
-using Pipeline.Provider.File;
-using Pipeline.Provider.MySql;
-using Pipeline.Provider.PostgreSql;
-using Pipeline.Provider.SqlServer;
-using Pipeline.Provider.SQLite;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop;
+using Transformalize.Provider.Ado;
+using Transformalize.Provider.Excel;
+using Transformalize.Provider.File;
+using Transformalize.Provider.MySql;
+using Transformalize.Provider.PostgreSql;
+using Transformalize.Provider.SqlServer;
+using Transformalize.Provider.SQLite;
 
 
 namespace JunkDrawer.Autofac {

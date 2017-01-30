@@ -20,8 +20,8 @@ using System.Diagnostics;
 using System.Linq;
 using Eto.Forms;
 using Eto.Drawing;
-using Pipeline.Contracts;
-using Pipeline.Extensions;
+using Transformalize.Contracts;
+using Transformalize.Extensions;
 
 namespace JunkDrawer.Eto.Core {
     public class MainForm : Form {

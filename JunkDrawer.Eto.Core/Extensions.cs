@@ -16,8 +16,8 @@
 #endregion
 using Eto.Drawing;
 using Eto.Forms;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Eto.Core {
 

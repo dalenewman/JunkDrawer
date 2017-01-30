@@ -19,8 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using JunkDrawer.Autofac.Modules;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
 

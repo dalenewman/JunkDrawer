@@ -20,12 +20,11 @@ using Autofac;
 using Cfg.Net.Contracts;
 using Cfg.Net.Ext;
 using Cfg.Net.Reader;
-using Pipeline;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Logging.NLog;
-using Pipeline.Nulls;
+using Transformalize;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Logging.NLog;
 
 namespace JunkDrawer.Autofac {
 
@@ -104,7 +103,7 @@ namespace JunkDrawer.Autofac {
             }).As<Cfg>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
-                var process = new Process(new NullValidator("js"), new NullValidator("sh"));
+                var process = new Process();
                 if(p.Any())
                     process.Load(p.Named<string>("cfg"));
                 return process;

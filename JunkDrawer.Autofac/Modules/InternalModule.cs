@@ -18,14 +18,14 @@
 
 using System.Linq;
 using Autofac;
-using Pipeline;
-using Pipeline.Configuration;
-using Pipeline.Context;
-using Pipeline.Contracts;
-using Pipeline.Desktop.Writers;
-using Pipeline.Extensions;
-using Pipeline.Logging.NLog;
-using Pipeline.Nulls;
+using Transformalize;
+using Transformalize.Configuration;
+using Transformalize.Context;
+using Transformalize.Contracts;
+using Transformalize.Desktop.Writers;
+using Transformalize.Extensions;
+using Transformalize.Logging.NLog;
+using Transformalize.Nulls;
 
 namespace JunkDrawer.Autofac.Modules {
 

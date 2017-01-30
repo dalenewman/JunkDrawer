@@ -15,8 +15,8 @@
 // limitations under the License.
 #endregion
 using System;
-using Pipeline.Context;
-using Pipeline.Contracts;
+using Transformalize.Context;
+using Transformalize.Contracts;
 
 namespace JunkDrawer.Eto.Core {
     public class CompositeLogger : IPipelineLogger {

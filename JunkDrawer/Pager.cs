@@ -15,8 +15,8 @@
 // limitations under the License.
 #endregion
 using System.Linq;
-using Pipeline.Configuration;
-using Pipeline.Contracts;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
 
 namespace JunkDrawer {
 
