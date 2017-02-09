@@ -28,6 +28,7 @@ using Transformalize.Provider.Excel;
 using Transformalize.Provider.File;
 using Transformalize.Provider.MySql;
 using Transformalize.Provider.PostgreSql;
+using Transformalize.Provider.SqlCe;
 using Transformalize.Provider.SqlServer;
 using Transformalize.Provider.SQLite;
 
@@ -87,6 +88,8 @@ namespace JunkDrawer.Autofac {
                         return new MySqlConnectionFactory(output);
                     case "postgresql":
                         return new PostgreSqlConnectionFactory(output);
+                    case "sqlce":
+                        return new SqlCeConnectionFactory(output);
                     case "sqlite":
                         return new SqLiteConnectionFactory(output);
                     default:
@@ -98,7 +101,8 @@ namespace JunkDrawer.Autofac {
             // Final product is Importer
             builder.Register((c, p) => {
                 var context = c.Resolve<IConnectionContext>();
-                var key = c.Resolve<Request>(p).ToKey(c.Resolve<Cfg>());
+                var request = c.Resolve<Request>(p);
+                var key = request.ToKey(c.Resolve<Cfg>());
                 var process = c.Resolve<Process>();
                 if (Cache.ContainsKey(key)) {
                     process.Load(Cache[key]);

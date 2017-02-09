@@ -16,6 +16,7 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Transformalize;
@@ -23,11 +24,11 @@ using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
 using Transformalize.Desktop;
-using Transformalize.Extensions;
 using Transformalize.Nulls;
 using Transformalize.Provider.Ado;
 using Transformalize.Provider.MySql;
 using Transformalize.Provider.PostgreSql;
+using Transformalize.Provider.SqlCe;
 using Transformalize.Provider.SqlServer;
 using Transformalize.Provider.SQLite;
 using Transformalize.Transforms.System;
@@ -35,7 +36,6 @@ using Transformalize.Transforms.System;
 namespace JunkDrawer.Autofac.Modules {
     public class AdoModule : Module {
         private readonly Process _process;
-        private readonly string[] _ado = { "sqlserver", "mysql", "postgresql", "sqlite" };
 
         public AdoModule() { }
 
@@ -49,7 +49,7 @@ namespace JunkDrawer.Autofac.Modules {
                 return;
 
             // connections
-            foreach (var connection in _process.Connections.Where(c => c.Provider.In(_ado))) {
+            foreach (var connection in _process.Connections.Where(c => Constants.AdoProviderSet().Contains(c.Provider))) {
 
                 // Connection Factory
                 builder.Register<IConnectionFactory>(ctx => {
@@ -62,6 +62,8 @@ namespace JunkDrawer.Autofac.Modules {
                             return new PostgreSqlConnectionFactory(connection);
                         case "sqlite":
                             return new SqLiteConnectionFactory(connection);
+                        case "sqlce":
+                            return new SqlCeConnectionFactory(connection);
                         default:
                             return new NullConnectionFactory();
                     }
@@ -92,7 +94,7 @@ namespace JunkDrawer.Autofac.Modules {
             // IEntityDeleteHandler
 
             // entitiy input
-            foreach (var entity in _process.Entities.Where(e => _process.Connections.First(c => c.Name == e.Connection).Provider.In(_ado))) {
+            foreach (var entity in _process.Entities.Where(e => Constants.AdoProviderSet().Contains(_process.Connections.First(c => c.Name == e.Connection).Provider))) {
 
                 // INPUT READER
                 builder.Register<IRead>(ctx => {
@@ -103,6 +105,7 @@ namespace JunkDrawer.Autofac.Modules {
                         case "mysql":
                         case "postgresql":
                         case "sqlite":
+                        case "sqlce":
                         case "sqlserver":
                             return new AdoInputReader(
                                 input,
@@ -122,6 +125,7 @@ namespace JunkDrawer.Autofac.Modules {
                         case "mysql":
                         case "postgresql":
                         case "sqlite":
+                        case "sqlce":
                         case "sqlserver":
                             return new AdoInputVersionDetector(input, ctx.ResolveNamed<IConnectionFactory>(input.Connection.Key));
                         default:
@@ -133,7 +137,7 @@ namespace JunkDrawer.Autofac.Modules {
             }
 
             // entity output
-            if (_process.Output().Provider.In(_ado)) {
+            if (Constants.AdoProviderSet().Contains(_process.Output().Provider)) {
 
                 var calc = _process.ToCalculatedFieldsProcess();
 
@@ -147,8 +151,13 @@ namespace JunkDrawer.Autofac.Modules {
                         case "mysql":
                         case "postgresql":
                         case "sqlite":
+                        case "sqlce":
                         case "sqlserver":
-                            return new AdoStarController(output, new AdoStarViewCreator(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)));
+                            var actions = new List<IAction> { new AdoStarViewCreator(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)) };
+                            if (_process.Flatten) {
+                                actions.Add(new AdoFlatTableCreator(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)));
+                            }
+                            return new AdoStarController(output, actions);
                         default:
                             return new NullOutputController();
                     }
@@ -190,6 +199,7 @@ namespace JunkDrawer.Autofac.Modules {
                             case "mysql":
                             case "postgresql":
                             case "sqlite":
+                            case "sqlce":
                             case "sqlserver":
                                 var initializer = _process.Mode == "init" ? (IAction)new AdoEntityInitializer(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key)) : new NullInitializer();
                                 return new AdoOutputController(
@@ -245,6 +255,7 @@ namespace JunkDrawer.Autofac.Modules {
                                     ctx.ResolveNamed<IWriteMasterUpdateQuery>(entity.Key + "MasterKeys")
                                 );
                             case "sqlite":
+                            case "sqlce":
                                 return new AdoTwoPartMasterUpdater(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key));
                             default:
                                 return new NullMasterUpdater();
@@ -254,6 +265,7 @@ namespace JunkDrawer.Autofac.Modules {
                     // WRITER
                     builder.Register<IWrite>(ctx => {
                         var output = ctx.ResolveNamed<OutputContext>(entity.Key);
+                        var cf = ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key);
 
                         switch (output.Connection.Provider) {
                             case "sqlserver":
@@ -263,10 +275,16 @@ namespace JunkDrawer.Autofac.Modules {
                                     ctx.ResolveNamed<ITakeAndReturnRows>(entity.Key),
                                     new AdoEntityUpdater(output, ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key))
                                 );
+                            case "sqlce":
+                                return new SqlCeWriter(
+                                    output,
+                                    cf,
+                                    ctx.ResolveNamed<ITakeAndReturnRows>(entity.Key),
+                                    new AdoEntityUpdater(output, cf)
+                                );
                             case "mysql":
                             case "postgresql":
                             case "sqlite":
-                                var cf = ctx.ResolveNamed<IConnectionFactory>(output.Connection.Key);
                                 return new AdoEntityWriter(
                                     output,
                                     ctx.ResolveNamed<ITakeAndReturnRows>(entity.Key),
@@ -293,6 +311,7 @@ namespace JunkDrawer.Autofac.Modules {
                                 case "mysql":
                                 case "postgresql":
                                 case "sqlite":
+                                case "sqlce":
                                 case "sqlserver":
                                     input = new AdoReader(
                                         inputContext,
@@ -312,6 +331,7 @@ namespace JunkDrawer.Autofac.Modules {
                             switch (outputConnection.Provider) {
                                 case "mysql":
                                 case "postgresql":
+                                case "sqlce":
                                 case "sqlite":
                                 case "sqlserver":
                                     var ocf = ctx.ResolveNamed<IConnectionFactory>(outputConnection.Key);

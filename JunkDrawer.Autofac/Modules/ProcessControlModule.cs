@@ -24,6 +24,7 @@ using Transformalize.Actions;
 using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
+using Transformalize.Provider.Ado;
 
 namespace JunkDrawer.Autofac.Modules {
     public class ProcessControlModule : Module {
@@ -74,46 +75,23 @@ namespace JunkDrawer.Autofac.Modules {
                         case "mysql":
                         case "postgresql":
                         case "sqlite":
+                        case "sqlce":
                         case "sqlserver":
                         case "elastic":
                         case "lucene":
                             controller.PreActions.Add(ctx.Resolve<IInitializer>());
                             break;
                         default:
-                            output.Warn($"The {outputConnection.Provider} provider does not support initialization.");
+                            output.Debug(()=>$"The {outputConnection.Provider} provider does not support initialization.");
                             break;
                     }
 
                 }
 
-                // input validation
-                if (_process.Mode == "init") {
-                    var providers = _process.Connections.Select(c => c.Provider).Distinct();
-
-                    foreach (var provider in providers) {
-                        switch (provider) {
-                            case "solr":
-                                foreach (var connection in _process.Connections.Where(c => c.Provider == "solr")) {
-                                    foreach (var entity in _process.Entities.Where(e => e.Connection == connection.Name)) {
-                                        controller.PreActions.Add(ctx.ResolveNamed<IInputValidator>(entity.Key));
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                }
-
-                // templates
-                foreach (var template in _process.Templates.Where(t => t.Enabled).Where(t => t.Actions.Any(a => a.GetModes().Any(m => m == _process.Mode)))) {
-                    controller.PreActions.Add(new RenderTemplateAction(template, ctx.ResolveNamed<ITemplateEngine>(template.Key)));
-                    foreach (var action in template.Actions.Where(a => a.GetModes().Any(m => m == _process.Mode || m == "*"))) {
-                        if (action.Before) {
-                            controller.PreActions.Add(ctx.ResolveNamed<IAction>(action.Key));
-                        }
-                        if (action.After) {
-                            controller.PostActions.Add(ctx.ResolveNamed<IAction>(action.Key));
-                        }
-                    }
+                // flatten
+                var o = ctx.ResolveNamed<OutputContext>(outputConnection.Key);
+                if (_process.Flatten && Constants.AdoProviderSet().Contains(o.Connection.Provider)) {
+                    controller.PostActions.Add(new AdoFlattenAction(o, ctx.ResolveNamed<IConnectionFactory>(outputConnection.Key)));
                 }
 
                 // actions

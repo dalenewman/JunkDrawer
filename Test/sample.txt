@@ -1,5 +1,5 @@
 ﻿Name,Birthday,Points
-Dale,3/3/1981 9 AM,73
-Tara,12/31/1990,1042
-Grace,9/9/2000 11 PM,56
-Gavin,7/3/2010,13
+Dad,3/3/1981 9 AM,73
+Mom,12/31/1990,1042
+Daughter,9/9/2000 11 PM,56
+Son,7/3/2010,13

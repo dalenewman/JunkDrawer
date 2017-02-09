@@ -36,14 +36,15 @@ namespace JunkDrawer {
 
         protected override void Validate() {
             if (Connections.Count < 2) {
-                Error("You need at least two connections defined; one named 'input', and one named 'output.'");
+                Error("You need at least two connections; and input, and an output.");
             }
             if (Connections.All(c => c.Name != "input")) {
-                Error("Please define an input named 'input.'");
+                Error("Please define an input connection named input.");
             }
             if (Connections.All(c => c.Name != "output")) {
-                Error("Please define an input named 'output.'");
+                Error("Please define an output connection named output.");
             }
+
         }
 
         public Connection Input() {

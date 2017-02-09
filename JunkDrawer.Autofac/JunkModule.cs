@@ -18,7 +18,6 @@ using System;
 using System.Linq;
 using Autofac;
 using Cfg.Net.Contracts;
-using Cfg.Net.Ext;
 using Cfg.Net.Reader;
 using Transformalize;
 using Transformalize.Configuration;
@@ -55,10 +54,9 @@ namespace JunkDrawer.Autofac {
                 var entityName = ctx.Resolve<Request>(p).FileInfo.Name;
                 return new PipelineContext(
                     ctx.Resolve<IPipelineLogger>(),
-                    new Process { Name = ProcessName }.WithDefaults(),
+                    new Process { Name = ProcessName },
                     new Entity { Name = entityName, Alias = entityName, Key = entityName }
-                        .WithDefaults()
-                    );
+                );
             }).As<IContext>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
@@ -74,7 +72,7 @@ namespace JunkDrawer.Autofac {
 
                 // modify the output connection
                 var output = cfg.Output();
-                if (!string.IsNullOrEmpty(request.Provider) && Constants.ProviderSet().Contains(request.Provider)) {
+                if (!string.IsNullOrEmpty(request.Provider) && Constants.AdoProviderSet().Contains(request.Provider)) {
                     output.Provider = request.Provider;
                 }
 
@@ -95,16 +93,15 @@ namespace JunkDrawer.Autofac {
                 context.Debug(() => "Manually over-riding types.");
                 cfg.Input().Types.Clear();
                 foreach (var type in request.Types.Where(type => Constants.TypeSet().Contains(type))) {
-                    cfg.Input().Types.Add(new TflType(type).WithDefaults());
+                    cfg.Input().Types.Add(new TflType(type));
                     context.Debug(() => $"Inspecting for type: {type}.");
                 }
-
                 return cfg;
             }).As<Cfg>().InstancePerLifetimeScope();
 
             builder.Register((ctx, p) => {
                 var process = new Process();
-                if(p.Any())
+                if (p.Any())
                     process.Load(p.Named<string>("cfg"));
                 return process;
             }).As<Process>();

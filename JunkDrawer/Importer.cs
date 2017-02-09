@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cfg.Net.Ext;
 using Transformalize.Configuration;
 using Transformalize.Contracts;
 using Transformalize.Provider.Ado;
@@ -46,18 +45,19 @@ namespace JunkDrawer {
 
                 var starFields = _process.GetStarFields().ToArray();
                 var fields = new List<Field>();
-                fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
-                fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }.WithDefaults()));
+                fields.AddRange(starFields[0].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }));
+                fields.AddRange(starFields[1].Where(f => !f.System).Select(f => new Field { Name = f.Alias, Alias = f.Alias, Type = f.Type, Length = f.Length }));
 
                 var arr = fields.ToArray();
+
+                var use = (_cf.AdoProvider == AdoProvider.SqlServer || _cf.AdoProvider == AdoProvider.MySql ? $"USE {_cf.Enclose(_process.Output().Database)};" : string.Empty) + System.Environment.NewLine;
 
                 return new Response {
                     Records = entity.Inserts,
                     Connection = _process.Output(),
                     Fields = arr,
                     View = entity.Alias,
-                    Sql = $@"USE {_cf.Enclose(_process.Output().Database)};
-
+                    Sql = $@"{use}
 SELECT
 {(string.Join("," + System.Environment.NewLine, arr.Select(f => "    " + _cf.Enclose(f.Alias))))}
 FROM {_cf.Enclose(entity.Alias)};"

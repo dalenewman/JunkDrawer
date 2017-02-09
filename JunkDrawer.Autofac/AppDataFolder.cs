@@ -24,7 +24,7 @@ namespace JunkDrawer.Autofac {
         private readonly string _path;
 
         public AppDataFolder() {
-            var appDataPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            var appDataPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
             _path = Path.Combine(appDataPath, Folder);
 
             if (!Directory.Exists(_path))

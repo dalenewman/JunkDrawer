@@ -21,7 +21,7 @@ namespace JunkDrawer {
     public class Response {
         public string View { get; set; } = string.Empty;
         public long Records { get; set; } = 0;
-        public Connection Connection { get; set; } = new Connection().WithDefaults();
+        public Connection Connection { get; set; } = new Connection();
         public Field[] Fields { get; set; } = new Field[0];
         public string Sql { get; set; } = string.Empty;
     }

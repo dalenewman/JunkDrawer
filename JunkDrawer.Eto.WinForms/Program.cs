@@ -66,7 +66,7 @@ namespace JunkDrawer.Eto.WinForms {
                 return new CompositeLogger(new TextAreaLogger(options.LogLevel), new NLogPipelineLogger(ProcessName));
             }).As<IPipelineLogger>().SingleInstance();
 
-            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = ProcessName }.WithDefaults()));
+            builder.Register<IContext>(c => new PipelineContext(c.Resolve<IPipelineLogger>(), new Process { Name = ProcessName }));
             builder.Register(c => new AutofacJunkBootstrapperFactory(c.Resolve<IPipelineLogger>())).As<IJunkBootstrapperFactory>();
             builder.RegisterType<AppDataFolder>().As<IFolder>();
 

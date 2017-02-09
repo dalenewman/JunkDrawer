@@ -59,6 +59,7 @@ namespace JunkDrawer.Autofac {
             container.RegisterType<NullDeleteHandler>().Named<IEntityDeleteHandler>(entity.Key);
 
             container.RegisterModule(new EntityPipelineModule(process));
+            container.RegisterModule(new ProcessPipelineModule(process));
             container.RegisterModule(new ProcessControlModule(process));
 
             using (var scope = container.Build().BeginLifetimeScope()) {

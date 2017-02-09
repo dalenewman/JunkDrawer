@@ -19,7 +19,9 @@ using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
     public class Bootstrapper : IJunkBootstrapper {
+
         private readonly ILifetimeScope _scope;
+
         public Bootstrapper(Request request, IPipelineLogger logger = null) {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new JunkModule(request, logger));

@@ -29,16 +29,15 @@ namespace JunkDrawer.Autofac {
 
         public string Create() {
 
-            var process = new Process().WithDefaults();
-            process.Name = "Pager";
+            var process = new Process { Name = "Pager" };
             process.Connections.Clear();
             process.Entities.Clear();
 
             process.Connections.Add(_response.Connection.Clone());
             process.Connections.First().Name = "input";
 
-            var entity = new Entity { Name = _response.View, Connection = "input" }.WithDefaults();
-            entity.Fields.Add(new Field { Name = Transformalize.Constants.TflKey, Alias = "Key", Type = "int", PrimaryKey = true }.WithDefaults());
+            var entity = new Entity { Name = _response.View, Connection = "input" };
+            entity.Fields.Add(new Field { Name = Transformalize.Constants.TflKey, Alias = "Key", Type = "int", PrimaryKey = true });
             entity.Fields.AddRange(_response.Fields);
             process.Entities.Add(entity);
 

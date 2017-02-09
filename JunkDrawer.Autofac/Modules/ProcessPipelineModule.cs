@@ -86,6 +86,7 @@ namespace JunkDrawer.Autofac.Modules {
                         break;
                     case "mysql":
                     case "postgresql":
+                    case "sqlce":
                     case "sqlite":
                         pipeline.Register(ctx.Resolve<IRead>());
                         pipeline.Register(ctx.Resolve<IWrite>());

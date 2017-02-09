@@ -16,20 +16,28 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using Dapper;
 using JunkDrawer;
 using JunkDrawer.Autofac;
 using NUnit.Framework;
+using Transformalize.Configuration;
+using Transformalize.Contracts;
+using Transformalize.Desktop.Loggers;
 
 namespace Test {
 
     [TestFixture]
-    public class SqlServerIntegration {
+    public class Integration {
 
-        private const string ConnectionString = "server=localhost;database=junk;trusted_connection=true;";
+        static readonly object[] Connections = {
+            //new object[] { "sqlserver", "Junk", "", "", "" },
+            //new object[] { "postgresql", "Junk", "", "postgres", "devdev1!" },
+            //new object[] { "mysql", "Junk", "", "root", "devdev1!" },
+            //new object[] { "sqlite", "", "junk.sqlite3", "", "" }
+            new object[] { "sqlce", "", "junk.sdf", "", "" }
+        };
 
         [Test]
         public void Demo() {
@@ -45,8 +53,8 @@ namespace Test {
 
         }
 
-        [Test]
-        public void CommaDelimited() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void CommaDelimited(string provider, string database, string file, string user, string password) {
 
             const string content = @"Name,WebSite,Created
 Google|,http://www.google.com|,9/4/98
@@ -57,16 +65,15 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
-            using (var scope = new Bootstrapper(request)) {
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password};
+            using (var scope = new Bootstrapper(request, new ConsoleLogger(LogLevel.Debug))) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
             }
 
             var companies = new List<Company>();
-
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -80,8 +87,8 @@ Microsoft|,http://www.microsoft.com|,4/4/1975";
         }
 
 
-        [Test]
-        public void CommaDelimitedNoNames() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void CommaDelimitedNoNames(string provider, string database, string file, string user, string password) {
 
             const string content = @"Google,http://www.google.com,9/4/98
 Apple,http://www.apple.com,4/1/1976
@@ -91,7 +98,7 @@ Microsoft,http://www.microsoft.com,4/4/1975";
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -99,8 +106,8 @@ Microsoft,http://www.microsoft.com,4/4/1975";
 
             var companies = new List<Abc>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Abc>("SELECT A,B,C FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Abc>(response.Sql));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -114,8 +121,8 @@ Microsoft,http://www.microsoft.com,4/4/1975";
         }
 
 
-        [Test]
-        public void CommaSeparatedValues() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void CommaSeparatedValues(string provider, string database, string file, string user, string password) {
 
             const string content = @"Name,WebSite,Created
 ""Google"",http://www.google.com,9/4/98
@@ -127,7 +134,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -135,8 +142,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -151,8 +158,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
         }
 
 
-        [Test]
-        public void CsvWithQuotedColumnNames() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void CsvWithQuotedColumnNames(string provider, string database, string file, string user, string password) {
 
             const string content = @"""Name"",""WebSite"",""Created""
 ""Google"",http://www.google.com,9/4/98
@@ -164,7 +171,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -172,16 +179,16 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(4, companies.Count);
 
         }
 
-        [Test]
-        public void CsvWithMissingAndQuotedColumnNames() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void CsvWithMissingAndQuotedColumnNames(string provider, string database, string file, string user, string password) {
 
             const string content = @",,""Created""
 ""Google"",http://www.google.com,9/4/98
@@ -193,7 +200,7 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -201,21 +208,21 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT [A],[B],Created FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(4, companies.Count);
 
         }
 
-        [Test]
-        public void ExcelXls() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void ExcelXls(string provider, string database, string file, string user, string password) {
 
-            const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xls";
+            const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel1.xls";
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -223,9 +230,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             var companies = new List<CompanyForOldExcel>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                var sql = "SELECT Name,Website,Created FROM " + response.View + ";";
-                companies.AddRange(cn.Query<CompanyForOldExcel>(sql));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<CompanyForOldExcel>(response.Sql));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -239,13 +245,13 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             Assert.AreEqual(23401, nike.Created);
         }
 
-        [Test]
-        public void ExcelXlsx() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void ExcelXlsx(string provider, string database, string file, string user, string password) {
 
-            const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel.xlsx";
+            const string fileName = @"C:\Code\JunkDrawer\Test\Files\Excel2.xlsx";
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -253,9 +259,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
 
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                var sql = "SELECT Name,Website,Created FROM " + response.View + ";";
-                companies.AddRange(cn.Query<Company>(sql));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -269,8 +274,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             Assert.AreEqual(Convert.ToDateTime("1/25/1964"), nike.Created);
         }
 
-        [Test]
-        public void PipeDelimited() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void PipeDelimited(string provider, string database, string file, string user, string password) {
 
             const string content = @"Name|WebSite|Created
 Google|http://www.google.com|9/4/98
@@ -281,7 +286,7 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 var importer = scope.Resolve<Importer>();
                 response = importer.Import();
@@ -289,8 +294,8 @@ Microsoft|http://www.microsoft.com|4/4/1975";
 
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -304,8 +309,8 @@ Microsoft|http://www.microsoft.com|4/4/1975";
             Assert.AreEqual(Convert.ToDateTime("4/4/1975"), ms.Created);
         }
 
-        [Test]
-        public void TabDelimited() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void TabDelimited(string provider, string database, string file, string user, string password) {
 
             const string content = @"Name	WebSite	Created
 Google	http://www.google.com	9/4/98
@@ -316,15 +321,15 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 response = scope.Resolve<Importer>().Import();
             }
 
             var companies = new List<Company>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                companies.AddRange(cn.Query<Company>("SELECT Name,Website,Created FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(3, companies.Count);
@@ -338,8 +343,8 @@ Microsoft	http://www.microsoft.com	4/4/1975";
             Assert.AreEqual(Convert.ToDateTime("4/4/1975"), ms.Created);
         }
 
-        [Test]
-        public void FixedWidth() {
+        [Test, TestCaseSource(nameof(Connections))]
+        public void FixedWidth(string provider, string database, string file, string user, string password) {
 
             const string content = @"Name     WebSite                 Created
 Google   http://www.google.com   9/4/98
@@ -350,15 +355,15 @@ Microsofthttp://www.microsoft.com4/4/1975";
             File.WriteAllText(fileName, content);
 
             Response response;
-            var request = new Request(fileName);
+            var request = new Request(fileName) { Provider = provider, Database = database, DatabaseFile = file, User = user, Password = password };
             using (var scope = new Bootstrapper(request)) {
                 response = scope.Resolve<Importer>().Import();
             }
 
             var lines = new List<string>();
 
-            using (var cn = new SqlConnection(ConnectionString)) {
-                lines.AddRange(cn.Query<string>("SELECT [Name     WebSite                 Created] FROM " + response.View + ";"));
+            using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
+                lines.AddRange(cn.Query<string>(response.Sql));
             }
 
             Assert.AreEqual(3, lines.Count);

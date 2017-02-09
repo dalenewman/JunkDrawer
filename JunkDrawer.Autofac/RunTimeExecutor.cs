@@ -54,6 +54,7 @@ namespace JunkDrawer.Autofac {
             builder.RegisterModule(new InternalModule(process));
 
             builder.RegisterModule(new EntityPipelineModule(process));
+            builder.RegisterModule(new ProcessPipelineModule(process));
             builder.RegisterModule(new ProcessControlModule(process));
 
             using (var scope = builder.Build().BeginLifetimeScope()) {
