@@ -1,6 +1,7 @@
 ﻿#region license
-// Test
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,18 +25,19 @@ using JunkDrawer.Autofac;
 using NUnit.Framework;
 using Transformalize.Configuration;
 using Transformalize.Contracts;
-using Transformalize.Desktop.Loggers;
+using Transformalize.Providers.Console;
 
 namespace Test {
 
     [TestFixture]
+    //[Ignore("This is integration testing, requires files and servers")]
     public class Integration {
 
         static readonly object[] Connections = {
-            //new object[] { "sqlserver", "Junk", "", "", "" },
-            //new object[] { "postgresql", "Junk", "", "postgres", "devdev1!" },
-            //new object[] { "mysql", "Junk", "", "root", "devdev1!" },
-            //new object[] { "sqlite", "", "junk.sqlite3", "", "" }
+            new object[] { "sqlserver", "Junk", "", "", "" },
+            new object[] { "postgresql", "Junk", "", "postgres", "devdev1!" },
+            new object[] { "mysql", "Junk", "", "root", "devdev1!" },
+            new object[] { "sqlite", "", "junk.sqlite3", "", "" },
             new object[] { "sqlce", "", "junk.sdf", "", "" }
         };
 
@@ -228,10 +230,10 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
                 response = importer.Import();
             }
 
-            var companies = new List<CompanyForOldExcel>();
+            var companies = new List<Company>();
 
             using (var cn = ConnectionFactory.Create(new Connection { Provider = provider, Database = database, File = file, User = user, Password = password })) {
-                companies.AddRange(cn.Query<CompanyForOldExcel>(response.Sql));
+                companies.AddRange(cn.Query<Company>(response.Sql));
             }
 
             Assert.AreEqual(4, companies.Count);
@@ -241,8 +243,8 @@ Microsoft,""http://www.microsoft.com"",4/4/1975
             var nike = companies.First(c => c.Name == "Nike, Inc.");
 
             Assert.AreEqual("http://www.google.com", google.WebSite);
-            Assert.AreEqual(27851, apple.Created);
-            Assert.AreEqual(23401, nike.Created);
+            Assert.AreEqual(DateTime.Parse("April, 1 1976"), apple.Created);
+            Assert.AreEqual(DateTime.Parse("1/25/1964"), nike.Created);
         }
 
         [Test, TestCaseSource(nameof(Connections))]
@@ -374,4 +376,17 @@ Microsofthttp://www.microsoft.com4/4/1975";
         }
 
     }
+
+    public class Abc {
+        public string A { get; set; }
+        public string B { get; set; }
+        public DateTime C { get; set; }
+    }
+
+    public class Company {
+        public string Name { get; set; }
+        public string WebSite { get; set; }
+        public DateTime Created { get; set; }
+    }
+
 }

@@ -1,6 +1,7 @@
 #region license
-// JunkDrawer.Eto.Core
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,48 +19,68 @@ using System;
 using Transformalize.Context;
 using Transformalize.Contracts;
 
-namespace JunkDrawer.Eto.Core {
-    public class CompositeLogger : IPipelineLogger {
+namespace JunkDrawer.Eto.Core
+{
+    public class CompositeLogger : IPipelineLogger
+    {
         private readonly IPipelineLogger[] _loggers;
 
-        public CompositeLogger(params IPipelineLogger[] loggers) {
+        public CompositeLogger(params IPipelineLogger[] loggers)
+        {
             _loggers = loggers;
         }
 
-        public void Debug(PipelineContext context, Func<string> lambda) {
-            foreach (var logger in _loggers) {
+        public void Debug(IContext context, Func<string> lambda)
+        {
+            foreach (var logger in _loggers)
+            {
                 logger.Debug(context, lambda);
             }
         }
 
-        public void Info(PipelineContext context, string message, params object[] args) {
-            foreach (var logger in _loggers) {
+        public void Info(IContext context, string message, params object[] args)
+        {
+            foreach (var logger in _loggers)
+            {
                 logger.Info(context, message, args);
             }
         }
 
-        public void Warn(PipelineContext context, string message, params object[] args) {
-            foreach (var logger in _loggers) {
+        public void Warn(IContext context, string message, params object[] args)
+        {
+            foreach (var logger in _loggers)
+            {
                 logger.Warn(context, message, args);
             }
         }
 
-        public void Error(PipelineContext context, string message, params object[] args) {
-            foreach (var logger in _loggers) {
+        public void Error(IContext context, string message, params object[] args)
+        {
+            foreach (var logger in _loggers)
+            {
                 logger.Error(context, message, args);
             }
         }
 
-        public void Error(PipelineContext context, Exception exception, string message, params object[] args) {
-            foreach (var logger in _loggers) {
+        public void Error(IContext context, Exception exception, string message, params object[] args)
+        {
+            foreach (var logger in _loggers)
+            {
                 logger.Error(context, exception, message, args);
             }
         }
 
-        public void Clear() {
-            foreach (var logger in _loggers) {
+        public void Clear()
+        {
+            foreach (var logger in _loggers)
+            {
                 logger.Clear();
             }
+        }
+
+        public void SuppressConsole()
+        {
+
         }
 
         public LogLevel LogLevel { get; }

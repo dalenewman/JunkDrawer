@@ -1,6 +1,7 @@
 ﻿#region license
 // JunkDrawer
-// Copyright 2013 Dale Newman
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Transformalize.Configuration;
 using Transformalize.Contracts;
-using Transformalize.Provider.Ado;
+using Transformalize.Providers.Ado;
 
 namespace JunkDrawer {
     public class Importer : IResolvable {

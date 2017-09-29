@@ -56,9 +56,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CfgNet, Version=0.9.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.9.4\lib\net452\CfgNet.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="CfgNet, Version=0.10.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.10.2\lib\net452\CfgNet.dll</HintPath>
     </Reference>
     <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
@@ -70,13 +69,11 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Transformalize, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.0.2.3-beta\lib\net452\Transformalize.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.0.2.7-beta\lib\net452\Transformalize.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.Ado, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Ado.0.2.3-beta\lib\net452\Transformalize.Provider.Ado.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.Ado, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.Ado.0.2.7-beta\lib\net452\Transformalize.Provider.Ado.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

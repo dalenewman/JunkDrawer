@@ -1,6 +1,8 @@
-﻿#region license
-// JunkDrawer.Console
-// Copyright 2013 Dale Newman
+﻿using System.Resources;
+#region license
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +16,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -22,7 +25,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Junk Drawer")]
-[assembly: AssemblyDescription("Import file into database in one step.")]
+[assembly: AssemblyDescription("An easier way to import excel or delimited files into a database.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dale Newman")]
 [assembly: AssemblyProduct("Junk Drawer")]
@@ -48,5 +51,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.1.3.0")]
+[assembly: AssemblyFileVersion("0.1.3.0")]
+[assembly: NeutralResourcesLanguage("en-US")]
+

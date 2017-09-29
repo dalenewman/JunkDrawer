@@ -1,6 +1,7 @@
 #region license
-// JunkDrawer.Console
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +33,7 @@ namespace JunkDrawer {
         [OptionList('t',"types", Separator = ',', HelpText = "Override the configuration's inspection types, comma separated (e.g. bool, byte, short, int, long, single, double, datetime).")]
         public IList<string> Types { get; set; }
 
-        [Option('c',"connection", Required = false, HelpText = "Override the configuration's connection type (e.g. sqlserver, mysql, postgresql, sqlite).")]
+        [Option('c',"connection", Required = false, HelpText = "Override the configuration's connection type (e.g. sqlserver, mysql, postgresql, sqlite, sqlce).")]
         public string Provider { get; set; }
 
         [Option('s',"server", Required = false,HelpText = "Override the configuration's output server.")]

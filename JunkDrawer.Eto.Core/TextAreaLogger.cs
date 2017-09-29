@@ -1,6 +1,7 @@
 #region license
-// JunkDrawer.Eto.Core
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,8 +42,13 @@ namespace JunkDrawer.Eto.Core {
 
         }
 
+        public void SuppressConsole()
+        {
+           
+        }
+
         public LogLevel LogLevel { get; }
-        static string ForLog(PipelineContext context) {
+        static string ForLog(IContext context) {
             return string.Format(Context, context.ForLog);
         }
 
@@ -59,32 +65,32 @@ namespace JunkDrawer.Eto.Core {
             }
         }
 
-        public void Debug(PipelineContext context, Func<string> lamda) {
+        public void Debug(IContext context, Func<string> lamda) {
             if (LogLevel <= LogLevel.Debug)
                 Write("debug | " + ForLog(context) + " | " + lamda() + Environment.NewLine);
         }
 
-        public void Info(PipelineContext context, string message, params object[] args) {
+        public void Info(IContext context, string message, params object[] args) {
             if (LogLevel <= LogLevel.Info) {
                 Write("info  | " + ForLog(context) + " | " + string.Format(message, args) + Environment.NewLine);
             }
         }
 
-        public void Warn(PipelineContext context, string message, params object[] args) {
+        public void Warn(IContext context, string message, params object[] args) {
             if (LogLevel <= LogLevel.Warn) {
                 Write("warn  | " + ForLog(context) + " | " + string.Format(message, args) + Environment.NewLine);
             }
 
         }
 
-        public void Error(PipelineContext context, string message, params object[] args) {
+        public void Error(IContext context, string message, params object[] args) {
             if (LogLevel <= LogLevel.Error) {
                 var custom = string.Format(message, args);
                 Write("error | " + ForLog(context) + " | " + custom + Environment.NewLine);
             }
         }
 
-        public void Error(PipelineContext context, Exception exception, string message, params object[] args) {
+        public void Error(IContext context, Exception exception, string message, params object[] args) {
             if (LogLevel <= LogLevel.Error) {
                 var custom = string.Format(message, args);
                 Write(exception.Message + Environment.NewLine);

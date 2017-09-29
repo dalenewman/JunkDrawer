@@ -1,6 +1,7 @@
 #region license
-// JunkDrawer.Autofac
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,47 +25,35 @@ using Transformalize.Nulls;
 
 namespace JunkDrawer.Autofac {
     public class RunTimeRunner : IRunTimeRun {
-        private readonly IContext _host;
+        private readonly IContext _context;
+        private readonly ILifetimeScope _scope;
 
-        public RunTimeRunner(IContext host) {
-            _host = host;
+        public RunTimeRunner(IContext context, ILifetimeScope scope) {
+            _scope = scope;
+            _context = context;
         }
 
         public IEnumerable<IRow> Run(Process process) {
 
+            if (!process.Enabled) {
+                _context.Error("Process is disabled");
+                return Enumerable.Empty<IRow>();
+            }
+
             foreach (var warning in process.Warnings()) {
-                _host.Warn(warning);
+                _context.Warn(warning);
             }
 
             if (process.Errors().Any()) {
                 foreach (var error in process.Errors()) {
-                    _host.Error(error);
+                    _context.Error(error);
                 }
-                _host.Error("The configuration errors must be fixed before this job will run.");
+                _context.Error("The configuration errors must be fixed before this job will run.");
                 return Enumerable.Empty<IRow>();
             }
 
-            var container = new ContainerBuilder();
-            container.RegisterInstance(_host.Logger).As<IPipelineLogger>().SingleInstance();
-            container.RegisterModule(new ContextModule(process));
-
-            // providers
-            container.RegisterModule(new AdoModule(process));
-            container.RegisterModule(new FileModule(process));
-            container.RegisterModule(new ExcelModule(process));
-            container.RegisterModule(new InternalModule(process));
-
-            var entity = process.Entities.First();
-            container.RegisterType<NullUpdater>().Named<IUpdate>(entity.Key);
-            container.RegisterType<NullDeleteHandler>().Named<IEntityDeleteHandler>(entity.Key);
-
-            container.RegisterModule(new EntityPipelineModule(process));
-            container.RegisterModule(new ProcessPipelineModule(process));
-            container.RegisterModule(new ProcessControlModule(process));
-
-            using (var scope = container.Build().BeginLifetimeScope()) {
-                return scope.Resolve<IProcessController>().Read();
-            }
+            var controller = _scope.Resolve<IProcessController>();
+            return controller.Read();
         }
     }
 

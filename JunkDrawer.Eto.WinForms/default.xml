@@ -37,8 +37,9 @@
     <!-- other connections for Junk Drawer GUI -->
     <add name="SQL Junk" provider="sqlserver" server="localhost" database="Junk" open-with="C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\Ssms.exe" />
     <add name="SQLite Junk" provider="sqlite" file="c:\temp\junk.sqlite3" open-with="C:\Program Files\SqliteBrowser3\bin\sqlitebrowser.exe" />
-    <add name="MySQL Junk" provider="mysql" server="localhost" database="Junk" user="root" password="" open-with="C:\Program Files\MySQL\MySQL Workbench 6.3 CE\MySQLWorkbench.exe" />
-    <add name="PostgreSQL Junk" provider="postgresql" server="localhost" database="Junk" user="postgres" password="" open-with="C:\Program Files\PostgreSQL\9.4\bin\pgAdmin3.exe" />
+    <add name="MySQL Junk" provider="mysql" server="localhost" database="Junk" user="root" password="*" open-with="C:\Program Files\MySQL\MySQL Workbench 6.3 CE\MySQLWorkbench.exe" />
+    <add name="PostgreSQL Junk" provider="postgresql" server="localhost" database="Junk" user="postgres" password="*" open-with="C:\Program Files\PostgreSQL\9.4\bin\pgAdmin3.exe" />
+    <add name="SqlCe Junk" provider="sqlce" file="c:\temp\junk.sdf" open-with="C:\Programs\SqlCe40Toolbox.exe" />
 
   </connections>
 

@@ -1,7 +1,7 @@
 #region license
-// Transformalize
-// A Configurable ETL Solution Specializing in Incremental Denormalization.
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,35 +15,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using System;
 using System.IO;
 using System.Linq;
 using Autofac;
+using Transformalize;
 using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
-using Transformalize.Desktop;
 using Transformalize.Nulls;
-using Transformalize.Provider.File;
+using Transformalize.Providers.File;
 
 namespace JunkDrawer.Autofac.Modules {
-    public class FileModule : Module {
+    public class FileModule : Module
+    {
         private readonly Process _process;
 
         public FileModule() { }
 
-        public FileModule(Process process) {
+        public FileModule(Process process)
+        {
             _process = process;
         }
 
-        protected override void Load(ContainerBuilder builder) {
+        protected override void Load(ContainerBuilder builder)
+        {
 
             if (_process == null)
                 return;
 
             // Connections
-            foreach (var connection in _process.Connections.Where(c => c.Provider == "file")) {
+            foreach (var connection in _process.Connections.Where(c => c.Provider == "file"))
+            {
 
                 // Schema Reader
                 builder.Register<ISchemaReader>(ctx => {
@@ -51,43 +54,49 @@ namespace JunkDrawer.Autofac.Modules {
                     var fileInfo = new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
                     var context = ctx.ResolveNamed<IConnectionContext>(connection.Key);
                     var cfg = new FileInspection(context, fileInfo, 100).Create();
-                    var process = ctx.Resolve<Process>();
-                    process.Load(cfg);
+                    var process = ctx.Resolve<Process>(new NamedParameter("cfg", cfg));
 
-                    foreach (var warning in process.Warnings()) {
+                    foreach (var warning in process.Warnings())
+                    {
                         context.Warn(warning);
                     }
 
-                    if (process.Errors().Any()) {
-                        foreach (var error in process.Errors()) {
+                    if (process.Errors().Any())
+                    {
+                        foreach (var error in process.Errors())
+                        {
                             context.Error(error);
                         }
                         return new NullSchemaReader();
                     }
 
-                    return new SchemaReader(context, new RunTimeRunner(context), process);
+                    var container = DefaultContainer.Create(process, ctx.Resolve<IPipelineLogger>());
+
+                    return new SchemaReader(context, new RunTimeRunner(context, container), process);
 
                 }).Named<ISchemaReader>(connection.Key);
             }
 
             // entity input
-            foreach (var entity in _process.Entities.Where(e => _process.Connections.First(c => c.Name == e.Connection).Provider == "file")) {
+            foreach (var entity in _process.Entities.Where(e => _process.Connections.First(c => c.Name == e.Connection).Provider == "file"))
+            {
 
                 // input version detector
-                builder.RegisterType<NullVersionDetector>().Named<IInputVersionDetector>(entity.Key);
+                builder.RegisterType<NullInputProvider>().Named<IInputProvider>(entity.Key);
 
                 // input read
                 builder.Register<IRead>(ctx => {
                     var input = ctx.ResolveNamed<InputContext>(entity.Key);
                     var rowFactory = ctx.ResolveNamed<IRowFactory>(entity.Key, new NamedParameter("capacity", input.RowCapacity));
 
-                    switch (input.Connection.Provider) {
+                    switch (input.Connection.Provider)
+                    {
                         case "file":
                             if (input.Connection.Delimiter == string.Empty &&
-                                input.Entity.Fields.Count(f => f.Input) == 1) {
+                                input.Entity.Fields.Count(f => f.Input) == 1)
+                            {
                                 return new FileReader(input, rowFactory);
                             }
-
                             return new DelimitedFileReader(input, rowFactory);
                         default:
                             return new NullReader(input, false);
@@ -97,12 +106,14 @@ namespace JunkDrawer.Autofac.Modules {
             }
 
             // Entity Output
-            if (_process.Output().Provider == "file") {
+            if (_process.Output().Provider == "file")
+            {
 
                 // PROCESS OUTPUT CONTROLLER
                 builder.Register<IOutputController>(ctx => new NullOutputController()).As<IOutputController>();
 
-                foreach (var entity in _process.Entities) {
+                foreach (var entity in _process.Entities)
+                {
 
                     // ENTITY OUTPUT CONTROLLER
                     builder.Register<IOutputController>(ctx => new NullOutputController()).Named<IOutputController>(entity.Key);
@@ -111,7 +122,8 @@ namespace JunkDrawer.Autofac.Modules {
                     builder.Register<IWrite>(ctx => {
                         var output = ctx.ResolveNamed<OutputContext>(entity.Key);
 
-                        switch (output.Connection.Provider) {
+                        switch (output.Connection.Provider)
+                        {
                             case "file":
                                 return new DelimitedFileWriter(output, output.Connection.File);
                             default:

@@ -1,7 +1,7 @@
 #region license
-// Transformalize
-// A Configurable ETL Solution Specializing in Incremental Denormalization.
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
-using Transformalize.Desktop.Transforms;
 using Transformalize.Nulls;
+using Transformalize.Providers.File.Transforms;
 using Transformalize.Transforms;
 using Transformalize.Transforms.System;
 using Transformalize.Validators;
@@ -48,12 +47,12 @@ namespace JunkDrawer.Autofac {
         }
 
         public static ITransform ShouldRunTransform(IComponentContext ctx, IContext context) {
-            return context.Transform.ShouldRun == null ? SwitchTransform(ctx, context) : new ShouldRunTransform(context, SwitchTransform(ctx, context));
+            return context.Operation.ShouldRun == null ? SwitchTransform(ctx, context) : new ShouldRunTransform(context, SwitchTransform(ctx, context));
         }
 
         static ITransform SwitchTransform(IComponentContext ctx, IContext context) {
 
-            switch (context.Transform.Method) {
+            switch (context.Operation.Method) {
 
                 case "add": case "sum": return new AddTransform(context);
                 case "coalesce": return new CoalesceTransform(context);
@@ -62,12 +61,11 @@ namespace JunkDrawer.Autofac {
                 case "convert": return new ConvertTransform(context);
                 case "copy": return new CopyTransform(context);
                 case "datepart": return new DatePartTransform(context);
-                case "decompress": return new DecompressTransform(context);
                 case "fileext": return new FileExtTransform(context);
                 case "filename": return new FileNameTransform(context);
                 case "filepath": return new FilePathTransform(context);
                 case "format": return new FormatTransform(context);
-                case "formatphone": return new FormatPhoneTransform(context);
+                case "formatphone": return new Transformalize.Transforms.FormatPhoneTransform(context);
                 case "hashcode": return new HashcodeTransform(context);
                 case "htmldecode": return new DecodeTransform(context);
                 case "insert": return new InsertTransform(context);
@@ -92,8 +90,6 @@ namespace JunkDrawer.Autofac {
                 case "splitlength": return new SplitLengthTransform(context);
                 case "substring": return new SubStringTransform(context);
                 case "tag": return new TagTransform(context);
-                case "timeago": return new RelativeTimeTransform(context, true);
-                case "timeahead": return new RelativeTimeTransform(context, false);
                 case "tostring": return new ToStringTransform(context);
                 case "totime": return new ToTimeTransform(context);
                 case "toyesno": return new ToYesNoTransform(context);
@@ -102,7 +98,6 @@ namespace JunkDrawer.Autofac {
                 case "trimstart": return new TrimStartTransform(context);
                 case "upper": case "toupper": return new ToUpperTransform(context);
                 case "xmldecode": return new DecodeTransform(context);
-                case "xpath": return new XPathTransform(context);
 
                 case "include": return new FilterTransform(context, FilterType.Include);
                 case "exclude": return new FilterTransform(context, FilterType.Exclude);
@@ -111,19 +106,19 @@ namespace JunkDrawer.Autofac {
                 case "fromlengths": return new FromLengthsTranform(context);
 
                 // return true or false, validators
-                case "any": return new AnyValidator(context);
-                case "startswith": return new StartsWithValidator(context);
-                case "endswith": return new EndsWithValidator(context);
-                case "in": return new InValidator(context);
-                case "contains": return new ContainsValidator(context);
-                case "is": return new IsValidator(context);
+                case "any": return new AnyTransform(context);
+                case "startswith": return new StartsWithTransform(context);
+                case "endswith": return new EndsWithTransform(context);
+                case "in": return new InTransform(context);
+                case "contains": return new ContainsTransform(context);
+                case "is": return new IsTransform(context);
                 case "equal":
-                case "equals": return new EqualsValidator(context);
-                case "isempty": return new IsEmptyValidator(context);
-                case "isdefault": return new IsDefaultValidator(context);
+                case "equals": return new EqualsTransform(context);
+                case "isempty": return new IsEmptyTransform(context);
+                case "isdefault": return new IsDefaultTransform(context);
 
                 default:
-                    context.Warn("The {0} method is undefined.", context.Transform.Method);
+                    context.Warn("The {0} method is undefined.", context.Operation.Method);
                     return new NullTransform(context);
             }
         }

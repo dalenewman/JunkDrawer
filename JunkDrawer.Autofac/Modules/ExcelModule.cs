@@ -1,7 +1,7 @@
 #region license
-// Transformalize
-// A Configurable ETL Solution Specializing in Incremental Denormalization.
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,34 +15,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using System;
 using System.IO;
 using System.Linq;
 using Autofac;
+using Transformalize;
 using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
-using Transformalize.Desktop;
 using Transformalize.Nulls;
-using Transformalize.Provider.Excel;
+using Transformalize.Providers.Excel;
+using Transformalize.Providers.OpenXml;
 
 namespace JunkDrawer.Autofac.Modules {
-    public class ExcelModule : Module {
+
+    public class ExcelModule : Module
+    {
         private readonly Process _process;
 
         public ExcelModule() { }
 
-        public ExcelModule(Process process) {
+        public ExcelModule(Process process)
+        {
             _process = process;
         }
 
-        protected override void Load(ContainerBuilder builder) {
+        protected override void Load(ContainerBuilder builder)
+        {
             if (_process == null)
                 return;
 
             // connections
-            foreach (var connection in _process.Connections.Where(c => c.Provider == "excel")) {
+            foreach (var connection in _process.Connections.Where(c => c.Provider == "excel"))
+            {
                 builder.Register<ISchemaReader>(ctx => {
                     /* file and excel are different, have to load the content and check it to determine schema */
                     var fileInfo = new FileInfo(Path.IsPathRooted(connection.File) ? connection.File : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, connection.File));
@@ -51,33 +56,39 @@ namespace JunkDrawer.Autofac.Modules {
                     var process = ctx.Resolve<Process>();
                     process.Load(cfg);
 
-                    foreach (var warning in process.Warnings()) {
+                    foreach (var warning in process.Warnings())
+                    {
                         context.Warn(warning);
                     }
 
-                    if (process.Errors().Any()) {
-                        foreach (var error in process.Errors()) {
+                    if (process.Errors().Any())
+                    {
+                        foreach (var error in process.Errors())
+                        {
                             context.Error(error);
                         }
                         return new NullSchemaReader();
                     }
+                    var container = DefaultContainer.Create(process, ctx.Resolve<IPipelineLogger>());
 
-                    return new SchemaReader(context, new RunTimeRunner(context), process);
+                    return new SchemaReader(context, new RunTimeRunner(context, container), process);
 
                 }).Named<ISchemaReader>(connection.Key);
             }
 
             // Entity input
-            foreach (var entity in _process.Entities.Where(e => _process.Connections.First(c => c.Name == e.Connection).Provider == "excel")) {
+            foreach (var entity in _process.Entities.Where(e => _process.Connections.First(c => c.Name == e.Connection).Provider == "excel"))
+            {
 
                 // input version detector
-                builder.RegisterType<NullVersionDetector>().Named<IInputVersionDetector>(entity.Key);
+                builder.RegisterType<NullInputProvider>().Named<IInputProvider>(entity.Key);
 
                 // input reader
                 builder.Register<IRead>(ctx => {
                     var input = ctx.ResolveNamed<InputContext>(entity.Key);
                     var rowFactory = ctx.ResolveNamed<IRowFactory>(entity.Key, new NamedParameter("capacity", input.RowCapacity));
-                    switch (input.Connection.Provider) {
+                    switch (input.Connection.Provider)
+                    {
                         case "excel":
                             return new ExcelReader(input, rowFactory);
                         default:
@@ -86,15 +97,31 @@ namespace JunkDrawer.Autofac.Modules {
                 }).Named<IRead>(entity.Key);
             }
 
-            if (_process.Output().Provider == "excel") {
+            if (_process.Output().Provider == "excel")
+            {
                 // PROCESS OUTPUT CONTROLLER
                 builder.Register<IOutputController>(ctx => new NullOutputController()).As<IOutputController>();
 
-                foreach (var entity in _process.Entities) {
-                    // todo
+                foreach (var entity in _process.Entities)
+                {
+                    builder.Register<IOutputController>(ctx => new NullOutputController()).Named<IOutputController>(entity.Key);
+
+                    // ENTITY WRITER
+                    builder.Register<IWrite>(ctx => {
+                        var output = ctx.ResolveNamed<OutputContext>(entity.Key);
+
+                        switch (output.Connection.Provider)
+                        {
+                            case "excel":
+                                return new ExcelWriter(output);
+                            default:
+                                return new NullWriter(output);
+                        }
+                    }).Named<IWrite>(entity.Key);
                 }
             }
 
         }
     }
+
 }

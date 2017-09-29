@@ -1,6 +1,7 @@
 #region license
-// JunkDrawer.Autofac
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,28 +21,33 @@ using Transformalize.Configuration;
 using Transformalize.Contracts;
 
 namespace JunkDrawer.Autofac {
-    public class ReverseConfiguration : ICreateConfiguration {
+    public class ReverseConfiguration {
+        private readonly IContext _context;
         private readonly Response _response;
 
-        public ReverseConfiguration(Response response) {
+        public ReverseConfiguration(IContext context, Response response) {
+            _context = context;
             _response = response;
         }
 
-        public string Create() {
+        public Process Create() {
 
             var process = new Process { Name = "Pager" };
-            process.Connections.Clear();
-            process.Entities.Clear();
-
             process.Connections.Add(_response.Connection.Clone());
             process.Connections.First().Name = "input";
 
             var entity = new Entity { Name = _response.View, Connection = "input" };
-            entity.Fields.Add(new Field { Name = Transformalize.Constants.TflKey, Alias = "Key", Type = "int", PrimaryKey = true });
+            entity.Fields.Add(new Field { Name = Transformalize.Constants.TflKey, Alias = "JdKey", Type = "int", PrimaryKey = true });
             entity.Fields.AddRange(_response.Fields);
             process.Entities.Add(entity);
 
-            return process.Serialize();
+            process.Check();
+
+            foreach (var error in process.Errors()) {
+                _context.Error(error);
+            }
+
+            return process;
         }
     }
 

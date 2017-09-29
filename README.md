@@ -279,7 +279,7 @@ using (var scope = new AutofacJunkBootstrapper(request)) {
 }
 
 ```
-The above snippet uses [Autofac](http://autofac.org/) to wire up 
+The above snippet uses [Autofac](http://autofac.org) to wire up 
 the `JunkImporter` dependencies.  A `JunkDrawer.Autofac` project 
 is included in the solution.
 
@@ -329,7 +329,7 @@ complete list:
                      separated (e.g. bool, byte, short, int, long, single,
                      double, datetime).
 -c, --connection     Override the configuration connection type (e.g.
-                     sqlserver, mysql, postgresql, sqlite).
+                     sqlserver, mysql, postgresql, sqlite, sqlce).
 -s, --server         Override the configuration output server.
 -n, --port           Override the configuration output port.
 -d, --database       Override the configuration output database.

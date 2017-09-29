@@ -1,7 +1,7 @@
 #region license
-// Transformalize
-// A Configurable ETL Solution Specializing in Incremental Denormalization.
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,55 +16,61 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Transformalize;
 using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
-using Transformalize.Desktop.Writers;
-using Transformalize.Extensions;
 using Transformalize.Logging.NLog;
 using Transformalize.Nulls;
+using Transformalize.Provider.Internal;
+using Transformalize.Providers.Trace;
+using Transformalize.Writers;
 
-namespace JunkDrawer.Autofac.Modules {
+namespace JunkDrawer.Autofac.Modules
+{
 
-    public class InternalModule : Module {
+    public class InternalModule : Module
+    {
         private readonly Process _process;
-        private readonly string[] _internal = { "internal", "console", "trace", "log" };
+        private readonly HashSet<string> _internal = new HashSet<string>(new[] { "internal", "trace", "log", "text" });
 
         public InternalModule() { }
 
-        public InternalModule(Process process) {
+        public InternalModule(Process process)
+        {
             _process = process;
         }
 
-        protected override void Load(ContainerBuilder builder) {
+        protected override void Load(ContainerBuilder builder)
+        {
 
             if (_process == null)
                 return;
 
             // Connections
-            foreach (var connection in _process.Connections.Where(c => c.IsInternal())) {
+            foreach (var connection in _process.Connections.Where(c => c.IsInternal()))
+            {
                 builder.RegisterType<NullSchemaReader>().Named<ISchemaReader>(connection.Key);
             }
 
             // Entity input
-            foreach (var entity in _process.Entities.Where(e => _process.Connections.First(c => c.Name == e.Connection).Provider.In(_internal))) {
+            foreach (var entity in _process.Entities.Where(e => _internal.Contains(_process.Connections.First(c => c.Name == e.Connection).Provider)))
+            {
 
-                builder.RegisterType<NullVersionDetector>().Named<IInputVersionDetector>(entity.Key);
+                builder.RegisterType<NullInputProvider>().Named<IInputProvider>(entity.Key);
 
                 // READER
-                builder.Register<IRead>(ctx => {
+                builder.Register<IRead>(ctx =>
+                {
                     var input = ctx.ResolveNamed<InputContext>(entity.Key);
                     var rowFactory = ctx.ResolveNamed<IRowFactory>(entity.Key, new NamedParameter("capacity", input.RowCapacity));
 
-                    switch (input.Connection.Provider) {
+                    switch (input.Connection.Provider)
+                    {
                         case "internal":
                             return new InternalReader(input, rowFactory);
-                        case "console":
-                            // todo: take standard input
-                            return new NullReader(input);
                         default:
                             return new NullReader(input, false);
                     }
@@ -73,26 +79,33 @@ namespace JunkDrawer.Autofac.Modules {
             }
 
             // Entity Output
-            if (_process.Output().Provider.In(_internal)) {
+            if (_internal.Contains(_process.Output().Provider))
+            {
 
                 // PROCESS OUTPUT CONTROLLER
                 builder.Register<IOutputController>(ctx => new NullOutputController()).As<IOutputController>();
 
-                foreach (var entity in _process.Entities) {
+
+                foreach (var entity in _process.Entities)
+                {
 
                     builder.Register<IOutputController>(ctx => new NullOutputController()).Named<IOutputController>(entity.Key);
+                    builder.Register<IWrite>(ctx => new InternalWriter(ctx.ResolveNamed<OutputContext>(entity.Key))).Named<IWrite>(entity.Key);
+                    builder.Register<IOutputProvider>(ctx => new InternalOutputProvider(ctx.ResolveNamed<OutputContext>(entity.Key), ctx.ResolveNamed<IWrite>(entity.Key))).Named<IOutputProvider>(entity.Key);
 
                     // WRITER
-                    builder.Register<IWrite>(ctx => {
+                    builder.Register<IWrite>(ctx =>
+                    {
                         var output = ctx.ResolveNamed<OutputContext>(entity.Key);
 
-                        switch (output.Connection.Provider) {
-                            case "console":
-                                return ctx.Resolve<ConsoleWriter>() ;
+                        switch (output.Connection.Provider)
+                        {
                             case "trace":
                                 return new TraceWriter(new JsonNetSerializer(output));
                             case "internal":
-                                return new InternalWriter(entity);
+                                return new InternalWriter(output);
+                            case "text":
+                                return new StringWriter(output);
                             case "log":
                                 return new NLogWriter(output);
                             default:

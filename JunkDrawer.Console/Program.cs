@@ -1,6 +1,7 @@
 ﻿#region license
-// JunkDrawer.Console
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -77,6 +78,7 @@ namespace JunkDrawer {
                         var response = bootstrapper.Resolve<Importer>().Import();
                         if (response.Records != 0)
                             return;
+
                         Console.Error.WriteLine("Did not import any records!");
                         Environment.ExitCode = Error;
                     }

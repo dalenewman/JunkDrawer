@@ -1,6 +1,7 @@
 #region license
-// JunkDrawer.Autofac
-// Copyright 2013 Dale Newman
+// JunkDrawer
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,23 +23,25 @@ using JunkDrawer.Autofac.Modules;
 using Transformalize.Configuration;
 using Transformalize.Contracts;
 
-namespace JunkDrawer.Autofac {
+namespace JunkDrawer.Autofac
+{
 
-    public class RunTimeExecutor : IRunTimeExecute {
+    public class RunTimeExecutor : IRunTimeExecute
+    {
         private readonly IContext _context;
 
-        public RunTimeExecutor(IContext context) {
+        public RunTimeExecutor(IContext context)
+        {
             _context = context;
         }
 
-        public void Execute(Process process) {
+        public void Execute(Process process)
+        {
 
-            foreach (var warning in process.Warnings()) {
-                _context.Warn(warning);
-            }
-
-            if (process.Errors().Any()) {
-                foreach (var error in process.Errors()) {
+            if (process.Errors().Any())
+            {
+                foreach (var error in process.Errors())
+                {
                     _context.Error(error);
                 }
                 _context.Error("The configuration errors must be fixed before this job will run.");
@@ -57,17 +60,23 @@ namespace JunkDrawer.Autofac {
             builder.RegisterModule(new ProcessPipelineModule(process));
             builder.RegisterModule(new ProcessControlModule(process));
 
-            using (var scope = builder.Build().BeginLifetimeScope()) {
-                try {
+            using (var scope = builder.Build().BeginLifetimeScope())
+            {
+                try
+                {
                     scope.Resolve<IProcessController>().Execute();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     _context.Error(ex.Message);
                 }
             }
         }
 
-        public void Execute(string cfg, string shorthand, Dictionary<string, string> parameters) {
+        public void Execute(string cfg, Dictionary<string, string> parameters)
+        {
             throw new NotImplementedException();
         }
+
     }
 }

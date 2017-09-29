@@ -33,29 +33,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.4.3.0\lib\net45\Autofac.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Autofac, Version=4.6.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.6.1\lib\net45\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Cfg.Net.Environment, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Environment.0.2.2\lib\portable-net45+win8+wpa81+wp8\Cfg.Net.Environment.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Cfg.Net.Environment, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Environment.0.3.2\lib\portable-net45+win8+wpa81+wp8\Cfg.Net.Environment.dll</HintPath>
     </Reference>
-    <Reference Include="Cfg.Net.Reader, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.3.2\lib\net45\Cfg.Net.Reader.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Cfg.Net.Reader, Version=0.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.Reader.0.3.3\lib\net45\Cfg.Net.Reader.dll</HintPath>
     </Reference>
-    <Reference Include="CfgNet, Version=0.9.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.9.4\lib\net452\CfgNet.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="CfgNet, Version=0.10.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cfg-NET.0.10.2\lib\net452\CfgNet.dll</HintPath>
     </Reference>
     <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
     </Reference>
-    <Reference Include="Excel, Version=2.1.2.3, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDataReader.2.1.2.3\lib\net45\Excel.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="DocumentFormat.OpenXml, Version=0.0.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenXMLSDK-MOT.2.7.1\lib\net45\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader, Version=3.1.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.3.1.0\lib\net45\ExcelDataReader.dll</HintPath>
     </Reference>
     <Reference Include="FileHelpers, Version=3.1.5.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
       <HintPath>..\packages\FileHelpers.3.1.5\lib\net45\FileHelpers.dll</HintPath>
@@ -86,25 +84,29 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.2\lib\net45\NLog.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql, Version=3.2.0.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Npgsql.3.2.0\lib\net451\Npgsql.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Npgsql, Version=3.2.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Npgsql.3.2.5\lib\net451\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenXmlPowerTools, Version=4.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenXmlPowerTools.4.5.3.1\lib\net45\OpenXmlPowerTools.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.104.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.104.0\lib\net451\System.Data.SQLite.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.105.2\lib\net451\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Management.Automation.dll.10.0.10586.0\lib\net40\System.Management.Automation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
@@ -119,49 +121,49 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.0.2.3-beta\lib\net452\Transformalize.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Transformalize\Compatibility\Transformalize.452\bin\Debug\Transformalize.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Desktop, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Desktop.0.2.2-beta\lib\net452\Transformalize.Desktop.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Logging.NLog, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Logging.NLog.0.2.7-beta\lib\net452\Transformalize.Logging.NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Logging.NLog, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Logging.NLog.0.2.2-beta\lib\net452\Transformalize.Logging.NLog.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.Access, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.Access.0.2.7-beta\lib\net452\Transformalize.Provider.Access.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.Ado, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Ado.0.2.3-beta\lib\net452\Transformalize.Provider.Ado.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.Ado, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.Ado.0.2.7-beta\lib\net452\Transformalize.Provider.Ado.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.Excel, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Excel.0.2.2-beta\lib\net452\Transformalize.Provider.Excel.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.Console, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.Console.0.2.7-beta\lib\net452\Transformalize.Provider.Console.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.File, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.File.0.2.2-beta\lib\net452\Transformalize.Provider.File.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.Excel, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Transformalize\Providers\Excel\bin\Debug\Transformalize.Provider.Excel.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.MySql, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.MySql.0.2.3-beta\lib\net452\Transformalize.Provider.MySql.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.File, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.File.0.2.7-beta\lib\net452\Transformalize.Provider.File.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.PostgreSql, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.PostgreSql.0.2.3-beta\lib\net452\Transformalize.Provider.PostgreSql.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.MySql, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.MySql.0.2.7-beta\lib\net452\Transformalize.Provider.MySql.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.SqlCe, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.SqlCe.0.2.3-beta\lib\net452\Transformalize.Provider.SqlCe.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.OpenXml, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.OpenXml.0.2.7-beta\lib\net452\Transformalize.Provider.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.SQLite, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.SQLite.0.2.3-beta\lib\net452\Transformalize.Provider.SQLite.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.PostgreSql, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.PostgreSql.0.2.7-beta\lib\net452\Transformalize.Provider.PostgreSql.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.SqlServer, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.SqlServer.0.2.3-beta\lib\net452\Transformalize.Provider.SqlServer.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Transformalize.Provider.SqlCe, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.SqlCe.0.2.7-beta\lib\net452\Transformalize.Provider.SqlCe.dll</HintPath>
+    </Reference>
+    <Reference Include="Transformalize.Provider.SQLite, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.SQLite.0.2.7-beta\lib\net452\Transformalize.Provider.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="Transformalize.Provider.SqlServer, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.SqlServer.0.2.7-beta\lib\net452\Transformalize.Provider.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Transformalize.Provider.Trace, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Transformalize.Provider.Trace.0.2.7-beta\lib\net452\Transformalize.Provider.Trace.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +175,7 @@
     <Compile Include="Modules\AdoModule.cs" />
     <Compile Include="Modules\ConnectionModule.cs" />
     <Compile Include="Modules\ContextModule.cs" />
+    <Compile Include="DefaultContainer.cs" />
     <Compile Include="Modules\EntityModule.cs" />
     <Compile Include="Modules\EntityPipelineModule.cs" />
     <Compile Include="Modules\ExcelModule.cs" />
@@ -201,13 +204,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.104.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.104.0\build\net451\System.Data.SQLite.Core.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.104.0\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.104.0\build\net451\System.Data.SQLite.Core.targets'))" />
-  </Target>
   <PropertyGroup>
     <PostBuildEvent>
     if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
@@ -215,6 +211,13 @@
     if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
     xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

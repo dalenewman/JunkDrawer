@@ -1,6 +1,7 @@
 #region license
 // JunkDrawer
-// Copyright 2013 Dale Newman
+// An easier way to import excel or delimited files into a database.
+// Copyright 2013-2017 Dale Newman
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +15,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using Cfg.Net.Ext;
 using Transformalize;
 using Transformalize.Configuration;
@@ -44,7 +43,6 @@ namespace JunkDrawer {
 
             var entity = process.Entities.First();
             entity.PrependProcessNameToOutputName = false;
-            entity.CalculateHashCode = _cfg.CalculateHashCode;
 
             if (!string.IsNullOrEmpty(_cfg.Output().Table) && _cfg.Output().Table != Constants.DefaultSetting) {
                 entity.Alias = _cfg.Output().Table;
