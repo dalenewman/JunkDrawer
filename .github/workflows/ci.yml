@@ -1,0 +1,213 @@
+name: Build, test, and image
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*.*.*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  IMAGE: ghcr.io/dalenewman/junkdrawer.cli
+
+jobs:
+  portable:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - run: dotnet restore JunkDrawer.sln
+      - run: dotnet build JunkDrawer.sln --no-restore -c Release
+      - run: dotnet test --project Test/Test.csproj --no-build -c Release
+      - run: ./scripts/nuget-pack.sh --output-dir artifacts/nuget
+        shell: bash
+        if: runner.os == 'Linux'
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: nuget-packages
+          path: artifacts/nuget/*.nupkg
+
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            project: JunkDrawer.Eto.Mac64/JunkDrawer.Eto.Mac64.csproj
+          - os: windows-latest
+            project: JunkDrawer.Eto.WinForms/JunkDrawer.Eto.WinForms.csproj
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - run: dotnet build ${{ matrix.project }} -c Release
+
+  native-macos:
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - run: sudo dotnet workload install macos
+      - run: dotnet build JunkDrawer.Eto.Core.Desktop/JunkDrawer.Eto.Core.Desktop.csproj -c Release
+
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - run: dotnet test --project Test.Database/Test.Database.csproj -c Release
+
+  container-smoke:
+    if: github.event_name == 'pull_request'
+    needs: [portable, database]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: docker build -f JunkDrawer.Console/Dockerfile -t junkdrawer-cli:pr .
+      - name: Import mounted CSV
+        run: |
+          mkdir -p "$RUNNER_TEMP/jd-smoke"
+          cp Test/Files/CommaSeparatedValues.csv "$RUNNER_TEMP/jd-smoke/input.csv"
+          docker run --rm -v "$RUNNER_TEMP/jd-smoke:/data" junkdrawer-cli:pr -f /data/input.csv
+          test -s "$RUNNER_TEMP/jd-smoke/junk.sqlite3"
+
+  image:
+    if: github.event_name != 'pull_request'
+    needs: [portable, desktop, database]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            label: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            label: arm64
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: JunkDrawer.Console/Dockerfile
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          provenance: true
+          sbom: true
+      - name: Smoke test image
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/jd-smoke"
+          cp Test/Files/CommaSeparatedValues.csv "$RUNNER_TEMP/jd-smoke/input.csv"
+          docker run --rm --platform '${{ matrix.platform }}' -v "$RUNNER_TEMP/jd-smoke:/data" "$IMAGE@$DIGEST" -f /data/input.csv
+          test -s "$RUNNER_TEMP/jd-smoke/junk.sqlite3"
+      - name: Save digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.label }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  manifest:
+    needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-*
+          merge-multiple: true
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/metadata-action@v6
+        id: meta
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
+      - name: Create multiarch manifest
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf "$IMAGE@sha256:%s " *)
+      - name: Inspect manifest
+        env:
+          TAG: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        run: docker buildx imagetools inspect "$TAG"
+
+  scan:
+    needs: manifest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - name: Set image tag
+        run: echo "IMAGE_TAG=sha-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+        env:
+          TRIVY_PLATFORM: linux/amd64
+      - uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+          category: container-scan

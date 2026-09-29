@@ -37,7 +37,7 @@ namespace JunkDrawer {
         public PageResult GetPage(int page, int pageSize) {
             var result = new PageResult();
             _entity.Page = page;
-            _entity.PageSize = pageSize;
+            _entity.Size = pageSize;
             result.Rows = _reader.Run(_process).ToArray(); // enumerate so i can get hits count back
             result.Fields = _fields;
             result.Hits = _entity.Hits;

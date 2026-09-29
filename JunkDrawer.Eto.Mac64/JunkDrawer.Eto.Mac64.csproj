@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>osx-arm64</RuntimeIdentifiers>
+    <AssemblyName>jdgui</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../JunkDrawer.Eto.Core/JunkDrawer.Eto.Core.csproj" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.11.0" />
+    <Compile Include="../JunkDrawer.Eto.Core.Desktop/Program.cs" Link="Program.cs" />
+    <Content Include="../JunkDrawer.Eto.Core.Desktop/sqlite.xml" Link="Examples/sqlite.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Icon.icns" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

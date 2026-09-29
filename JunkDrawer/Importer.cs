@@ -40,7 +40,6 @@ namespace JunkDrawer {
 
         public Response Import() {
 
-            try {
                 _executor.Execute(_process);
                 var entity = _process.Entities.First();
 
@@ -51,11 +50,11 @@ namespace JunkDrawer {
 
                 var arr = fields.ToArray();
 
-                var use = (_cf.AdoProvider == AdoProvider.SqlServer || _cf.AdoProvider == AdoProvider.MySql ? $"USE {_cf.Enclose(_process.Output().Database)};" : string.Empty) + System.Environment.NewLine;
+                var use = (_cf.AdoProvider == AdoProvider.SqlServer || _cf.AdoProvider == AdoProvider.MySql ? $"USE {_cf.Enclose(_process.GetOutputConnection().Database)};" : string.Empty) + System.Environment.NewLine;
 
                 return new Response {
                     Records = entity.Inserts,
-                    Connection = _process.Output(),
+                    Connection = _process.GetOutputConnection(),
                     Fields = arr,
                     View = entity.Alias,
                     Sql = $@"{use}
@@ -63,10 +62,6 @@ SELECT
 {(string.Join("," + System.Environment.NewLine, arr.Select(f => "    " + _cf.Enclose(f.Alias))))}
 FROM {_cf.Enclose(entity.Alias)};"
                 };
-
-            } catch (Exception) {
-                return new Response();
-            }
 
         }
 
