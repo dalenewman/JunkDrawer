@@ -1,6 +1,7 @@
 using JunkDrawer;
 using JunkDrawer.Autofac;
 using Microsoft.Data.Sqlite;
+using System.Threading;
 
 namespace Test;
 
@@ -15,11 +16,39 @@ public sealed class ModernIntegration {
     }
 
     [TestCleanup]
-    public void Cleanup() => Directory.Delete(_directory, recursive: true);
+    public void Cleanup() {
+        // Some providers or background operations may leave file handles briefly open.
+        // Retry deletion a few times to reduce flaky test failures caused by transient file locks.
+        const int maxAttempts = 5;
+        var attempt = 0;
+        while (attempt++ < maxAttempts) {
+            try {
+                if (Directory.Exists(_directory)) {
+                    // Clear read-only attributes just in case
+                    foreach (var file in Directory.EnumerateFiles(_directory, "*", SearchOption.AllDirectories)) {
+                        try {
+                            File.SetAttributes(file, FileAttributes.Normal);
+                        } catch { }
+                    }
+                    Directory.Delete(_directory, recursive: true);
+                }
+                break;
+            } catch (IOException) {
+                // Give other processes a moment to release handles
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Thread.Sleep(200);
+            } catch (UnauthorizedAccessException) {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Thread.Sleep(200);
+            }
+        }
+    }
 
     [TestMethod]
     public void CsvImportCanRunTwiceAndPageResults() {
-        var database = Path.Combine(_directory, "data.sqlite3");
+        var database = Path.Combine(_directory, $"data-{Guid.NewGuid():N}.sqlite3");
         var arrangement = CreateArrangement(database);
         var request = new Request(Path.Combine(AppContext.BaseDirectory, "Files", "CommaSeparatedValues.csv")) {
             Configuration = arrangement,
@@ -61,7 +90,7 @@ public sealed class ModernIntegration {
 
     [TestMethod]
     public void CliReportsMissingInput() {
-        var code = JunkDrawer.Program.Main(["-f", Path.Combine(_directory, "missing.csv"), "-a", CreateArrangement(Path.Combine(_directory, "data.sqlite3"))]);
+        var code = JunkDrawer.Program.Main(["-f", Path.Combine(_directory, "missing.csv"), "-a", CreateArrangement(Path.Combine(_directory, $"data-{Guid.NewGuid():N}.sqlite3"))]);
         Assert.AreEqual(1, code);
     }
 
@@ -69,7 +98,7 @@ public sealed class ModernIntegration {
     [DataRow("Excel1.xls")]
     [DataRow("Excel2.xlsx")]
     public void ExcelCanImport(string fileName) {
-        var database = Path.Combine(_directory, "data.sqlite3");
+        var database = Path.Combine(_directory, $"data-{Guid.NewGuid():N}.sqlite3");
         var arrangement = CreateArrangement(database);
         var request = new Request(Path.Combine(AppContext.BaseDirectory, "Files", fileName)) {
             Configuration = arrangement,
@@ -121,7 +150,7 @@ public sealed class ModernIntegration {
     [DataRow("CsvWithDoubleQuotesAroundHeaders.csv", 4L)]
     public void DelimitersAndQuotedHeadersImport(string fileName, long expected) {
         var request = new Request(Path.Combine(AppContext.BaseDirectory, "Files", fileName)) {
-            Configuration = CreateArrangement(Path.Combine(_directory, "data.sqlite3")),
+            Configuration = CreateArrangement(Path.Combine(_directory, $"data-{Guid.NewGuid():N}.sqlite3")),
             Retries = 0
         };
         using var bootstrapper = new Bootstrapper(request);
