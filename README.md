@@ -82,7 +82,7 @@ dotnet test --project Test/Test.csproj
 
 To run the server integration tests, start Docker and run `dotnet test --project Test.Database/Test.Database.csproj`. The tests create disposable PostgreSQL, MySQL, and SQL Server containers; SQL Server uses x64 emulation on Apple Silicon.
 
-`JunkDrawer.sln` contains the portable libraries, CLI, shared GUI, and tests. Build each desktop launcher on its own OS.
+`JunkDrawer.sln` shows all nine projects, including the Windows and macOS desktop launchers. The default solution build includes the portable libraries, CLI, shared GUI, and tests; build a desktop launcher separately on its own OS using the commands below.
 
 ## CLI
 

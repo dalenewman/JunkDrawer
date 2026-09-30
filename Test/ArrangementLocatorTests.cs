@@ -25,7 +25,7 @@ public sealed class ArrangementLocatorTests {
 
     [TestMethod]
     public void DefaultLookupUsesWorkingThenApplicationThenHomeThenExample() {
-        var example = Create(_application, "Examples/sqlite.xml");
+        var example = Create(Path.Combine(_application, "Examples"), "sqlite.xml");
         Assert.AreEqual(example, Find());
 
         var personal = Create(Path.Combine(_home, ".junkdrawer"), "sqlite.xml");
