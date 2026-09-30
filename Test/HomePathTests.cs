@@ -19,19 +19,18 @@ public sealed class HomePathTests {
     }
 
     [TestMethod]
-    public void ArrangementExpandsConnectionFileAndOpenWithPaths() {
+    public void ArrangementExpandsConnectionFilePath() {
         var arrangement = Path.Combine(Path.GetTempPath(), "jd-paths-" + Guid.NewGuid().ToString("N") + ".xml");
         try {
             File.WriteAllText(arrangement, """
                 <jd><connections>
                   <add name="input" provider="file" file="*.*" />
-                  <add name="output" provider="sqlite" file="~/.junkdrawer/junk.sqlite3" open-with="~/bin/sqlite-browser" />
+                  <add name="output" provider="sqlite" file="~/.junkdrawer/junk.sqlite3" />
                 </connections></jd>
                 """);
             var cfg = new global::JunkDrawer.Cfg(arrangement, new FileReader());
             Assert.IsFalse(cfg.Errors().Any(), string.Join(Environment.NewLine, cfg.Errors()));
             Assert.AreEqual(HomePath.Expand("~/.junkdrawer/junk.sqlite3"), cfg.Output().File);
-            Assert.AreEqual(HomePath.Expand("~/bin/sqlite-browser"), cfg.Output().OpenWith);
         } finally {
             File.Delete(arrangement);
         }

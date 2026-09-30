@@ -2,6 +2,7 @@ using JunkDrawer;
 using JunkDrawer.Autofac;
 using Microsoft.Data.Sqlite;
 using System.Threading;
+using Transformalize.Configuration;
 
 namespace Test;
 
@@ -61,6 +62,9 @@ public sealed class ModernIntegration {
             Assert.AreEqual(4L, response.Records);
             StringAssert.Contains(response.Sql, "WebSite");
             var page = bootstrapper.Resolve<Pager>(request, response).GetPage(1, 2);
+            var nextPage = bootstrapper.Resolve<Pager>(request, response).GetPage(2, 2);
+            StringAssert.Contains(page.Query, "LIMIT 0,2");
+            StringAssert.Contains(nextPage.Query, "LIMIT 2,2");
             Assert.AreEqual(4L, page.Hits);
             Assert.AreEqual(2, page.Rows.Length);
         }
@@ -70,6 +74,32 @@ public sealed class ModernIntegration {
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT COUNT(*) FROM CommaSeparatedValues";
         Assert.AreEqual(4L, (long)command.ExecuteScalar()!);
+    }
+
+    [TestMethod]
+    public void PageResultsApplyRequestedSortBeforePaging() {
+        var database = Path.Combine(_directory, "sorted.sqlite3");
+        var request = new Request(Path.Combine(AppContext.BaseDirectory, "Files", "CommaSeparatedValues.csv")) {
+            Configuration = CreateArrangement(database),
+            Retries = 0
+        };
+
+        using var bootstrapper = new Bootstrapper(request);
+        var response = bootstrapper.Resolve<Importer>().Import();
+        var ascending = bootstrapper.Resolve<Pager>(request, response).GetPage(1, 2,
+            [new Order { Field = "Name", Sort = "asc" }]);
+        var descending = bootstrapper.Resolve<Pager>(request, response).GetPage(1, 2,
+            [new Order { Field = "Name", Sort = "desc" }]);
+        var multiple = bootstrapper.Resolve<Pager>(request, response).GetPage(1, 2,
+            [new Order { Field = "Name", Sort = "asc" }, new Order { Field = "WebSite", Sort = "desc" }]);
+        var name = ascending.Fields.Single(field => field.Alias == "Name");
+
+        Assert.AreEqual("Apple", ascending.Rows[0][name]?.ToString());
+        Assert.AreEqual("Google", ascending.Rows[1][name]?.ToString());
+        Assert.AreEqual("Nike, Inc.", descending.Rows[0][name]?.ToString());
+        StringAssert.Contains(ascending.Query.ToLowerInvariant(), "order by");
+        StringAssert.Contains(descending.Query.ToLowerInvariant(), "desc");
+        StringAssert.Contains(multiple.Query, "WebSite");
     }
 
     [TestMethod]

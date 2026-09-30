@@ -111,22 +111,22 @@ The output file path is relative to the process working directory. Use an absolu
 
 ### Personal arrangements
 
-Keep your connection settings in `~/.junkdrawer/config.xml` (or `~/.junkdrawer/sqlite.xml`). Both the CLI and GUI read the same XML format. Start with the SQLite example, then add named output connections under `<connections>`; the GUI lists every connection except `input` in its Connections menu and dropdown.
+Keep your connection settings in `~/.junkdrawer/config.xml` (or `~/.junkdrawer/sqlite.xml`). Both the CLI and GUI read the same XML format. Start with the SQLite example, then add named output connections under `<connections>`; the GUI lists every connection except `input` in its Connections menu.
 
 ```sh
 mkdir -p ~/.junkdrawer
 cp -n JunkDrawer.Console/sqlite.xml ~/.junkdrawer/config.xml
 ```
 
-The default lookup checks `config.xml` and then `sqlite.xml` in each location, in this order: the process working directory, the application directory, and `~/.junkdrawer`. If none exists, it uses the bundled `Examples/sqlite.xml`. This keeps the bundled example from hiding your personal file. The apps do not pick an arbitrary XML file automatically because the choice would be ambiguous; select another filename with `-a path/to/work.xml` or set `JUNKDRAWER_CONFIG` to its path. An explicit selection takes precedence and reports an error if the file is missing. A bare filename is searched in the same three directories. Paths beginning with `~/` or `~\` expand to the current user's home directory on macOS, Linux, and Windows, including connection `file` and `open-with` values. A bare `~` also expands; `~otheruser` does not. Relative output paths such as `file="junk.sqlite3"` still use the process working directory, so use `file="~/.junkdrawer/junk.sqlite3"` for a stable personal database location.
+The default lookup checks `config.xml` and then `sqlite.xml` in each location, in this order: the process working directory, the application directory, and `~/.junkdrawer`. If none exists, it uses the bundled `Examples/sqlite.xml`. This keeps the bundled example from hiding your personal file. The apps do not pick an arbitrary XML file automatically because the choice would be ambiguous; select another filename with `-a path/to/work.xml` or set `JUNKDRAWER_CONFIG` to its path. An explicit selection takes precedence and reports an error if the file is missing. A bare filename is searched in the same three directories. Paths beginning with `~/` or `~\` expand to the current user's home directory on macOS, Linux, and Windows, including connection `file` values. A bare `~` also expands; `~otheruser` does not. Relative output paths such as `file="junk.sqlite3"` still use the process working directory, so use `file="~/.junkdrawer/junk.sqlite3"` for a stable personal database location.
 
 ## Desktop GUI
 
-The GUI shares one form across native Eto backends. It can open a file, import it in the background, browse pages with a selectable page size, show generated SQL, switch among arrangement connections, choose inspection types, and start a configured `open-with` program. File, Connections, and Types menus are available alongside the on-screen controls. The GUI uses the personal arrangement lookup above and accepts `-a path/to/work.xml` to select another arrangement at launch. Restart it after editing the XML.
+The GUI shares one form across native Eto backends. It can open a file, import it in the background, browse pages with a selectable page size, show the current page query, switch among arrangement connections, and choose inspection types. Use the File, Connections, and Types menus to open files and choose settings. File > Settings opens the active arrangement XML in its associated application. The SQL icon beside the paging controls toggles the lower pane between logs and the current page query. The divider between the data grid and lower pane can be dragged to resize either pane. The SQL view formats Transformalize's query using the connection's SQL dialect, with the formatter's default SQL dialect for SQLite. The GUI uses the personal arrangement lookup above and accepts `-a path/to/work.xml` to select another arrangement at launch. Restart it after editing the XML.
 
 ![Earlier Windows Junk Drawer GUI showing imported data and the activity log](Content/jdgui.png)
 
-The earlier Windows GUI pictured above shows the data grid and activity log. The current GUI keeps those views and opens generated SQL with the SQL button.
+The earlier Windows GUI pictured above shows the data grid and activity log. The current GUI keeps those views and uses the database icon button to switch the lower pane between logs and SQL.
 
 On this arm64 Mac, run the Mac64 host without an extra workload:
 

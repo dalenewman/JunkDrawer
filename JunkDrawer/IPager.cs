@@ -17,6 +17,6 @@
 #endregion
 namespace JunkDrawer {
     public interface IPager : IResolvable {
-        PageResult GetPage(int page, int pageSize);
+        PageResult GetPage(int page, int pageSize, System.Collections.Generic.IReadOnlyList<Transformalize.Configuration.Order> order = null);
     }
 }

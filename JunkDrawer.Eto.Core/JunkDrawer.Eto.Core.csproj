@@ -7,14 +7,19 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Test" />
     <ProjectReference Include="../JunkDrawer.Autofac/JunkDrawer.Autofac.csproj" />
     <PackageReference Include="Eto.Forms" Version="2.11.0" />
+    <PackageReference Include="Hogimn.Sql.Formatter" Version="2.0.4" />
     <Compile Include="ModernMainForm.cs" />
+    <Compile Include="RecentFiles.cs" />
     <Compile Include="GuiLaunchOptions.cs" />
     <Compile Include="GuiStartup.cs" />
     <EmbeddedResource Include="Images/first.png" />
     <EmbeddedResource Include="Images/previous.png" />
     <EmbeddedResource Include="Images/next.png" />
     <EmbeddedResource Include="Images/last.png" />
+    <EmbeddedResource Include="Images/sql.png" />
+    <EmbeddedResource Include="Images/log.png" />
   </ItemGroup>
 </Project>

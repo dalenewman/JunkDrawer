@@ -30,7 +30,6 @@ namespace JunkDrawer {
             if (Connections != null) {
                 foreach (var connection in Connections) {
                     connection.File = HomePath.Expand(connection.File);
-                    connection.OpenWith = HomePath.Expand(connection.OpenWith);
                 }
             }
         }

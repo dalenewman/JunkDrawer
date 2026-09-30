@@ -9,10 +9,12 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../JunkDrawer.Console/JunkDrawer.Console.csproj" />
+    <ProjectReference Include="../JunkDrawer.Eto.Core/JunkDrawer.Eto.Core.csproj" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     <Compile Include="ModernIntegration.cs" />
     <Compile Include="ArrangementLocatorTests.cs" />
     <Compile Include="HomePathTests.cs" />
+    <Compile Include="RecentFilesTests.cs" />
     <Content Include="Files/CommaSeparatedValues.csv" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Files/CommaDelimited.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Files/PipeDelimited.txt" CopyToOutputDirectory="PreserveNewest" />

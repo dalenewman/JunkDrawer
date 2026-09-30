@@ -1,9 +1,10 @@
-using System.Diagnostics;
 using Cfg.Net.Reader;
 using Eto.Drawing;
 using Eto.Forms;
 using JunkDrawer.Autofac;
+using SQL.Formatter;
 using Transformalize;
+using Order = Transformalize.Configuration.Order;
 using Transformalize.Context;
 using Transformalize.Contracts;
 using Transformalize.Logging;
@@ -11,19 +12,32 @@ using Transformalize.Logging;
 namespace JunkDrawer.Eto.Core;
 
 public sealed class MainForm : Form {
+    private static readonly Bitmap SqlIcon = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.sql.png");
+    private static readonly Bitmap LogIcon = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.log.png");
     private readonly string _arrangement;
     private readonly Cfg _cfg;
-    private readonly DropDown _connections = new();
-    private readonly List<RadioMenuItem> _connectionItems = new();
+    private readonly List<string> _connectionNames;
+    private string _selectedConnection;
     private readonly List<CheckMenuItem> _typeItems = new();
-    private readonly Label _pageLabel = new() { Text = "" };
+    private readonly RecentFiles _recentFiles = new();
+    private ButtonMenuItem? _recentMenu;
+    private readonly Label _pageLabel = new() { Text = "", VerticalAlignment = VerticalAlignment.Center };
     private readonly GridView _grid = new() { ShowHeader = true };
+    private readonly List<Order> _sorts = new();
+    private readonly Dictionary<GridColumn, string> _columnFields = new();
     private readonly TextArea _log = new() {
         ReadOnly = true,
         Wrap = false,
         TextColor = Colors.LightGreen,
         BackgroundColor = Colors.Black
     };
+    private readonly TextArea _sqlView = new() {
+        ReadOnly = true,
+        Wrap = false,
+        TextColor = Colors.LightGreen,
+        BackgroundColor = Colors.Black
+    };
+    private readonly Panel _lowerPane = new();
     private readonly GuiLogger _logger;
     private readonly Button _first = new() {
         Image = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.first.png"),
@@ -41,68 +55,85 @@ public sealed class MainForm : Form {
         Image = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.last.png"),
         ToolTip = "Last page", MinimumSize = Size.Empty, Size = new Size(32, 28), Enabled = false
     };
-    private readonly Button _sql = new() { Text = "SQL", Enabled = false };
-    private readonly Button _openWith = new() { Text = "Open with", Enabled = false };
+    private readonly Button _sql = new() {
+        Image = SqlIcon,
+        ToolTip = "Show current page SQL", MinimumSize = Size.Empty, Size = new Size(32, 28), Enabled = false
+    };
     private readonly NumericStepper _pageSizeControl = new() {
-        MinValue = 10, MaxValue = 50, Increment = 5, DecimalPlaces = 0, Value = 20
+        MinValue = 10, MaxValue = 50, Increment = 5, DecimalPlaces = 0, Value = 20, Width = 65
     };
     private Request? _request;
     private Response? _response;
     private int _page = 1;
     private int _lastPage = 1;
     private int _pageSize = 20;
+    private string _pageQuery = string.Empty;
+    private bool _showingSql;
     private bool _busy;
 
     public MainForm(string arrangement, string? initialFile = null) {
         _arrangement = arrangement;
         _cfg = new Cfg(arrangement, new FileReader());
         if (_cfg.Errors().Any()) throw new InvalidOperationException(string.Join(Environment.NewLine, _cfg.Errors()));
+        _connectionNames = _cfg.Connections.Where(c => c.Name != "input").Select(c => c.Name).ToList();
+        _selectedConnection = _connectionNames.FirstOrDefault() ?? "output";
         _logger = new GuiLogger(line => Application.Instance.AsyncInvoke(() =>
             _log.Text += line + Environment.NewLine));
 
         Title = "Junk Drawer";
         ClientSize = new Size(900, 650);
+        _lowerPane.Content = _log;
         AppendLog($"Arrangement: {arrangement}");
 
-        var open = new Button { Text = "Open file" };
-        open.Click += (_, _) => OpenFile();
-        foreach (var connection in _cfg.Connections.Where(c => c.Name != "input")) _connections.Items.Add(connection.Name);
-        _connections.SelectedIndex = 0;
-        _connections.SelectedIndexChanged += (_, _) => {
-            if (_connections.SelectedIndex >= 0 && _connections.SelectedIndex < _connectionItems.Count)
-                _connectionItems[_connections.SelectedIndex].Checked = true;
-        };
         CreateMenu();
         _first.Click += (_, _) => ShowPage(1);
         _previous.Click += (_, _) => ShowPage(_page - 1);
         _next.Click += (_, _) => ShowPage(_page + 1);
         _last.Click += (_, _) => ShowPage(_lastPage);
-        _sql.Click += (_, _) => ShowSql();
-        _openWith.Click += (_, _) => OpenWith();
+        _sql.Click += (_, _) => ToggleSql();
+        _grid.ColumnHeaderClick += (_, args) => ToggleSort(args.Column);
         _pageSizeControl.ValueChanged += (_, _) => {
             _pageSize = (int)_pageSizeControl.Value;
             if (_response is not null) ShowPage(1);
         };
 
-        var top = new StackLayout {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Items = { open, new Label { Text = "Connection" }, _connections, _sql, _openWith }
-        };
         var navigation = new StackLayout {
             Orientation = Orientation.Horizontal,
+            VerticalContentAlignment = VerticalAlignment.Center,
             Spacing = 8,
-            Items = { _first, _previous, _pageLabel, _next, _last,
-                new Label { Text = "Page size" }, _pageSizeControl }
+            Items = { _first, _previous, _pageLabel, _next, _last }
+        };
+        var actions = new StackLayout {
+            Orientation = Orientation.Horizontal,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Spacing = 8,
+            Items = { _sql }
+        };
+        var pageSize = new StackLayout {
+            Orientation = Orientation.Horizontal,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Spacing = 8,
+            Items = { new Label { Text = "Page size", VerticalAlignment = VerticalAlignment.Center }, _pageSizeControl }
+        };
+        var toolbar = new TableLayout {
+            Spacing = new Size(8, 0),
+            Rows = { new TableRow(new TableCell(navigation, true), actions, pageSize) }
+        };
+        var content = new Splitter {
+            Orientation = Orientation.Vertical,
+            FixedPanel = SplitterFixedPanel.None,
+            RelativePosition = 0.7,
+            Panel1MinimumSize = 100,
+            Panel2MinimumSize = 100,
+            Panel1 = _grid,
+            Panel2 = _lowerPane
         };
         Content = new TableLayout {
             Padding = 10,
             Spacing = new Size(6, 6),
             Rows = {
-                new TableRow(top),
-                new TableRow(navigation),
-                new TableRow(_grid) { ScaleHeight = true },
-                new TableRow(_log) { ScaleHeight = true }
+                new TableRow(toolbar),
+                new TableRow(content) { ScaleHeight = true }
             }
         };
 
@@ -121,25 +152,27 @@ public sealed class MainForm : Form {
             MenuText = "&Open", Shortcut = Application.Instance.CommonModifier | Keys.O
         };
         open.Executed += (_, _) => OpenFile();
+        _recentMenu = new ButtonMenuItem { Text = "Open &Recent..." };
+        RefreshRecentMenu();
+        var settings = new Command { MenuText = "&Settings" };
+        settings.Executed += (_, _) => OpenSettings();
         var quit = new Command {
             MenuText = "&Quit", Shortcut = Application.Instance.CommonModifier | Keys.Q
         };
         quit.Executed += (_, _) => Application.Instance.Quit();
-        var fileMenu = new ButtonMenuItem { Text = "&File", Items = { open } };
+        var fileMenu = new ButtonMenuItem { Text = "&File", Items = { open, _recentMenu, settings } };
         var connectionMenu = new ButtonMenuItem { Text = "&Connections" };
         if (Platform.Supports<RadioMenuItem>()) {
             RadioMenuItem? controller = null;
-            for (var index = 0; index < _connections.Items.Count; index++) {
+            for (var index = 0; index < _connectionNames.Count; index++) {
                 var item = controller is null ? new RadioMenuItem() : new RadioMenuItem(controller);
                 controller ??= item;
-                item.Text = _connections.Items[index].Text;
-                item.Checked = index == _connections.SelectedIndex;
-                var selectedIndex = index;
+                item.Text = _connectionNames[index];
+                item.Checked = _connectionNames[index] == _selectedConnection;
+                var selectedConnection = _connectionNames[index];
                 item.CheckedChanged += (_, _) => {
-                    if (item.Checked && _connections.SelectedIndex != selectedIndex)
-                        _connections.SelectedIndex = selectedIndex;
+                    if (item.Checked) _selectedConnection = selectedConnection;
                 };
-                _connectionItems.Add(item);
                 connectionMenu.Items.Add(item);
             }
         }
@@ -157,9 +190,47 @@ public sealed class MainForm : Form {
         Menu = new MenuBar { Items = { fileMenu, connectionMenu, typeMenu }, QuitItem = quit };
     }
 
+    private void RefreshRecentMenu() {
+        if (_recentMenu is null) return;
+        _recentMenu.Items.Clear();
+        foreach (var file in _recentFiles.Files) {
+            var recentFile = file;
+            var item = new ButtonMenuItem { Text = file.Replace("&", "&&") };
+            item.Click += (_, _) => {
+                if (_busy) return;
+                if (!File.Exists(recentFile)) {
+                    TryUpdateRecentFiles(() => _recentFiles.Remove(recentFile));
+                    MessageBox.Show(this, $"File no longer exists: {recentFile}");
+                    return;
+                }
+                StartImport(recentFile);
+            };
+            _recentMenu.Items.Add(item);
+        }
+        _recentMenu.Enabled = _recentMenu.Items.Count > 0;
+    }
+
+    private void TryUpdateRecentFiles(Action update) {
+        try {
+            update();
+        } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) {
+            AppendLog($"Could not save recent files: {ex.Message}");
+        }
+        RefreshRecentMenu();
+    }
+
+    private void OpenSettings() {
+        try {
+            var target = OperatingSystem.IsMacOS() ? new Uri(_arrangement).AbsoluteUri : _arrangement;
+            Application.Instance.Open(target);
+        } catch (Exception ex) {
+            MessageBox.Show(this, $"Could not open settings: {ex.Message}");
+        }
+    }
+
     private void StartImport(string file) {
         if (_busy) return;
-        var selected = _connections.SelectedValue?.ToString() ?? "output";
+        var selected = _selectedConnection;
         var connection = _cfg.Connections.First(c => c.Name == selected);
         var request = new Request(file) {
             Configuration = _arrangement,
@@ -179,13 +250,17 @@ public sealed class MainForm : Form {
             return;
         }
         _busy = true;
+        ShowLog();
         _log.Text = $"Arrangement: {_arrangement}{Environment.NewLine}Importing {request.FileInfo.Name}…{Environment.NewLine}";
         _request = null;
         _response = null;
+        _pageQuery = string.Empty;
+        _sorts.Clear();
         _grid.DataStore = null;
         _grid.Columns.Clear();
+        _columnFields.Clear();
         _first.Enabled = _previous.Enabled = _next.Enabled = _last.Enabled = false;
-        _sql.Enabled = _openWith.Enabled = false;
+        _sql.Enabled = false;
         Task.Run(() => {
             try {
                 using var bootstrapper = new Bootstrapper(request, _logger);
@@ -195,7 +270,7 @@ public sealed class MainForm : Form {
                     _response = response;
                     _page = 1;
                     AppendLog($"Imported {response.Records} records into {response.View}.");
-                    _sql.Enabled = _openWith.Enabled = true;
+                    TryUpdateRecentFiles(() => _recentFiles.Add(request.FileInfo.FullName));
                     ShowPage(1);
                     _busy = false;
                 });
@@ -215,18 +290,29 @@ public sealed class MainForm : Form {
         if (_request is null || _response is null || page < 1) return;
         try {
             using var bootstrapper = new Bootstrapper(_request, _logger);
-            var result = bootstrapper.Resolve<Pager>(_request, _response).GetPage(page, _pageSize);
+            var result = bootstrapper.Resolve<Pager>(_request, _response).GetPage(page, _pageSize, _sorts);
             _page = page;
+            _pageQuery = result.Query;
+            _sql.Enabled = _showingSql || !string.IsNullOrWhiteSpace(_pageQuery);
+            if (_showingSql) UpdateSqlView();
             _grid.Columns.Clear();
+            _columnFields.Clear();
             foreach (var field in result.Fields.Where(f => !f.System)) {
                 var captured = field;
-                _grid.Columns.Add(new GridColumn {
-                    HeaderText = captured.Alias,
+                var fieldName = string.IsNullOrWhiteSpace(captured.Alias) ? captured.Name : captured.Alias;
+                var sort = _sorts.FirstOrDefault(item => item.Field == fieldName);
+                var sortIndicator = sort is null ? "" : sort.Sort == "asc" ? "▲" : "▼";
+                var column = new GridColumn {
+                    HeaderText = sort is null ? fieldName : $"{fieldName} {sortIndicator}",
+                    HeaderToolTip = "Click to sort ascending, descending, or clear the sort",
                     DataCell = new TextBoxCell {
                         Binding = new DelegateBinding<IRow, string>(row => row[captured]?.ToString() ?? "")
                     },
-                    Resizable = true
-                });
+                    Resizable = true,
+                    Sortable = true
+                };
+                _grid.Columns.Add(column);
+                _columnFields.Add(column, fieldName);
             }
             _grid.DataStore = result.Rows;
             var pages = Math.Max(1, (int)Math.Ceiling((double)result.Hits / _pageSize));
@@ -239,36 +325,52 @@ public sealed class MainForm : Form {
         }
     }
 
-    private void ShowSql() {
+    private void ToggleSort(GridColumn column) {
         if (_response is null) return;
-        new Dialog {
-            Title = "Generated SQL",
-            ClientSize = new Size(650, 350),
-            Content = new TextArea { Text = _response.Sql, ReadOnly = true, Wrap = false }
-        }.ShowModal(this);
+        if (!_columnFields.TryGetValue(column, out var fieldName)) return;
+        var sort = _sorts.FirstOrDefault(item => item.Field == fieldName);
+        if (sort is null) _sorts.Add(new Order { Field = fieldName, Sort = "asc" });
+        else if (sort.Sort == "asc") sort.Sort = "desc";
+        else _sorts.Remove(sort);
+        ShowPage(1);
     }
 
-    private void OpenWith() {
-        if (_response is null) return;
-        var selected = _connections.SelectedValue?.ToString() ?? "output";
-        var connection = _cfg.Connections.First(c => c.Name == selected);
-        if (string.IsNullOrWhiteSpace(connection.OpenWith)) {
-            MessageBox.Show(this, "Set open-with on this connection in the arrangement.");
+    private void ToggleSql() {
+        if (_showingSql) {
+            ShowLog();
             return;
         }
-        var target = string.IsNullOrWhiteSpace(connection.File) ? _response.Sql : connection.File;
-        if (string.IsNullOrWhiteSpace(connection.File)) {
-            var folder = new AppDataFolder();
-            var path = folder.FileName(_request!.ToKey(_cfg));
-            File.WriteAllText(path, _response.Sql);
-            target = path;
+        if (string.IsNullOrWhiteSpace(_pageQuery)) return;
+        UpdateSqlView();
+        _lowerPane.Content = _sqlView;
+        _showingSql = true;
+        _sql.Image = LogIcon;
+        _sql.ToolTip = "Show logs";
+    }
+
+    private void ShowLog() {
+        if (!_showingSql) return;
+        _lowerPane.Content = _log;
+        _showingSql = false;
+        _sql.Image = SqlIcon;
+        _sql.ToolTip = "Show current page SQL";
+    }
+
+    private void UpdateSqlView() {
+        if (string.IsNullOrWhiteSpace(_pageQuery)) {
+            _sqlView.Text = string.Empty;
+            return;
         }
         try {
-            var start = new ProcessStartInfo(connection.OpenWith);
-            start.ArgumentList.Add(target);
-            Process.Start(start);
+            _sqlView.Text = _response?.Connection.Provider switch {
+                "mysql" => SqlFormatter.Of("mysql").Format(_pageQuery),
+                "postgresql" => SqlFormatter.Of("postgresql").Format(_pageQuery),
+                "sqlserver" => SqlFormatter.Of("tsql").Format(_pageQuery),
+                _ => SqlFormatter.Format(_pageQuery)
+            };
         } catch (Exception ex) {
-            MessageBox.Show(this, ex.Message);
+            AppendLog($"Could not format page SQL: {ex.Message}");
+            _sqlView.Text = _pageQuery;
         }
     }
 }
