@@ -56,7 +56,7 @@ jobs:
       - run: dotnet build ${{ matrix.project }} -c Release
 
   native-macos:
-    runs-on: macos-latest
+    runs-on: xcode-27
     continue-on-error: true
     steps:
       - uses: actions/checkout@v6
