@@ -63,7 +63,8 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
-      - run: sudo dotnet workload install macos
+      # Keep the privileged workload install's NuGet cache under root's home.
+      - run: sudo -H dotnet workload install macos
       - run: dotnet build JunkDrawer.Eto.Core.Desktop/JunkDrawer.Eto.Core.Desktop.csproj -c Release
 
   database:
