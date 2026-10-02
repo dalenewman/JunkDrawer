@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Dale Newman</Authors>
+    <Company>JunkDrawer</Company>
+    <PackageProjectUrl>https://github.com/dalenewman/JunkDrawer</PackageProjectUrl>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

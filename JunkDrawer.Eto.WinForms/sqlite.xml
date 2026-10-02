@@ -1,0 +1,6 @@
+<jd>
+  <connections>
+    <add name="input" provider="file" file="*.*" />
+    <add name="output" provider="sqlite" file="junk.sqlite3" />
+  </connections>
+</jd>

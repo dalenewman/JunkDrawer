@@ -4,7 +4,6 @@
     <add name="output"
          provider="mysql"
          database="junk"
-         user="root"
-         password="password"/>
+         user="root"/>
   </connections>
 </jd>

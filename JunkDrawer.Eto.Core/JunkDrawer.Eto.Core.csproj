@@ -1,79 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DB40D3D3-042A-4099-AD29-5486C0993874}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>JunkDrawer.Eto.Core</RootNamespace>
-    <AssemblyName>JunkDrawer.Eto.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <DoNotCopyLocalIfInGac>true</DoNotCopyLocalIfInGac>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CfgNet, Version=0.10.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.10.2\lib\net452\CfgNet.dll</HintPath>
-    </Reference>
-    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Eto, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Eto.Forms.2.3.0\lib\net45\Eto.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Transformalize, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Transformalize\Compatibility\Transformalize.452\bin\Debug\Transformalize.dll</HintPath>
-    </Reference>
+    <InternalsVisibleTo Include="Test" />
+    <ProjectReference Include="../JunkDrawer.Autofac/JunkDrawer.Autofac.csproj" />
+    <PackageReference Include="Eto.Forms" Version="2.11.0" />
+    <PackageReference Include="Hogimn.Sql.Formatter" Version="2.0.4" />
+    <Compile Include="ModernMainForm.cs" />
+    <Compile Include="RecentFiles.cs" />
+    <Compile Include="GuiLaunchOptions.cs" />
+    <Compile Include="GuiStartup.cs" />
+    <EmbeddedResource Include="Images/first.png" />
+    <EmbeddedResource Include="Images/previous.png" />
+    <EmbeddedResource Include="Images/next.png" />
+    <EmbeddedResource Include="Images/last.png" />
+    <EmbeddedResource Include="Images/sql.png" />
+    <EmbeddedResource Include="Images/log.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CompositeLogger.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Icons.cs" />
-    <Compile Include="Options.cs" />
-    <Compile Include="PageGridView.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MainForm.cs" />
-    <Compile Include="TextAreaLogger.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\JunkDrawer\JunkDrawer.csproj">
-      <Project>{35022c73-d66e-43aa-814e-af8ce6b96294}</Project>
-      <Name>JunkDrawer</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\first.png" />
-    <EmbeddedResource Include="Images\last.png" />
-    <EmbeddedResource Include="Images\next.png" />
-    <EmbeddedResource Include="Images\previous.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\sql.png" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

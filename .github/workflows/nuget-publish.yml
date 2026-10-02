@@ -1,0 +1,51 @@
+name: NuGet Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Push packages to NuGet.org after reviewing artifacts
+        required: true
+        default: false
+        type: boolean
+      version:
+        description: Package version
+        required: true
+        default: 2.0.0-preview.1
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  pack-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      PACKAGE_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - run: ./scripts/nuget-pack.sh --output-dir artifacts/nuget --package-version "$PACKAGE_VERSION"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages-${{ inputs.version }}
+          path: artifacts/nuget/*.nupkg
+          if-no-files-found: error
+      - name: Require NuGet API key
+        if: ${{ inputs.publish }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: test -n "$NUGET_API_KEY"
+      - name: Push core package
+        if: ${{ inputs.publish }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/nuget/JunkDrawer.$PACKAGE_VERSION.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
+      - name: Push Autofac package
+        if: ${{ inputs.publish }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "artifacts/nuget/JunkDrawer.Autofac.$PACKAGE_VERSION.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"

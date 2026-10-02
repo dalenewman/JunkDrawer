@@ -45,7 +45,7 @@ namespace JunkDrawer {
         public Request(
             string fileName
         ) {
-            FileName = fileName;
+            FileName = HomePath.Expand(fileName);
             try {
                 FileInfo = new FileInfo(FileName);
                 Extension = FileInfo.Extension.ToLower();

@@ -23,5 +23,6 @@ namespace JunkDrawer {
         public IRow[] Rows { get; set; }
         public Field[] Fields { get; set; }
         public int Hits { get; set; }
+        public string Query { get; set; } = string.Empty;
     }
 }

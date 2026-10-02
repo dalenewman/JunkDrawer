@@ -4,7 +4,6 @@
     <add name="output"
          provider="postgresql"
          database="Junk"
-         user="postgres"
-         password="password"/>
+         user="postgres"/>
   </connections>
 </jd>

@@ -1,10 +1,8 @@
-JunkDrawer
-==============
-JunkDrawer imports excel or delimited files into 
-a database.  It is [open source](https://github.com/dalenewman/JunkDrawer) under
-Apache 2.
+# JunkDrawer
 
-### Introduction
+JunkDrawer imports delimited text and Excel files into a database, then lets you browse the result in a desktop app or run the import from a terminal. The modernized projects use .NET 10 and [Transformalize](https://github.com/dalenewman/Transformalize).
+
+## Introduction
 
 **analyst**: *"Is there something that automatically imports files into a database?"*
 
@@ -12,26 +10,25 @@ Apache 2.
 
 The data analyst sighed as he recalled the wizard...
 
-<img src="http://www.codeproject.com/KB/database/716239/SqlServerImportExportWizard.png" class="img-responsive img-thumbnail" alt="SQL Server Import Wizard" />
-<br/>
+![SQL Server Import and Export Wizard welcome screen](Content/SqlServerImportExportWizard.png)
 
 Wizarding data into SQL Server goes something like this:
 
-*   Install SQL Server Management Studio.
-*   Find Tasks and choose Import Data.
-*   Select "Flat File Source."
-*   Browse for the file.
-*   Preview the data.
-*   Specify the delimiter.
-*   Specify if the first row is column names.
-*   Preview the data (again).
-*   Go to each column and choose the correct data type or use "Suggest Types."
-*   Choose if you want to save the SSIS package for later.
-*   Execute it
+* Install SQL Server Management Studio.
+* Find Tasks and choose Import Data.
+* Select "Flat File Source."
+* Browse for the file.
+* Preview the data.
+* Specify the delimiter.
+* Specify if the first row is column names.
+* Preview the data (again).
+* Go to each column and choose the correct data type or use "Suggest Types."
+* Choose if you want to save the SSIS package for later.
+* Execute it.
 
 **analyst**: *"Is there something that imports the data without asking questions?"*
 
-**programmer**: *"No.  Use the wizard.  If you get an error 
+**programmer**: *"No. Use the wizard. If you get an error
 message, fix the problem and try again."*
 
 **analyst**: *"I get a lot of different files.
@@ -44,353 +41,129 @@ saying YOUR time is being wasted?"*
 
 ---
 
-Sadly, this scenario happens a lot in IT offices. Recently, 
+Sadly, this scenario happens a lot in IT offices. Recently,
 while helping a co-worker learn `SQL`, he said:
 
 **staff**: *"SQL is amazing, but how do I get these files
 into the database?"*
 
-I thought of the import wizard, but it didn't feel right. 
-If he found out he'd have to run the wizard every time, 
-and most likely deal with error messages, it would be a 
+I thought of the import wizard, but it didn't feel right.
+If he found out he'd have to run the wizard every time,
+and most likely deal with error messages, it would be a
 stumbling block for him.
 
-This gave me the idea to create a program that 
-imports an Excel or text file into a database 
+This gave me the idea to create a program that
+imports an Excel or text file into a database
 without asking questions.
 
+Junk Drawer refers to files as *junk*, and the database as a *drawer*.
+The file is an input, and the database is an output. Both are connections.
 
-### Getting Started
+I called it Junk Drawer because allowing folks to import files directly into
+a database can create a mess. You may want to keep an eye on it, or put your
+Junk database on an isolated test server where it can't hurt anything.
 
-Junk Drawer refers to files as *junk*, and the 
-database as a *drawer*.  The file is an input, and 
-the database is an output.  Both are connections. 
+## Current status
 
-To configure connections, open the default configuration file *default.xml*.
+- CSV, TXT, XLS, and XLSX input to SQLite pass local integration tests on macOS arm64.
+- SQL Server, PostgreSQL, and MySQL import and paging pass local Testcontainers tests on macOS arm64. CI repeats them on Linux x64.
+- The shared Eto GUI and Windows launcher compile. The Eto Mac64 host launches and imports on this Mac without an extra workload. An additional native macOS host builds with the `macos` .NET workload and still needs its own launch check.
+- Access and SQL Server Compact are no longer supported. Existing arrangements using them must select a supported output provider.
 
-```xml
-<jd>
-  <connections>
+## Build and test
 
-    <add name="input" 
-         provider="file" 
-         file="*.*" />
+Install the .NET 10 SDK. On macOS or Windows, run from the repository root:
 
-    <add name="output" 
-         provider="sqlserver" 
-         server="localhost" 
-         database="Junk" />
-
-  </connections>
-</jd>
+```sh
+dotnet restore JunkDrawer.sln
+dotnet build JunkDrawer.sln
+dotnet test --project Test/Test.csproj
 ```
 
-The configuration (above) defines two connections: an input, and an output.
-The input is set to a file named `*.*`, which is changed to your 
-file at run-time. The output is set to a local SQL Server database named Junk. 
+To run the server integration tests, start Docker and run `dotnet test --project Test.Database/Test.Database.csproj`. The tests create disposable PostgreSQL, MySQL, and SQL Server containers; SQL Server uses x64 emulation on Apple Silicon.
 
-### The File Input
+`JunkDrawer.sln` shows all nine projects, including the Windows and macOS desktop launchers. The default solution build includes the portable libraries, CLI, shared GUI, and tests; build a desktop launcher separately on its own OS using the commands below.
 
-The file must be an Excel (e.g. `.xls`, `.xlsx`), or delimited 
-text file (e.g. `.csv`, `.txt`).
+## CLI
 
-I Googled `filetype:csv colors` and found [colors.csv](https://github.com/codebrainz/color-names/blob/master/output/colors.csv) for this demo.
+The SQLite example writes `junk.sqlite3` in the current working directory:
 
-Here's a sample of *colors.csv*:
-
-```bash
-Code,Name,Hex,Red,Green,Blue
-air_force_blue_raf,"Air Force Blue (Raf)",#5d8aa8,93,138,168
-air_force_blue_usaf,"Air Force Blue (Usaf)",#00308f,0,48,143
-air_superiority_blue,"Air Superiority Blue",#72a0c1,114,160,193
-alabama_crimson,"Alabama Crimson",#a32638,163,38,56
-alice_blue,"Alice Blue",#f0f8ff,240,248,255
-alizarin_crimson,"Alizarin Crimson",#e32636,227,38,54
-alloy_orange,"Alloy Orange",#c46210,196,98,16
-almond,"Almond",#efdecd,239,222,205
-...
+```sh
+dotnet run --project JunkDrawer.Console/JunkDrawer.Console.csproj -- \
+  -f Test/Files/CommaSeparatedValues.csv -a JunkDrawer.Console/sqlite.xml
 ```
 
-### Command Line
+On Windows PowerShell, put the command on one line. Run `dotnet run --project JunkDrawer.Console/JunkDrawer.Console.csproj -- --help` for all options. A single filename also works. A nonexistent input exits with code 1; invalid flags exit with code 2. With no `-a`, the CLI uses the shared arrangement lookup described below; the bundled SQLite example is its final fallback.
 
-To import the file, execute Junk Drawer with the `-f` (file) flag:
-
-```bash
-jd.exe -f c:\temp\colors.csv
-```
-
-If a file is the only argument, `-f` is optional. It's only required 
-when combined with other options exposed to the command line interface.
-
-When `jd.exe` is done, the data is in your local SQL Server 
-and it may be queried:
-
-```sql
-USE Junk;
-
-SELECT TOP 10 Code, Name, Hex, Red, Green, Blue
-FROM colors;
-```
-
-```bash
-Code                  Name                   Hex     Red Green Blue
---------------------- ---------------------- ------- --- ----- ----
-air_force_blue_raf    Air Force Blue (Raf)   #5d8aa8 93  138   168
-air_force_blue_usaf   Air Force Blue (Usaf)  #00308f 0   48    143
-air_superiority_blue  Air Superiority Blue   #72a0c1 114 160   193
-alabama_crimson       Alabama Crimson        #a32638 163 38    56
-alice_blue            Alice Blue             #f0f8ff 240 248   255
-alizarin_crimson      Alizarin Crimson       #e32636 227 38    54
-alloy_orange          Alloy Orange           #c46210 196 98    16
-almond                Almond                 #efdecd 239 222   205
-amaranth              Amaranth               #e52b50 229 43    80
-amber                 Amber                  #ffbf00 255 191   0
-```
-
-The `colors` object is a view.  The data columns are defined like so:
-
-```sql
-Code NVARCHAR(40),
-Name NVARCHAR(42),
-Hex NVARCHAR(8),
-Red TINYINT,
-Green TINYINT,
-Blue TINYINT
-```
-
-### How Does it Work?
-
-When we glance at *colors.csv* above, it's easy for us
-to see the first row is a header, and subsequent 
-rows are records.
-
-Moreover, we see that a _comma_ delimits the values.  We 
-also recognize patterns with the fields.  We see that `Code`, 
-`Name`, and `Hex` are text, and `Red`, `Green`, and `Blue` 
-are numeric.
-
-Junk Drawer has to see the same thing as we do:
-
-1. the delimiter
-2. the column names (if available)
-3. the column data types
-
-### Finding the Delimiter
- 
-100 lines are examined for delimiters. If delimiters
-are found, the average number per line and [standard
-deviation](http://www.mathsisfun.com/data/standard-deviation.html)
-is calculated.
-
-Then, the delimiter with the lowest [coefficient
-of variation](http://en.wikipedia.org/wiki/Coefficient_of_variation)
-is declared winner.  This provides us with the most 
-consistent delimiter across the first 100 records.
-
-The default delimiters searched for are comma, pipe, tab, and semicolon. 
-If you want control over the delimiters, configure them in 
-the input connection like this:
-
-```xml
-<add name="input" provider="file" file="*.*">
-  <delimiters>
-     <add name="comma" character=","/>
-     <add name="pipe" character="|"/>
-     <add name="tab" character="&#009;"/>
-     <add name="semicolon" character=";"/>
-  </delimiters>
-</add>
-```
-
-### Column Names
-
-The first line is split by the winning delimiter 
-and tested for:
-
-* duplicates
-* empties
-* white space values
-* numbers
-* dates
-
-If there are any of the above, the first line is not suitable 
-for column names and Excel-like names are generated (i.e. A, B, C). 
-In *colors.csv*, the first line doesn't have any 
-duplicates, empties, white space values, numbers, or dates, 
-so it is used as column names.
-
-### Data Types
-
-Initially, every field is considered a `string`. 
-Often, when importing a file for ad-hoc queries, 
-strings are fine. However, if you want to *type-check* 
-the data, add types into the input connection like this: 
-
-```xml
-<add name="input" provider="file" file="*.*">
-    <types>
-        <add type="bool"/>
-        <add type="byte"/>
-        <add type="short"/>
-        <add type="int"/>
-        <add type="long"/>
-        <add type="single"/>
-        <add type="double"/>
-        <add type="decimal"/>
-        <add type="datetime"/>
-    </types>
-</add>
-```
-
-Types are checked in the order they appear. So, to select the 
-most efficient type, place more restrictive types ahead of less restrictive types. 
-For example, if you test for a `short` (-32,768 to 32,767), before a `byte` (0 to 255), 
-any *would-be* `bytes` end up as `shorts`.
-
-Every value in a field is checked against a type's restrictions. 
-The first compatible type is used. If no type allows all the values, 
-a `string` is used.
-
-A string's length is measured. A field assumes the length 
-of the longest value in the file (+1). If you want control 
-over string length, add `min-length` and/or `max-length` to 
-the connection:
-
-```xml
-<add name="input" 
-     provider="file" 
-     file="*.*"
-     min-length="64"
-     max-length="4000" />
-```
-
-Once the values are type and/or length checked, Junk Drawer
-imports the file
-
-### In Code
-
-JunkDrawer may be used in code like this:
-
-```csharp
-JunkResponse response;
-var request = new JunkRequest(@"c:\temp\colors.csv");
-using (var scope = new AutofacJunkBootstrapper(request)) {
-    response = scope.Resolve<JunkImporter>().Import();
-}
-
-```
-The above snippet uses [Autofac](http://autofac.org) to wire up 
-the `JunkImporter` dependencies.  A `JunkDrawer.Autofac` project 
-is included in the solution.
-
-### Options
-
-#### View Name
-By default, Junk Drawer creates a view named after your 
-file (without the extension).  For example, `colors.csv` is 
-named `colors`. If you want to name your view something else, 
-set the `View` property in the `JunkRequest` or use the `-v` 
-flag from the command line.
-
-#### Configuration
-
-If you do not provide a configuration, *default.xml* is used.
-
-The configuration is file based. You may make as 
-many configurations as you want.  For example, 
-to import into SQLite instead of SQL Server, create 
-a configuration like this:
+An arrangement defines an `input` and one or more output connections. The GUI lists the named outputs:
 
 ```xml
 <jd>
   <connections>
     <add name="input" provider="file" file="*.*" />
-    <add name="output"
-         provider="sqlite"
-         file="c:\temp\junk.sqlite3" />
+    <add name="output" provider="sqlite" file="junk.sqlite3" />
+    <add name="scratch" provider="sqlite" file="scratch.sqlite3" />
   </connections>
 </jd>
 ```
 
-Save it as *sqlite.xml*.  Now import *colors.csv* into 
-a SQLite database:
+The output file path is relative to the process working directory. Use an absolute path when invoking the CLI from another directory. For server databases, edit the corresponding example arrangement and pass credentials at runtime or through a private arrangement; do not commit passwords. The CLI prints the generated query after importing.
 
-`jd.exe -f c:\temp\colors.csv -a sqlite.xml`
+### Personal arrangements
 
-The `-a` flag stands for *arrangement*. You can control 
-everything from the arrangment (aka configuration). In addition, 
-you over-ride some options from the command line.  Here is the 
-complete list:
+Keep your connection settings in `~/.junkdrawer/config.xml` (or `~/.junkdrawer/sqlite.xml`). Both the CLI and GUI read the same XML format. Start with the SQLite example, then add named output connections under `<connections>`; the GUI lists every connection except `input` in its Connections menu.
 
-```bash
--f, --file           Required. The file to import.
--a, --arrangement    The configuration file (default.xml).
--t, --types          Override the configuration inspection types, comma
-                     separated (e.g. bool, byte, short, int, long, single,
-                     double, datetime).
--c, --connection     Override the configuration connection type (e.g.
-                     sqlserver, mysql, postgresql, sqlite, sqlce).
--s, --server         Override the configuration output server.
--n, --port           Override the configuration output port.
--d, --database       Override the configuration output database.
--v, --view           Override the configuration output view.
--u, --user           Override the configuration output user.
--p, --password       Override the configuration output password.
---help               Display this help screen.
+```sh
+mkdir -p ~/.junkdrawer
+cp -n JunkDrawer.Console/sqlite.xml ~/.junkdrawer/config.xml
 ```
 
-### GUI
+The default lookup checks `config.xml` and then `sqlite.xml` in each location, in this order: the process working directory, the application directory, and `~/.junkdrawer`. If none exists, it uses the bundled `Examples/sqlite.xml`. This keeps the bundled example from hiding your personal file. The apps do not pick an arbitrary XML file automatically because the choice would be ambiguous; select another filename with `-a path/to/work.xml` or set `JUNKDRAWER_CONFIG` to its path. An explicit selection takes precedence and reports an error if the file is missing. A bare filename is searched in the same three directories. Paths beginning with `~/` or `~\` expand to the current user's home directory on macOS, Linux, and Windows, including connection `file` values. A bare `~` also expands; `~otheruser` does not. Relative output paths such as `file="junk.sqlite3"` still use the process working directory, so use `file="~/.junkdrawer/junk.sqlite3"` for a stable personal database location.
 
-If you'd rather use a GUI (a graphical user-interface), you may 
-use `jdgui.exe`.  It looks like this:
+## Desktop GUI
 
-![Junk Drawer GUI](Content/jdgui.png "Junk Drawer GUI")
+The GUI shares one form across native Eto backends. It can open a file, import it in the background, browse pages with a selectable page size, show the current page query, switch among arrangement connections, and choose inspection types. Use the File, Connections, and Types menus to open files and choose settings. File > Settings opens the active arrangement XML in its associated application. The SQL icon beside the paging controls toggles the lower pane between logs and the current page query. The divider between the data grid and lower pane can be dragged to resize either pane. The SQL view formats Transformalize's query using the connection's SQL dialect, with the formatter's default SQL dialect for SQLite. The GUI uses the personal arrangement lookup above and accepts `-a path/to/work.xml` to select another arrangement at launch. Restart it after editing the XML.
 
-In addition to importing files into databases, you can page through 
-the data a bit.  Any connections you define in addition to `input` are 
-listed in the connections menu.  This allows you to 
-conveniently switch between connections you use often (just 
-in case you have junk everywhere).
+![Earlier Windows Junk Drawer GUI showing imported data and the activity log](Content/jdgui.png)
 
-### Precautions
+The earlier Windows GUI pictured above shows the data grid and activity log. The current GUI keeps those views and uses the database icon button to switch the lower pane between logs and SQL.
 
-#### Junk Overwrite
+On this arm64 Mac, run the Mac64 host without an extra workload:
 
-If you import the same file into Junk Drawer twice, it overwrites 
-the previous table.  Don't worry though; it's only junk ;-)
+```sh
+./scripts/run-mac.sh
+```
 
-#### Junk Overflow
+You can pass a file path as the first argument, for example `./scripts/run-mac.sh Test/Files/CommaSeparatedValues.csv`, or select an arrangement with `./scripts/run-mac.sh -a ~/.junkdrawer/work.xml Test/Files/CommaSeparatedValues.csv`. The script builds and starts the generated local `.app` directly. Eto's Mac64 package currently generates a `dotnet run` path with Windows separators on this setup, so use the script.
 
-I called it Junk Drawer because allowing folks to 
-import files directly into a database can create a mess. 
-You may want to keep an eye on it, or put your Junk database 
-on an isolated test server where it can't hurt anything.
+The additional native macOS backend can be built after installing the macOS workload:
 
-### Conclusion
+```sh
+sudo dotnet workload install macos
+dotnet build JunkDrawer.Eto.Core.Desktop/JunkDrawer.Eto.Core.Desktop.csproj
+```
 
-Once in place, Junk Drawer empowers your trusted
-friends to import their data into a Junk database
-and run ad-hoc queries until their heart's content.
+On Windows, install the .NET 10 SDK and build the Windows host:
 
-Of course, there are files out there that are so 
-jacked up that Junk Drawer won't be able handle them. 
-In that case, you'll have to resort to the import wizard.
+```powershell
+dotnet run --project JunkDrawer.Eto.WinForms/JunkDrawer.Eto.WinForms.csproj
+```
 
-### Credits
+The Windows host must be launched on Windows. There is no downloadable app package or signing flow yet.
 
-Junk Drawer is not possible without:
+## Docker CLI image
 
-* [Microsoft .NET](https://www.microsoft.com/net)
-* [AutoFac](http://autofac.org/) - MIT
-* [Dapper](https://github.com/StackExchange/dapper-dot-net) - Apache 2
-* [FileHelpers](http://www.filehelpers.net/) - MIT
-* [ExcelDataReader](https://github.com/ExcelDataReader/ExcelDataReader) - MIT
-    * [SharpZipLib](https://icsharpcode.github.io/SharpZipLib/) - GNU
-* [Nlog](http://nlog-project.org/) - BSD
-* [Cfg-Net](https://github.com/dalenewman/Cfg-NET) - Apache 2
-* [Command Line Parser](https://github.com/gsscoder/commandline) - MIT
-* [System.Data.SQLite](https://system.data.sqlite.org)
-* [Npgsql](http://www.npgsql.org/)
-* [MySql.Data](http://dev.mysql.com/downloads/connector/net/)- GPL 2
-* [ETO.Forms](https://github.com/picoe/Eto) - Custom
-* [Transformalize](https://github.com/dalenewman/transformalize) - Apache 2 
+Build locally for your machine:
+
+```sh
+docker build -f JunkDrawer.Console/Dockerfile -t junkdrawer-cli .
+docker run --rm -v "$PWD:/data" junkdrawer-cli -f /data/Test/Files/CommaSeparatedValues.csv
+```
+
+The container runs from `/data`, so a writable bind mount stores `junk.sqlite3` on the host. Mount CSV/Excel files, arrangements, and output paths into the container and use container paths in CLI arguments. For a database on the host, use `host.docker.internal` where supported; for another container, use a shared Docker network. Supply credentials through a private mounted arrangement or CLI flags rather than baking them into an image.
+
+GitHub Actions builds and smoke tests native `linux/amd64` and `linux/arm64` images by digest, then creates one GHCR manifest. The regular .NET runtime image is the supported variant. Alpine is deferred until musl and globalization testing passes. Desktop builds are CI checks only; the workflow does not publish desktop downloads.
+
+## Packaging and changes
+
+The reusable package IDs are `JunkDrawer` (`netstandard2.0`) and `JunkDrawer.Autofac` (`net10.0`). See [packaging](docs/packaging.md) for local pack and manual publishing steps, and [changelog](CHANGELOG.md) for migration changes. The [modernization plan](modernize-plan.md) tracks remaining validation work.
