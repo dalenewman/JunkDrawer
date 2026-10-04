@@ -2,6 +2,7 @@ using JunkDrawer;
 using JunkDrawer.Autofac;
 using Microsoft.Data.Sqlite;
 using System.Threading;
+using System.Xml.Linq;
 using Transformalize.Configuration;
 
 namespace Test;
@@ -100,6 +101,22 @@ public sealed class ModernIntegration {
         StringAssert.Contains(ascending.Query.ToLowerInvariant(), "order by");
         StringAssert.Contains(descending.Query.ToLowerInvariant(), "desc");
         StringAssert.Contains(multiple.Query, "WebSite");
+    }
+
+    [TestMethod]
+    public void PageResultsIncludeArrangementXml() {
+        var database = Path.Combine(_directory, "arrangement-pages.sqlite3");
+        var request = new Request(Path.Combine(AppContext.BaseDirectory, "Files", "CommaSeparatedValues.csv")) {
+            Configuration = CreateArrangement(database),
+            Retries = 0
+        };
+
+        using var bootstrapper = new Bootstrapper(request);
+        var response = bootstrapper.Resolve<Importer>().Import();
+        var page = bootstrapper.Resolve<Pager>(request, response).GetPage(1, 2);
+
+        Assert.IsFalse(string.IsNullOrWhiteSpace(page.Arrangement));
+        XDocument.Parse(page.Arrangement);
     }
 
     [TestMethod]

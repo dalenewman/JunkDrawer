@@ -12,8 +12,11 @@ using Transformalize.Logging;
 namespace JunkDrawer.Eto.Core;
 
 public sealed class MainForm : Form {
+    private enum DetailView { Logs, Sql, Arrangement }
+
     private static readonly Bitmap SqlIcon = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.sql.png");
     private static readonly Bitmap LogIcon = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.log.png");
+    private static readonly Bitmap XmlIcon = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.xml.png");
     private readonly string _arrangement;
     private readonly Cfg _cfg;
     private readonly List<string> _connectionNames;
@@ -31,7 +34,7 @@ public sealed class MainForm : Form {
         TextColor = Colors.LightGreen,
         BackgroundColor = Colors.Black
     };
-    private readonly TextArea _sqlView = new() {
+    private readonly TextArea _detailsView = new() {
         ReadOnly = true,
         Wrap = false,
         TextColor = Colors.LightGreen,
@@ -55,7 +58,7 @@ public sealed class MainForm : Form {
         Image = Bitmap.FromResource("JunkDrawer.Eto.Core.Images.last.png"),
         ToolTip = "Last page", MinimumSize = Size.Empty, Size = new Size(32, 28), Enabled = false
     };
-    private readonly Button _sql = new() {
+    private readonly Button _details = new() {
         Image = SqlIcon,
         ToolTip = "Show current page SQL", MinimumSize = Size.Empty, Size = new Size(32, 28), Enabled = false
     };
@@ -68,7 +71,8 @@ public sealed class MainForm : Form {
     private int _lastPage = 1;
     private int _pageSize = 20;
     private string _pageQuery = string.Empty;
-    private bool _showingSql;
+    private string _pageArrangement = string.Empty;
+    private DetailView _detailView;
     private bool _busy;
 
     public MainForm(string arrangement, string? initialFile = null) {
@@ -90,7 +94,7 @@ public sealed class MainForm : Form {
         _previous.Click += (_, _) => ShowPage(_page - 1);
         _next.Click += (_, _) => ShowPage(_page + 1);
         _last.Click += (_, _) => ShowPage(_lastPage);
-        _sql.Click += (_, _) => ToggleSql();
+        _details.Click += (_, _) => ToggleDetails();
         _grid.ColumnHeaderClick += (_, args) => ToggleSort(args.Column);
         _pageSizeControl.ValueChanged += (_, _) => {
             _pageSize = (int)_pageSizeControl.Value;
@@ -107,7 +111,7 @@ public sealed class MainForm : Form {
             Orientation = Orientation.Horizontal,
             VerticalContentAlignment = VerticalAlignment.Center,
             Spacing = 8,
-            Items = { _sql }
+            Items = { _details }
         };
         var pageSize = new StackLayout {
             Orientation = Orientation.Horizontal,
@@ -255,12 +259,14 @@ public sealed class MainForm : Form {
         _request = null;
         _response = null;
         _pageQuery = string.Empty;
+        _pageArrangement = string.Empty;
+        _detailsView.Text = string.Empty;
         _sorts.Clear();
         _grid.DataStore = null;
         _grid.Columns.Clear();
         _columnFields.Clear();
         _first.Enabled = _previous.Enabled = _next.Enabled = _last.Enabled = false;
-        _sql.Enabled = false;
+        _details.Enabled = false;
         Task.Run(() => {
             try {
                 using var bootstrapper = new Bootstrapper(request, _logger);
@@ -293,8 +299,10 @@ public sealed class MainForm : Form {
             var result = bootstrapper.Resolve<Pager>(_request, _response).GetPage(page, _pageSize, _sorts);
             _page = page;
             _pageQuery = result.Query;
-            _sql.Enabled = _showingSql || !string.IsNullOrWhiteSpace(_pageQuery);
-            if (_showingSql) UpdateSqlView();
+            _pageArrangement = result.Arrangement;
+            _details.Enabled = _detailView != DetailView.Logs ||
+                !string.IsNullOrWhiteSpace(_pageQuery) || !string.IsNullOrWhiteSpace(_pageArrangement);
+            UpdateDetailsView();
             _grid.Columns.Clear();
             _columnFields.Clear();
             foreach (var field in result.Fields.Where(f => !f.System)) {
@@ -335,34 +343,43 @@ public sealed class MainForm : Form {
         ShowPage(1);
     }
 
-    private void ToggleSql() {
-        if (_showingSql) {
-            ShowLog();
-            return;
+    private void ToggleDetails() {
+        switch (_detailView) {
+            case DetailView.Logs when !string.IsNullOrWhiteSpace(_pageQuery):
+                _detailView = DetailView.Sql;
+                break;
+            case DetailView.Logs or DetailView.Sql when !string.IsNullOrWhiteSpace(_pageArrangement):
+                _detailView = DetailView.Arrangement;
+                break;
+            default:
+                ShowLog();
+                return;
         }
-        if (string.IsNullOrWhiteSpace(_pageQuery)) return;
-        UpdateSqlView();
-        _lowerPane.Content = _sqlView;
-        _showingSql = true;
-        _sql.Image = LogIcon;
-        _sql.ToolTip = "Show logs";
+        UpdateDetailsView();
+        _lowerPane.Content = _detailsView;
+        _details.Image = _detailView == DetailView.Sql ? XmlIcon : LogIcon;
+        _details.ToolTip = _detailView == DetailView.Sql ? "Show current page arrangement XML" : "Show logs";
     }
 
     private void ShowLog() {
-        if (!_showingSql) return;
         _lowerPane.Content = _log;
-        _showingSql = false;
-        _sql.Image = SqlIcon;
-        _sql.ToolTip = "Show current page SQL";
+        _detailView = DetailView.Logs;
+        _details.Image = SqlIcon;
+        _details.ToolTip = "Show current page SQL";
+    }
+
+    private void UpdateDetailsView() {
+        if (_detailView == DetailView.Sql) UpdateSqlView();
+        else if (_detailView == DetailView.Arrangement) _detailsView.Text = _pageArrangement;
     }
 
     private void UpdateSqlView() {
         if (string.IsNullOrWhiteSpace(_pageQuery)) {
-            _sqlView.Text = string.Empty;
+            _detailsView.Text = string.Empty;
             return;
         }
         try {
-            _sqlView.Text = _response?.Connection.Provider switch {
+            _detailsView.Text = _response?.Connection.Provider switch {
                 "mysql" => SqlFormatter.Of("mysql").Format(_pageQuery),
                 "postgresql" => SqlFormatter.Of("postgresql").Format(_pageQuery),
                 "sqlserver" => SqlFormatter.Of("tsql").Format(_pageQuery),
@@ -370,7 +387,7 @@ public sealed class MainForm : Form {
             };
         } catch (Exception ex) {
             AppendLog($"Could not format page SQL: {ex.Message}");
-            _sqlView.Text = _pageQuery;
+            _detailsView.Text = _pageQuery;
         }
     }
 }

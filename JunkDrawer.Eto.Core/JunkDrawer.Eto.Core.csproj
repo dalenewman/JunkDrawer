@@ -21,5 +21,6 @@
     <EmbeddedResource Include="Images/last.png" />
     <EmbeddedResource Include="Images/sql.png" />
     <EmbeddedResource Include="Images/log.png" />
+    <EmbeddedResource Include="Images/xml.png" />
   </ItemGroup>
 </Project>

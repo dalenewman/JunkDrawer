@@ -40,6 +40,7 @@ namespace JunkDrawer {
             _entity.Size = pageSize;
             _entity.Order = order?.Select(item => new Order { Field = item.Field, Sort = item.Sort }).ToList()
                 ?? new System.Collections.Generic.List<Order>();
+            result.Arrangement = _process.Serialize();
             result.Rows = _reader.Run(_process).ToArray(); // enumerate so i can get hits count back
             result.Fields = _fields;
             result.Hits = _entity.Hits;

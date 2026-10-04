@@ -122,11 +122,11 @@ The default lookup checks `config.xml` and then `sqlite.xml` in each location, i
 
 ## Desktop GUI
 
-The GUI shares one form across native Eto backends. It can open a file, import it in the background, browse pages with a selectable page size, show the current page query, switch among arrangement connections, and choose inspection types. Use the File, Connections, and Types menus to open files and choose settings. File > Settings opens the active arrangement XML in its associated application. The SQL icon beside the paging controls toggles the lower pane between logs and the current page query. The divider between the data grid and lower pane can be dragged to resize either pane. The SQL view formats Transformalize's query using the connection's SQL dialect, with the formatter's default SQL dialect for SQLite. The GUI uses the personal arrangement lookup above and accepts `-a path/to/work.xml` to select another arrangement at launch. Restart it after editing the XML.
+The GUI shares one form across native Eto backends. It can open a file, import it in the background, browse pages with a selectable page size, show the current page query and arrangement, switch among arrangement connections, and choose inspection types. Use the File, Connections, and Types menus to open files and choose settings. File > Settings opens the active arrangement XML in its associated application. The button beside the paging controls cycles the lower pane through logs, the current page SQL, and arrangement XML. Its database, code (`</>`), or log icon indicates the next view. The XML is Cfg-Net's `Serialize()` output captured from the Transformalize process before the current page request runs, including its connections, fields, page, page size, and sort order. Both SQL and XML refresh when you change the page, page size, or sorting. The divider between the data grid and lower pane can be dragged to resize either pane. The SQL view formats Transformalize's query using the connection's SQL dialect, with the formatter's default SQL dialect for SQLite. The GUI uses the personal arrangement lookup above and accepts `-a path/to/work.xml` to select another arrangement at launch. Restart it after editing the XML.
 
 ![Earlier Windows Junk Drawer GUI showing imported data and the activity log](Content/jdgui.png)
 
-The earlier Windows GUI pictured above shows the data grid and activity log. The current GUI keeps those views and uses the database icon button to switch the lower pane between logs and SQL.
+The earlier Windows GUI pictured above shows the data grid and activity log. The current GUI keeps those views and adds SQL and arrangement XML to the lower pane toggle.
 
 On this arm64 Mac, run the Mac64 host without an extra workload:
 
