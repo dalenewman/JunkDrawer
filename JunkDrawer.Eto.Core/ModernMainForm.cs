@@ -299,7 +299,7 @@ public sealed class MainForm : Form {
             var result = bootstrapper.Resolve<Pager>(_request, _response).GetPage(page, _pageSize, _sorts);
             _page = page;
             _pageQuery = result.Query;
-            _pageArrangement = result.Arrangement;
+            _pageArrangement = ArrangementXml.Simplify(result.Arrangement);
             _details.Enabled = _detailView != DetailView.Logs ||
                 !string.IsNullOrWhiteSpace(_pageQuery) || !string.IsNullOrWhiteSpace(_pageArrangement);
             UpdateDetailsView();

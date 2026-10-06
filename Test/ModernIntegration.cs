@@ -1,5 +1,6 @@
 using JunkDrawer;
 using JunkDrawer.Autofac;
+using JunkDrawer.Eto.Core;
 using Microsoft.Data.Sqlite;
 using System.Threading;
 using System.Xml.Linq;
@@ -116,7 +117,18 @@ public sealed class ModernIntegration {
         var page = bootstrapper.Resolve<Pager>(request, response).GetPage(1, 2);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(page.Arrangement));
-        XDocument.Parse(page.Arrangement);
+        var original = XDocument.Parse(page.Arrangement);
+        var simplified = XDocument.Parse(ArrangementXml.Simplify(page.Arrangement));
+        Assert.IsTrue(original.Descendants("searchtypes").Any());
+        Assert.IsFalse(simplified.Descendants("searchtypes").Any());
+        var entity = simplified.Root!.Element("entities")!.Element("add")!;
+        Assert.AreEqual("1", entity.Attribute("page")!.Value);
+        Assert.AreEqual("2", entity.Attribute("size")!.Value);
+        Assert.IsTrue(original.Descendants("fields").Elements("add")
+            .Any(field => field.Attribute("system")?.Value == "true"));
+        CollectionAssert.AreEqual(
+            page.Fields.Select(field => field.Name).ToArray(),
+            entity.Element("fields")!.Elements("add").Select(field => field.Attribute("name")!.Value).ToArray());
     }
 
     [TestMethod]

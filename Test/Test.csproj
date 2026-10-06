@@ -12,6 +12,7 @@
     <ProjectReference Include="../JunkDrawer.Eto.Core/JunkDrawer.Eto.Core.csproj" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     <Compile Include="ModernIntegration.cs" />
+    <Compile Include="ArrangementXmlTests.cs" />
     <Compile Include="ArrangementLocatorTests.cs" />
     <Compile Include="HomePathTests.cs" />
     <Compile Include="RecentFilesTests.cs" />
