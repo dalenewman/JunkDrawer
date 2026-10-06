@@ -1,71 +1,93 @@
-#region license
-// JunkDrawer
-// An easier way to import excel or delimited files into a database.
-// Copyright 2013-2017 Dale Newman
-//  
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//   
-//       http://www.apache.org/licenses/LICENSE-2.0
-//   
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-#endregion
-using System.Collections.Generic;
-using CommandLine;
-using CommandLine.Text;
 using Transformalize.Contracts;
 
-namespace JunkDrawer {
+namespace JunkDrawer;
 
-    public class Options {
+public sealed class Options {
+    public string? File { get; private set; }
+    public string? Configuration { get; private set; }
+    public IList<string> Types { get; private set; } = new List<string>();
+    public string? Provider { get; private set; }
+    public string? Server { get; private set; }
+    public int Port { get; private set; }
+    public string? Database { get; private set; }
+    public string? Schema { get; private set; }
+    public string? View { get; private set; }
+    public string? User { get; private set; }
+    public string? Password { get; private set; }
+    public LogLevel LogLevel { get; private set; } = LogLevel.Info;
 
-        [Option('f', "file", Required = true, HelpText = "The file to import.")]
-        public string File { get; set; }
+    public const string Usage = """
+        Usage: jd <file> [options]
+               jd -f <file> [options]
 
-        [Option('a', "arrangement", Required = false, DefaultValue = "default.xml", HelpText = "The configuration file.")]
-        public string Configuration { get; set; }
+          -f, --file          File to import
+          -a, --arrangement   XML arrangement (overrides JUNKDRAWER_CONFIG and default lookup)
+          -t, --types         Inspection types, comma separated
+          -c, --connection    Output provider
+          -s, --server        Output server
+          -n, --port          Output port
+          -d, --database      Output database
+          -o, --owner         Output schema
+          -v, --view          Output view
+          -u, --user          Output user
+          -p, --password      Output password
+          -l, --loglevel      none, error, warn, info, or debug
+              --help          Show this help
+        """;
 
-        [OptionList('t',"types", Separator = ',', HelpText = "Override the configuration's inspection types, comma separated (e.g. bool, byte, short, int, long, single, double, datetime).")]
-        public IList<string> Types { get; set; }
-
-        [Option('c',"connection", Required = false, HelpText = "Override the configuration's connection type (e.g. sqlserver, mysql, postgresql, sqlite, sqlce).")]
-        public string Provider { get; set; }
-
-        [Option('s',"server", Required = false,HelpText = "Override the configuration's output server.")]
-        public string Server { get; set; }
-
-        [Option('n', "port", Required = false, HelpText = "Override the configuration's output port.")]
-        public int Port { get; set; }
-
-        [Option('d', "database", Required = false, HelpText = "Override the configuration's output database.")]
-        public string Database { get; set; }
-
-        [Option('o', "owner", Required = false, HelpText = "Override the configuration's owner (schema) database.")]
-        public string Schema { get; set; }
-
-        [Option('v', "view", Required = false, HelpText = "Override the configuration's output view.")]
-        public string Table { get; set; }
-
-
-        [Option('u', "user", Required = false, HelpText = "Override the configuration's output user.")]
-        public string User { get; set; }
-
-        [Option('p', "password", Required = false, HelpText = "Override the configuration's output password.")]
-        public string Password { get; set; }
-
-        [Option('l', "loglevel", Required = false, DefaultValue = LogLevel.Info, HelpText = "The log level (i.e. none, info, debug, warn, error).")]
-        public LogLevel LogLevel { get; set; }
-
-
-        [HelpOption]
-        public string GetUsage() {
-            return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
+    public static bool TryParse(string[] args, out Options options, out string error) {
+        options = new Options();
+        error = string.Empty;
+        for (var index = 0; index < args.Length; index++) {
+            var option = args[index];
+            if (!option.StartsWith("-", StringComparison.Ordinal)) {
+                if (options.File is null) {
+                    options.File = option;
+                    continue;
+                }
+                error = $"Unexpected argument: {option}";
+                return false;
+            }
+            if (++index >= args.Length) {
+                error = $"Missing value for {option}.";
+                return false;
+            }
+            var value = args[index];
+            switch (option) {
+                case "-f": case "--file": options.File = value; break;
+                case "-a": case "--arrangement": options.Configuration = value; break;
+                case "-t": case "--types": options.Types = value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries); break;
+                case "-c": case "--connection": options.Provider = value; break;
+                case "-s": case "--server": options.Server = value; break;
+                case "-d": case "--database": options.Database = value; break;
+                case "-o": case "--owner": options.Schema = value; break;
+                case "-v": case "--view": options.View = value; break;
+                case "-u": case "--user": options.User = value; break;
+                case "-p": case "--password": options.Password = value; break;
+                case "-n": case "--port":
+                    if (!int.TryParse(value, out var port) || port is < 0 or > 65535) {
+                        error = $"Invalid port: {value}";
+                        return false;
+                    }
+                    options.Port = port;
+                    break;
+                case "-l": case "--loglevel":
+                    if (!Enum.TryParse(value, true, out LogLevel level) || !Enum.IsDefined(level)) {
+                        error = $"Invalid log level: {value}";
+                        return false;
+                    }
+                    options.LogLevel = level;
+                    break;
+                default:
+                    error = $"Unknown option: {option}";
+                    return false;
+            }
         }
 
+        if (string.IsNullOrWhiteSpace(options.File)) {
+            error = "A file is required.";
+            return false;
+        }
+        return true;
     }
 }

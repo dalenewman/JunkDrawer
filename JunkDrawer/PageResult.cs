@@ -23,5 +23,8 @@ namespace JunkDrawer {
         public IRow[] Rows { get; set; }
         public Field[] Fields { get; set; }
         public int Hits { get; set; }
+        public string Query { get; set; } = string.Empty;
+        /// <summary>The serialized Transformalize arrangement captured before the page request runs.</summary>
+        public string Arrangement { get; set; } = string.Empty;
     }
 }

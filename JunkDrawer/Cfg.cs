@@ -26,7 +26,12 @@ namespace JunkDrawer {
     public class Cfg : CfgNode, IResolvable {
 
         public Cfg(string cfg, params IDependency[] dependencies) : base(dependencies) {
-            Load(cfg);
+            Load(HomePath.Expand(cfg));
+            if (Connections != null) {
+                foreach (var connection in Connections) {
+                    connection.File = HomePath.Expand(connection.File);
+                }
+            }
         }
 
         [Cfg(required = true)]

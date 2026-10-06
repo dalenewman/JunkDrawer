@@ -20,9 +20,9 @@ using Transformalize.Contracts;
 namespace JunkDrawer.Autofac {
     public class AutofacJunkBootstrapperFactory : IJunkBootstrapperFactory {
 
-        private readonly IPipelineLogger _logger;
+        private readonly IPipelineLogger? _logger;
 
-        public AutofacJunkBootstrapperFactory(IPipelineLogger logger = null) {
+        public AutofacJunkBootstrapperFactory(IPipelineLogger? logger = null) {
             _logger = logger;
         }
 

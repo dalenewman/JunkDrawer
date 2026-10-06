@@ -34,13 +34,17 @@ namespace JunkDrawer {
             _fields = _entity.Fields.Where(f => !f.System).ToArray();
         }
 
-        public PageResult GetPage(int page, int pageSize) {
+        public PageResult GetPage(int page, int pageSize, System.Collections.Generic.IReadOnlyList<Order> order = null) {
             var result = new PageResult();
             _entity.Page = page;
-            _entity.PageSize = pageSize;
+            _entity.Size = pageSize;
+            _entity.Order = order?.Select(item => new Order { Field = item.Field, Sort = item.Sort }).ToList()
+                ?? new System.Collections.Generic.List<Order>();
+            result.Arrangement = _process.Serialize();
             result.Rows = _reader.Run(_process).ToArray(); // enumerate so i can get hits count back
             result.Fields = _fields;
             result.Hits = _entity.Hits;
+            result.Query = _entity.Query ?? string.Empty;
             return result;
         }
 

@@ -49,12 +49,6 @@ namespace JunkDrawer {
             }
             process.Mode = "init";
 
-            // sqlce does not support views
-            if (_cfg.Output().Provider == "sqlce") {
-                process.Flatten = true;
-                process.Flat = entity.Alias;
-            }
-
             return process.Serialize();
         }
     }

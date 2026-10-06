@@ -1,228 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{88510D10-831B-4F9D-8F04-20B990BFD0E1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JunkDrawer.Autofac</RootNamespace>
-    <AssemblyName>JunkDrawer.Autofac</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>2.0.0-preview.1</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/dalenewman/JunkDrawer</RepositoryUrl>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <PackageId>JunkDrawer.Autofac</PackageId>
+    <Description>Transformalize Autofac integration for JunkDrawer.</Description>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.6.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.4.6.1\lib\net45\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Cfg.Net.Environment, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Environment.0.3.2\lib\portable-net45+win8+wpa81+wp8\Cfg.Net.Environment.dll</HintPath>
-    </Reference>
-    <Reference Include="Cfg.Net.Reader, Version=0.3.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.Reader.0.3.3\lib\net45\Cfg.Net.Reader.dll</HintPath>
-    </Reference>
-    <Reference Include="CfgNet, Version=0.10.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cfg-NET.0.10.2\lib\net452\CfgNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
-    </Reference>
-    <Reference Include="DocumentFormat.OpenXml, Version=0.0.1.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenXMLSDK-MOT.2.7.1\lib\net45\DocumentFormat.OpenXml.dll</HintPath>
-    </Reference>
-    <Reference Include="ExcelDataReader, Version=3.1.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDataReader.3.1.0\lib\net45\ExcelDataReader.dll</HintPath>
-    </Reference>
-    <Reference Include="FileHelpers, Version=3.1.5.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
-      <HintPath>..\packages\FileHelpers.3.1.5\lib\net45\FileHelpers.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.1.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.1.1.0\lib\netstandard1.1\Microsoft.Extensions.Logging.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.1.1.0\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MySql.Data, Version=6.7.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <HintPath>..\packages\MySql.Data.6.7.9\lib\net45\MySql.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Npgsql, Version=3.2.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Npgsql.3.2.5\lib\net451\Npgsql.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenXmlPowerTools, Version=4.5.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenXmlPowerTools.4.5.3.1\lib\net45\OpenXmlPowerTools.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.105.2\lib\net451\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Management.Automation.dll.10.0.10586.0\lib\net40\System.Management.Automation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Transformalize\Compatibility\Transformalize.452\bin\Debug\Transformalize.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Logging.NLog, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Logging.NLog.0.2.7-beta\lib\net452\Transformalize.Logging.NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.Access, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Access.0.2.7-beta\lib\net452\Transformalize.Provider.Access.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.Ado, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Ado.0.2.7-beta\lib\net452\Transformalize.Provider.Ado.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.Console, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Console.0.2.7-beta\lib\net452\Transformalize.Provider.Console.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.Excel, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Transformalize\Providers\Excel\bin\Debug\Transformalize.Provider.Excel.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.File, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.File.0.2.7-beta\lib\net452\Transformalize.Provider.File.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.MySql, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.MySql.0.2.7-beta\lib\net452\Transformalize.Provider.MySql.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.OpenXml, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.OpenXml.0.2.7-beta\lib\net452\Transformalize.Provider.OpenXml.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.PostgreSql, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.PostgreSql.0.2.7-beta\lib\net452\Transformalize.Provider.PostgreSql.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.SqlCe, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.SqlCe.0.2.7-beta\lib\net452\Transformalize.Provider.SqlCe.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.SQLite, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.SQLite.0.2.7-beta\lib\net452\Transformalize.Provider.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.SqlServer, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.SqlServer.0.2.7-beta\lib\net452\Transformalize.Provider.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Transformalize.Provider.Trace, Version=0.2.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Transformalize.Provider.Trace.0.2.7-beta\lib\net452\Transformalize.Provider.Trace.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="../JunkDrawer/JunkDrawer.csproj" />
+    <PackageReference Include="Autofac" Version="9.3.4" />
+    <PackageReference Include="Cfg-NET.Reader" Version="1.0.1" />
+    <PackageReference Include="Transformalize.Container.Autofac" Version="1.5.2" />
+    <PackageReference Include="Transformalize.Provider.CsvHelper.Autofac" Version="1.5.1" />
+    <PackageReference Include="Transformalize.Provider.Excel" Version="1.5.0" />
+    <PackageReference Include="Transformalize.Provider.Sqlite.Autofac" Version="1.5.0" />
+    <PackageReference Include="Transformalize.Provider.SqlServer.Autofac" Version="1.5.0" />
+    <PackageReference Include="Transformalize.Provider.PostgreSql.Autofac" Version="1.5.0" />
+    <PackageReference Include="Transformalize.Provider.MySql.Autofac" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDataFolder.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="AutofacJunkBootstrapperFactory.cs" />
-    <Compile Include="JsonNetSerializer.cs" />
-    <Compile Include="JunkModule.cs" />
-    <Compile Include="Modules\AdoModule.cs" />
-    <Compile Include="Modules\ConnectionModule.cs" />
-    <Compile Include="Modules\ContextModule.cs" />
-    <Compile Include="DefaultContainer.cs" />
-    <Compile Include="Modules\EntityModule.cs" />
-    <Compile Include="Modules\EntityPipelineModule.cs" />
-    <Compile Include="Modules\ExcelModule.cs" />
-    <Compile Include="Modules\FileModule.cs" />
-    <Compile Include="Modules\InternalModule.cs" />
-    <Compile Include="Modules\MapModule.cs" />
-    <Compile Include="Modules\ProcessControlModule.cs" />
-    <Compile Include="Modules\ProcessPipelineModule.cs" />
-    <Compile Include="Modules\RootModule.cs" />
-    <Compile Include="PageModule.cs" />
-    <Compile Include="ImportModule.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReverseConfiguration.cs" />
-    <Compile Include="RunTimeExecutor.cs" />
-    <Compile Include="RunTimeRunner.cs" />
-    <Compile Include="TransformFactory.cs" />
+    <Compile Include="AppDataFolder.cs" />
+    <Compile Include="Modern/*.cs" />
+    <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="../docs/package-readme.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\JunkDrawer\JunkDrawer.csproj">
-      <Project>{35022c73-d66e-43aa-814e-af8ce6b96294}</Project>
-      <Name>JunkDrawer</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
-    xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\x86\*.*" "$(TargetDir)x86"
-    if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
-    xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>
-  </PropertyGroup>
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
